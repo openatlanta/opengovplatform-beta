@@ -6198,15 +6198,11 @@ body #mini-panel-signup_panel .item-list ul li , body #block-panels_mini-openid_
 /* style for open id block ----------END--------*/
 
 /* +++++++++++++++++++++++++++++++ New User Profile Form code starts +++++++++++++++++++++++++++++ */
-form#user-profile-form .form-item label {
-	font-size:1.28em;
-}
 form#user-profile-form .form-item .form-text {
-    width: 382px;
+    width: 175px;
     height: 28px;
     background: #F4F4F4;
     border: 1px solid #939393;
-    font-size: 1.28em;
     padding: 0 4px;
     
 }
@@ -6217,9 +6213,7 @@ form#user-profile-form fieldset {
 form#user-profile-form fieldset legend {
 	display:none;
 }
-form#user-profile-form > div {
-	padding:10px;
-}
+
 /* +++++++++++++++++++++++++  User Profile after logged in , Code Starts ++++++++++++++++++++++++++++++ */
 #user-profile {
 	font-size: 1.28em;
