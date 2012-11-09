@@ -422,7 +422,7 @@ function common_utility_cache()
 
 function cms_customizations_reorder_login_form($form, &$form_state) {
   $form['name']['#title'] = t('Email ID');
-  $form['name']['#description'] = t('Enter Username of your NICEMAIL.');
+  $form['name']['#description'] = t('Enter Username of your mail.');
   $form['pass']['#description'] = t('Enter the password that accompanies your Username.');
   $form['name']['#weight'] = -5;
   $form['pass']['#weight'] = -4;
