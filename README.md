@@ -1,4 +1,4 @@
-Open Government Platform - Ver 1.0
+Open Government Platform - Beta
 ====================
 
 Release notes
