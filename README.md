@@ -15,3 +15,4 @@ Release notes
 - Improved catalog page
 
 
+Data Portal India (http://data.gov.in) is powered by OGPL-Beta Codebase
