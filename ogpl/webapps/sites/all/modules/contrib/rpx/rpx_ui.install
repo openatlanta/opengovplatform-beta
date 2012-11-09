@@ -1,0 +1,322 @@
+<?php
+
+/**
+ * @file
+ *
+ * Install, update and uninstall functions for the rpx_ui module.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * In addition to supporting fresh installs of the module, we have to check for
+ * 1.x installations being upgraded to 2.x (we can't use rpx_ui_update_6200()
+ * because the module has been renamed.)
+ */
+function rpx_ui_install() {
+  drupal_install_schema('rpx_ui');
+
+  // Can't use module_load_include() here, because module is not installed yet
+  require_once dirname(__FILE__) . '/rpx_ui.admin.inc';
+  _rpx_profile_field_insert_defaults();
+
+  // Are we upgrading from 1.x?
+  $authmaps = db_result(db_query("SELECT aid FROM {authmap} WHERE module = 'rpx'"));
+  if (!variable_get('rpx_extra_profile_data', FALSE) &&
+      !variable_get('rpx_attach_share_link', FALSE) &&
+      !$authmaps) {
+
+    // Probably not, do nothing.
+    return;
+  }
+
+  // Change the module name in authmap to 'rpx_core'.
+  db_query("UPDATE {authmap} SET module = 'rpx_core' WHERE module = 'rpx'");
+
+  // Delete variables that are not used in 2.x.
+  variable_del('rpx_form_submitted');
+  variable_del('rpx_extra_profile_data');
+
+  // Rename user_mail_rpx_* variables.
+  if ($setting = variable_get('user_mail_rpx_confirm_email_body', FALSE)) {
+    variable_set('rpx_mail_rpx_confirm_email_body', $setting);
+  }
+  if ($setting = variable_get('user_mail_rpx_confirm_email_subject', FALSE)) {
+    variable_set('rpx_mail_rpx_confirm_email_subject', $setting);
+  }
+  variable_del('user_mail_rpx_confirm_email_body');
+  variable_del('user_mail_rpx_confirm_email_subject');
+
+  //
+  // Migrate the old settings.
+  //
+
+  // These settings applied to all content types.
+  if(variable_get('rpx_attach_share_link', FALSE)) {
+    foreach (node_get_types('names') as $type => $v) {
+      variable_set('rpx_attach_share_link_to_comments_'. $type, 1);
+    }
+  }
+  variable_del('rpx_attach_share_link');
+
+  // Migrate field mappings (Drupal Profile module fields only.)
+  if($old_map = variable_get('rpx_profile_fields_map', array())) {
+    $new_map = array();
+
+    foreach ($old_map as $rpx_field => $drupal_field) {
+      // Get fid for this field in 2.x.
+      $fid = db_result(db_query("SELECT fid FROM {rpx_profile_field} WHERE path LIKE '%s'", '%'. $rpx_field . '%'));
+
+      // Only create mappings for fields that exists.
+      if ($fid) {
+         $new_map[] = array(
+          'fid' => $fid,
+          'set' => 'profile',
+          'bundle' => '',
+          'field' => $drupal_field,
+          'update' => RPX_UPDATE_NONE,
+        );
+      }
+    }
+
+    variable_set('rpx_profile_fields_map', $new_map);
+  }
+
+  // Populate the rpx_linked_account table with data for already existing authmaps.
+  $result = db_query("SELECT aid, uid, authname FROM {authmap} WHERE module = 'rpx_core'");
+  while ($row = db_fetch_object($result)) {
+    $provider = _rpx_get_identity_provider($row->authname);
+    db_query("INSERT INTO {rpx_linked_account} (aid, uid, provider_name, provider_title) VALUES (%d, %d, '%s', '%s')", $row->aid, $row->uid, $provider['name'], $provider['title']);
+  }
+}
+
+/**
+ * Implements hook_schema().
+ */
+function rpx_ui_schema() {
+  $schema['rpx_profile_field'] = array(
+    'description' => 'Stores Janrain Engage profile field information.',
+    'fields' => array(
+      'fid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique profile field ID.',
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'Title of the field shown to the end user.',
+      ),
+      'path' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'Path within Engage data in a PHP-like array notation.',
+      ),
+      'parsed_path' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+        'description' => 'Parsed and serialized path',
+      ),
+    ),
+    'primary key' => array('fid'),
+  );
+
+  //
+  // Create rpx_mapping_provider table to record providers used last in a mapping
+  // (this data is used by the Engage-to-Drupal data mapping code to decide if a
+  // data field should be overwritten with data from new provider).
+  //
+  $schema['rpx_mapping_provider'] = array(
+    'description' => 'Stores the name of last provider used in the Janrain Engage to Drupal data mapping.',
+    'fields' => array(
+      'uid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'The user id for the data mapping.',
+      ),
+      'mid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'The mapping id.',
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 30,
+        'not null' => TRUE,
+        'description' => 'The machine name of last provider from which the data for the mapping came.',
+      ),
+    ),
+    'primary key' => array('uid', 'mid'),
+  );
+
+  //
+  // Create rpx_linked_account table that will hold provider data necessary for
+  // the Views integration.
+  //
+  $schema['rpx_linked_account'] = array(
+    'description' => 'Stores Engage linked account information (used in the Views integration).',
+    'fields' => array(
+      'aid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Authmap ID from the authmap table.',
+      ),
+      // We have to include uids in this table, as Drupal 6 user_delete() deletes
+      // authmaps before calling hook_user(). Therefore we won't be able to look up
+      // the aids of deleted users in that hook and will have to delete records
+      // from this table using the uids.
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The user id.',
+      ),
+      'provider_name' => array(
+        'type' => 'varchar',
+        'length' => 30,
+        'not null' => TRUE,
+        'description' => 'The provider\'s machine name.',
+      ),
+      'provider_title' => array(
+        'type' => 'varchar',
+        'length' => 30,
+        'not null' => TRUE,
+        'description' => 'The provider\'s title.',
+      ),
+    ),
+    'primary key' => array('aid'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function rpx_ui_uninstall() {
+  drupal_uninstall_schema('rpx_ui');
+
+  variable_del('rpx_admin_url');
+  variable_del('rpx_apikey');
+  variable_del('rpx_app_id');
+  variable_del('rpx_attach_login_form');
+  variable_del('rpx_bypass_email_verification');
+  variable_del('rpx_enabled_providers');
+  variable_del('rpx_extended_authinfo');
+  variable_del('rpx_mapping_api');
+  variable_del('rpx_force_registration_form');
+  variable_del('rpx_import_profile_photo');
+  variable_del('rpx_javascript_global');
+  variable_del('rpx_openid_override');
+  variable_del('rpx_profile_fields_map');
+  variable_del('rpx_realm');
+  variable_del('rpx_realm_scheme');
+  variable_del('rpx_signin_string');
+  variable_del('rpx_accounts_string');
+  variable_del('rpx_user_help_text');
+  variable_del('rpx_social_enabled');
+  variable_del('rpx_social_pub');
+  variable_del('rpx_mail_rpx_confirm_email_body');
+  variable_del('rpx_mail_rpx_confirm_email_subject');
+  variable_del('rpx_default_label_nodes');
+  variable_del('rpx_default_message_nodes');
+  variable_del('rpx_default_linktext_nodes');
+  variable_del('rpx_default_title_nodes');
+  variable_del('rpx_default_summary_nodes');
+  variable_del('rpx_default_label_comments');
+  variable_del('rpx_default_message_comments');
+  variable_del('rpx_default_linktext_comments');
+  variable_del('rpx_default_title_comments');
+  variable_del('rpx_default_summary_comments');
+  variable_del('rpx_default_provider_weight');
+  variable_del('rpx_login_icons_size');
+  variable_del('rpx_login_links_weight');
+
+  db_query("DELETE FROM {variable} WHERE
+    name LIKE 'rpx_comment_popup_social_at_once_%' OR
+    name LIKE 'rpx_attach_share_link_to_comments_%' OR
+    name LIKE 'rpx_attach_share_link_to_teasers_%' OR
+    name LIKE 'rpx_attach_share_link_to_nodelink_%' OR
+    name LIKE 'rpx_label_nodes_%' OR
+    name LIKE 'rpx_message_nodes_%' OR
+    name LIKE 'rpx_linktext_nodes_%' OR
+    name LIKE 'rpx_title_nodes_%' OR
+    name LIKE 'rpx_summary_nodes_%' OR
+    name LIKE 'rpx_label_comments_%' OR
+    name LIKE 'rpx_message_comments_%' OR
+    name LIKE 'rpx_linktext_comments_%' OR
+    name LIKE 'rpx_title_comments_%' OR
+    name LIKE 'rpx_summary_comments_%'
+  ");
+}
+
+/**
+ * Helper function: return sign-in provider info given an Engage ID.
+ *
+ * @param string $id
+ *   An Engage ID.
+ *
+ * @return
+ *   An associative array with provider info (name and title).
+ *
+ * @todo
+ *   This code assumes that the provider top-level domain names are all of
+ *   the provider.tld type.
+ */
+function _rpx_get_identity_provider($id) {
+  // For _rpx_providers().
+  module_load_include('module', 'rpx_core');
+
+  $entire_list = TRUE;
+  $providers = _rpx_providers($entire_list);
+
+  // Extract the FQDN from the id
+  $provider = parse_url($id, PHP_URL_HOST);
+  // Extract the provider name from the FQDN (assumes it is provider.tld).
+  $parts = explode('.', $provider);
+  array_pop($parts);
+  $provider = array_pop($parts);
+
+  $result = array(
+    'name' => 'other',
+    'title' => 'Other',
+  );
+  if (isset($providers[$provider])) {
+    $result['name'] = $provider;
+    $result['title'] = $providers[$provider];
+  }
+  return $result;
+}
+
+/**
+ * Add parsed_path column to rpx_profile_field and fill it from
+ * existing path column.
+ */
+function rpx_ui_update_6201() {
+  module_load_include('admin.inc', 'rpx_ui');
+  $ret = array();
+  db_add_field($ret, 'rpx_profile_field', 'parsed_path', array('type' => 'text', 'not null' => TRUE, 'initial' => ''));
+  $result = db_query('SELECT fid, title, path FROM {rpx_profile_field}');
+  $unparsable = array();
+  while ($field = db_fetch_object($result)) {
+    if ($parsed = _rpx_parse_path($field->path)) {
+      // Do NOT use update_sql here, see http://drupal.org/node/667714
+      $sql = "UPDATE {rpx_profile_field} SET parsed_path = '%s' WHERE fid = %d";
+      $success = db_query($sql, serialize($parsed), $field->fid);
+      $log_sql = "UPDATE {rpx_profile_field} SET parsed_path = '" . db_escape_string(serialize($parsed)) . "' WHERE fid = " . $field->fid;
+      $ret[] = array('success' => $success, 'query' => check_plain($log_sql));
+    }
+    else {
+      $unparsable[$field->fid] = $field->title;
+    }
+  }
+  if (!empty($unparsable)) {
+    drupal_set_message(t("Some fields can't be converted to new format. Please, edit and save or delete them: !list", array(
+      '!list' => '<ul><li>' . implode('</li><li>', $unparsable) . '</li></ul>',
+    )), 'error');
+  }
+  return $ret;
+}

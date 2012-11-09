@@ -1,0 +1,14 @@
+<?php
+// $Id: jquery_aop.module,v 1.1 2008/12/20 20:04:38 effulgentsia Exp $
+
+/**
+ * @file
+ * Adds the jQuery AOP (Aspect Oriented Programming) plugin to all pages.
+ */
+ 
+/**
+ * Implementation of hook_init().
+ */
+function jquery_aop_init() {
+  drupal_add_js(drupal_get_path('module', 'jquery_aop') . '/misc/jquery.aop.js');
+}

@@ -1,0 +1,162 @@
+<?php
+// $Id: profile_role.test,v 1.2.2.1 2010/01/19 05:18:01 boombatower Exp $
+/**
+ * @file
+ * Provides tests for functionality.
+ *
+ * Copyright 2008 by Jimmy Berry ("boombatower", http://drupal.org/user/214218)
+ */
+
+/**
+ * Base profile_role test case.
+ */
+class ProfileRoleTestCase extends DrupalWebTestCase {
+
+  /**
+   * Administrative user used for testing.
+   *
+   * @var object
+   */
+  protected $admin_user;
+
+  /**
+   * Profile field created for testing.
+   *
+   * @var array
+   */
+  protected $field = array();
+
+  protected function setUp() {
+    parent::setUp('profile', 'profile_role');
+
+    // Create and login user.
+    $this->admin_user = $this->drupalCreateUser(array('administer users'));
+    $this->drupalLogin($this->admin_user);
+
+    // Create profile field.
+    $this->drupalget('admin/user/profile');
+    $this->clickLink(t('single-line textfield'));
+
+    $this->field = array();
+    $this->field['category'] = $this->randomName();
+    $this->field['title'] = $this->randomName();
+    $this->field['name'] = $this->randomName();
+    $this->drupalPost(NULL, $this->field, t('Save field'));
+    $this->assertText(t('The field has been created.'));
+  }
+
+  /**
+   * Set the roles that contain the category.
+   *
+   * @param array $roles (Optional) Role IDs.
+   * @param integer $category (Optional) Profile role category ID.
+   */
+  protected function setRoles(array $roles = array(), $category = 0) {
+    // Let the 'authenticate user' role have access to the field.
+    $edit = array();
+    $edit[$category . '[roles][]'] = $roles;
+    $this->drupalPost('admin/user/profile/role', $edit, t('Save configuration'));
+    $this->assertText(t('The configuration options have been saved.'));
+  }
+}
+
+/**
+ * Test the visibility of a field based on its role settings.
+ */
+class ProfileRoleVisibiltiyTestCase extends ProfileRoleTestCase {
+
+  public function getInfo() {
+    return array(
+      'name' => t('Role visibitility'),
+      'description' => t('Test the visibility of a field based on its role settings.'),
+      'group' => t('Profile'),
+    );
+  }
+
+  /**
+   * Test the visibility of a field based on its role settings.
+   */
+  protected function testFieldVisibility() {
+    // Attempt to view field on profile.
+    $this->drupalGet('user/' . $this->admin_user->uid . '/edit');
+    $this->assertNoText($this->field['category'], t('Category not visible.'));
+
+    // Let the 'authenticate user' role have access to the field.
+    $this->setRoles(array(DRUPAL_AUTHENTICATED_RID));
+
+    // Attempt to view field on profile.
+    $this->drupalGet('user/' . $this->admin_user->uid . '/edit');
+    $this->assertText($this->field['category'], t('Category visible.'));
+  }
+}
+
+/**
+ * Ensure the profile_role records are prunes when categories are removed.
+ */
+class ProfileRolePruneTestCase extends ProfileRoleTestCase {
+
+  public function getInfo() {
+    return array(
+      'name' => t('Role pruning'),
+      'description' => t('Ensure the profile_role records are prunes when categories are removed.'),
+      'group' => t('Profile'),
+    );
+  }
+
+  /**
+   * Ensure the profile_role records are prunes when categories are removed.
+   */
+  protected function testPruning() {
+    $original = $this->field['category'];
+    $second = $this->randomName();
+
+    // Restrict the field to authenticated role to create a record.
+    $this->setRoles(array(DRUPAL_AUTHENTICATED_RID));
+
+    // Ensure that only original category has profile_role records.
+    $this->assertCategory($original);
+    $this->assertNoCategory($second);
+
+    // Switch field category.
+    $edit = array(
+      'category' => $second,
+    );
+    $this->drupalPost('admin/user/profile/edit/1', $edit, t('Save field'));
+
+    // Restrict the field to authenticated role to create a record.
+    $this->setRoles(array(DRUPAL_AUTHENTICATED_RID));
+
+    // Ensure that only second category has profile_role records.
+    $this->assertNoCategory($original);
+    $this->assertCategory($second);
+
+    // Delete field (and second category).
+    $this->drupalPost('admin/user/profile/delete/1', array(), t('Delete'));
+
+    // Ensure that neither category has profile_role records.
+    $this->assertNoCategory($original);
+    $this->assertNoCategory($second);
+  }
+
+  /**
+   * Assert that the category has a profile_role record.
+   *
+   * @param string $category Profile category.
+   * @return boolean TRUE if assertion passed, otherwise FALSE.
+   */
+  protected function assertCategory($category) {
+    $rid = db_result(db_query("SELECT rid FROM {profile_role} WHERE category = '%s'", $category));
+    return $this->assertTrue($rid, 'Category found [' . $category . ']');
+  }
+
+  /**
+   * Assert that the category does not have a profile_role record.
+   *
+   * @param string $category Profile category.
+   * @return boolean TRUE if assertion passed, otherwise FALSE.
+   */
+  protected function assertNoCategory($category) {
+    $rid = db_result(db_query("SELECT rid FROM {profile_role} WHERE category = '%s'", $category));
+    return $this->assertFalse($rid, 'Category not found [' . $category . ']');
+  }
+}

@@ -1,0 +1,13 @@
+<?php
+/**
+ * @file content_profile_create_user.install
+ */
+
+/**
+ * Implementation hook_uninstall().
+ */
+function content_profile_create_user_uninstall() {
+  variable_del(CONTENT_PROFILE_CREATE_USER_EMAIL_SUBJECT);
+  variable_del(CONTENT_PROFILE_CREATE_USER_EMAIL_BODY);
+  variable_del(CONTENT_PROFILE_CREATE_USER_SEND_EMAIL);
+}

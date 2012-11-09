@@ -1,0 +1,19 @@
+Index: custom_breadcrumbs.module
+===================================================================
+--- custom_breadcrumbs.module	(revision 157)
++++ custom_breadcrumbs.module	(working copy)
+@@ -371,8 +371,12 @@
+   if (module_exists('token')) {
+     // Do token replacement.
+     $types = custom_breadcrumbs_token_types($objs);
+-    $titles = token_replace_multiple($titles, $types);
+-    $paths = token_replace_multiple($paths, $types);
++    foreach ($titles as $index => $value) {
++      $titles[$index] = token_replace_multiple($value, $types);
++    }
++    foreach ($paths as $index => $value) {
++      $paths[$index] = token_replace_multiple($value, $types);
++    }
+   }
+   $items = _custom_breadcrumbs_get_trail_items($breadcrumb, $titles, $paths);
+ 

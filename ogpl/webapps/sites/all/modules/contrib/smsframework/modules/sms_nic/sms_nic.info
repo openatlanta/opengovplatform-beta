@@ -1,0 +1,5 @@
+name = "NIC SMS Server"
+description = "Allows the SMS Framework for NIC."
+package = SMS Framework
+dependencies[] = sms
+core = 6.x

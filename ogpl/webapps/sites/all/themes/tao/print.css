@@ -1,0 +1,10 @@
+
+#menu , #branding{
+	display:none;
+}
+.header-anounced-text {
+	display:none;
+}
+a#help-toggler , #help-text{
+	display:none;
+}

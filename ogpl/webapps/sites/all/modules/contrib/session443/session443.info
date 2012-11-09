@@ -1,0 +1,10 @@
+name = 443 Session
+description = Redirects certain pages to always be HTTP or HTTPS based on certain rules.
+core = 6.x
+package = Security
+; Information added by drupal.org packaging script on 2011-10-25
+version = "6.x-1.0"
+core = "6.x"
+project = "session443"
+datestamp = "1319553935"
+

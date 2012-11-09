@@ -1,0 +1,5 @@
+; $Id$
+name = "Vrm Custom Comment"
+description = "Displays the number of characters remaining"
+package = OGPL
+core = 6.x

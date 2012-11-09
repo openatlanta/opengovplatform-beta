@@ -1,0 +1,243 @@
+
+/**
+ * Header Menu AS Panel ============================================================
+ */ 
+ 
+
+
+
+.pane-superfish-1 {
+   border: none;
+}
+.pane-superfish-1 .pane-content {
+    background: #214472 !important;
+    background: -moz-linear-gradient(left, #214472 0%, #59718e 60%, #214472 100%) !important; /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,#214472), color-stop(60%,#59718e), color-stop(100%,#214472)) !important; /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(left, #214472 0%,#59718e 60%,#214472 100%) !important; /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(left, #214472 0%,#59718e 60%,#214472 100%)  !important; /* Opera 11.10+ */
+    background: -ms-linear-gradient(left, #214472 0%,#59718e 60%,#214472 100%) !important; /* IE10+ */
+    background: linear-gradient(left, #214472 0%,#59718e 60%,#214472 100%) !important; /* W3C */
+    border-radius: 10px 10px 0px 0px;
+    -moz-border-radius: 10px 10px 0px 0px;
+    -webkit-border-radius: 10px 10px 0px 0px;
+    /*border: 1px transparent solid;*/
+    color: #FFFFFF !important;
+    font-family: Myriad,Helvetica,Tahoma,Arial,clean,sans-serif;
+    height: 54px !important;
+    margin: auto;
+    overflow: visible;
+    padding: 0;
+    /*position: absolute;*/
+    right: 29px;
+    text-align: center;
+    top: 25px;
+    width:100%;
+    float:right;
+}
+
+.pane-superfish-1 ul.primary-navbar li#menu-13076-1 {
+    background: url("../images/home.png") no-repeat scroll left 8px transparent !important;
+    padding-left: 35px !important;
+}
+
+.pane-superfish-1 .pane-content .sf-menu li {
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none !important;
+    display: inline; 
+    overflow: visible;
+    padding: 0 !important;
+    font-size: 14px !important;
+    line-height: 50px !important;
+    margin: 0 15px !important;
+    
+}
+
+.pane-superfish-1 .sf-menu a {
+    color:#fff !important;
+    text-decoration:none;
+    font-weight:bolder;
+    padding: 0 !important;
+}
+
+
+.pane-superfish-1 ul.menu li a:hover, #block-menu-primary-links ul.menu li a, 
+.primary-navigation .sf-menu li a:hover, .primary-navigation .sf-menu li a  {
+    text-decoration:none;
+}
+
+.pane-superfish-1 ul.menu li a.active, .primary-navigation .sf-menu li a.active {
+    color:#fff;
+}
+
+ /* Primary Navigation Superfish Dropdown Styles
+/-------------------------------------------------------------- */
+.pane-superfish-1 ul.primary-navbar li.menuparent:hover, ul.primary-navbar li.menuparent:active, 
+.pane-superfish-1 ul.primary-navbar li.sf-no-children:hover, ul.primary-navbar li.sf-no-children:active {
+    border-bottom: 4px solid #f1c851 !important;
+}
+.pane-superfish-1 ul.primary-navbar li ul {
+    background: #f1c851 !important;
+    margin: 10px 0 0 0 !important;
+    padding: 0 !important;
+    padding-right:15px !important;
+    overflow: visible;
+    text-align:left;
+    line-height:30px !important;
+}
+
+.pane-superfish-1 ul.primary-navbar li ul li.first:hover,
+.pane-superfish-1 ul.primary-navbar li ul li.middle:hover,
+.pane-superfish-1 ul.primary-navbar li ul li.last:hover,
+.pane-superfish-1 ul.primary-navbar li ul li.sf-no-children:hover, ul.primary-navbar li ul li.sf-no-children:active {
+    margin: 0 !important;
+    padding-left:15px !important;
+    padding-right:15px;
+    background: none !important;
+    height:30px !important;
+    border: 0 !important;
+    overflow: visible;
+    text-align:left;
+    font-size: 14px !important;
+    font-weight:500 !important;
+    line-height:30px;
+    color:#214472 !important;
+    font-family: Myriad,Helvetica,Tahoma,Arial,clean,sans-serif;
+}
+
+.pane-superfish-1 ul.primary-navbar li ul li a {
+    line-height:30px !important;
+    color: #214472 !important;
+    padding-left:15px !important;
+    font-weight:500 !important;
+    border: 0 !important;
+    
+}
+
+.pane-superfish-1 ul.primary-navbar li ul li a:hover {
+    
+    line-height:30px !important;
+    color:#003366 !important;
+    background: url("../images/menu-arrow-blue.png") left center no-repeat;
+    border:0 !important;
+    
+}
+/* Creating Whats the New Block below the Menu of the Home Page */
+#home-admin .view-whats-new {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #6A6868;
+    font-size: 10px;
+    height: 25px !important;
+    max-width: 425px  !important;
+    width:380px;
+    margin: -32px 42px 0 0 !important;
+    overflow: hidden;
+    padding: 0 2px 0 0 !important;
+    vertical-align: middle;
+    width: 290px;
+    margin: 10px 10px 0 0 !important;
+    float: right;
+}
+#home-admin .view-whats-new .views-field-title {
+   /* display:none; */
+}
+.ticker-1 {
+    float: left;
+    height: 25px;
+    vertical-align: middle;
+    width: 80px;
+    padding-left:12px;
+}
+.ticker-2 {
+    color: #444444;
+    float: left;
+    line-height: 25px !important;
+    text-align: right;
+    width: 192px;
+}
+
+#home-admin .view-whats-new .ticker-1 h2.title {
+    font-size: 12px;
+    line-height: 25px !important;
+    overflow: hidden;
+    color:#024672;
+}
+/* for Rootcandy theme, Whats new Adjustment Starts */
+.content-in .view-whats-new .ticker-1 h2.title { 
+	margin-top:0 !important;
+}
+.content-in .view-whats-new .ticker-2 a { 
+  color:#024672 !important;
+  font-size: 12px !important;
+}
+.content-in #dataset-button .pane-content p a {
+	color:#21759B !important;
+}
+/* for Rootcandy theme, Whats new Adjustment ENDS */
+
+.ticker-1 a, .ticker-2 a {
+	text-decoration:none;
+}
+#home-admin .view-whats-new .views-field-title .field-content{
+	color:#21759B;
+}
+
+/*  Creating Whats the New Block below the Menu of the Home Page ENDS  */
+
+
+
+/* Creating Dataset below the Menu of the Home Page */
+#home-admin #dataset-button{
+    background: url("../images/create-dataset-bg.png") no-repeat scroll right top;
+    border:none;
+    height: 45px;
+    width: 185px !important;
+    float: right;
+    
+}
+
+#home-admin .pane-content .pane-content{
+    background:none;
+}
+#home-admin #dataset-button .pane-content p {
+    display: block;
+    float: right;
+    font-size: 15px !important;
+    font-weight: bold;
+    color: #21759B;
+    height: 45px;
+    margin: 10px 18px 0 0 !important;
+    text-align: right;
+    width: 175px;
+}
+#home-admin #dataset-button .pane-content p a {
+	text-decoration:none;
+}
+#welcome-message {
+	clear:both !important;
+  
+}
+.pane-content {
+  margin-top:0 !important;	
+}
+#welcome-message .pane-content {
+	padding-bottom: 30px;
+}
+#home-admin #dataset-button .pane-title{
+	display:none;
+}
+
+/* Overrite for primary link of garland theme */
+ul.primary-links li a:hover, ul.primary-links li a.active {
+    background: none !important;
+}
+
+ul.primary-links li a, ul.primary-links li a:link, ul.primary-links li a:visited {
+    background: none !important;
+}
+  
+  
+    
+    
+    
+    
+    

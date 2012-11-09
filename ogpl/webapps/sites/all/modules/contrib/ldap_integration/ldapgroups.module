@@ -1,0 +1,224 @@
+<?php
+
+/**
+ * @file
+ * ldapgroups integrates ldap groups with drupal roles.
+ */
+
+//////////////////////////////////////////////////////////////////////////////
+
+define('LDAPGROUPS_DEFAULT_DN_ATTRIBUTE',      'ou');
+define('LDAPGROUPS_DEFAULT_ENTRIES_ATTRIBUTE', 'member');
+
+define('LDAPGROUPS_RULE_TYPE_ALLOW',   'ALLOW');
+define('LDAPGROUPS_RULE_TYPE_DENY',    'DENY');
+define('LDAPGROUPS_RULE_TYPE_ALLOW_X', 'ALLOW-X');
+define('LDAPGROUPS_RULE_TYPE_DENY_X',  'DENY-X');
+
+define('LDAPGROUPS_GROUP_ALL',      'ALL');
+define('LDAPGROUPS_GROUP_EXISTING', 'EXISTING');
+
+define('LDAPGROUPS_ROLE_MODE_DISABLED', 2 );
+define('LDAPGROUPS_ROLE_MODE_USE_MAP',  1 );
+define('LDAPGROUPS_ROLE_MODE_AUTO',     0 );
+
+//////////////////////////////////////////////////////////////////////////////
+// Core API hooks
+
+/**
+ * Implementation of hook_menu().
+ */
+function ldapgroups_menu() {
+  return array(
+    'admin/settings/ldap/ldapgroups' => array(
+      'title' => 'Groups',
+      'description' => 'Configure LDAP groups to Drupal roles mapping settings.',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('ldapgroups_admin_settings'),
+      'access arguments' => array('administer ldap modules'),
+      'file' => 'ldapgroups.admin.inc',
+    ),
+    'admin/settings/ldap/ldapgroups/configure' => array(
+      'title' => 'Settings',
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+    ),
+    'admin/settings/ldap/ldapgroups/test' => array(
+      'title' => 'Test Group Settings',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('ldapgroups_user_test'),
+      'access arguments' => array('administer ldap modules'),
+      'file' => 'ldapgroups.admin.inc',
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 1,
+    ),
+    'admin/settings/ldap/ldapgroups/edit' => array(
+      'title' => 'Groups',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('ldapgroups_admin_edit', 4, 5),
+      'type' => MENU_CALLBACK,
+      'access arguments' => array('administer ldap modules'),
+      'file' => 'ldapgroups.admin.inc',
+    ),
+    'admin/settings/ldap/ldapgroups/reset' => array(
+      'title' => 'Groups',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('ldapgroups_admin_edit', 4, 5),
+      'type' => MENU_CALLBACK,
+      'weight' => 1,
+      'access arguments' => array('administer ldap modules'),
+      'file' => 'ldapgroups.admin.inc',
+    ),
+  );
+}
+
+/**
+ * Implements hook_user().
+ */
+function ldapgroups_user($op, &$edit, &$account, $category = NULL) {
+
+  // Only care about ldap authenticated users.
+  if (!isset($account->ldap_authentified))
+    return;
+
+  switch ($op) {
+    case 'login':
+      module_load_include('inc', 'ldapauth', 'includes/ldap.core');
+      module_load_include('inc', 'ldapauth', 'includes/LDAPInterface');
+      module_load_include('inc', 'ldapgroups', 'ldapgroups');
+      ldapgroups_user_login($account);
+      break;
+  }
+}
+/**
+ * Implementation of hook_schema_alter().
+ *
+ * @param &$schema Nested array describing the schemas for all modules.
+ */
+function ldapgroups_schema_alter($schema) {
+  $schema['ldapauth']['fields']['ldapgroups_in_dn'] = array(
+    'type' => 'int',
+    'size' => 'tiny',
+    'not null' => TRUE,
+    'default' => '0',
+  );
+  $schema['ldapauth']['fields']['ldapgroups_dn_attribute'] = array(
+    'type' => 'varchar',
+    'length' => 255,
+  );
+  $schema['ldapauth']['fields']['ldapgroups_attr'] = array(
+    'type' => 'varchar',
+    'length' => 255,
+  );
+  $schema['ldapauth']['fields']['ldapgroups_in_attr'] = array(
+    'type' => 'int',
+    'size' => 'tiny',
+    'not null' => TRUE,
+    'default' => '0',
+  );
+  $schema['ldapauth']['fields']['ldapgroups_as_entries'] = array(
+    'type' => 'int',
+    'size' => 'tiny',
+    'not null' => TRUE,
+    'default' => '0',
+  );
+  $schema['ldapauth']['fields']['ldapgroups_entries'] = array(
+    'type' => 'text',
+  );
+  $schema['ldapauth']['fields']['ldapgroups_entries_attribute'] = array(
+    'type' => 'varchar',
+    'length' => 255,
+  );
+  $schema['ldapauth']['fields']['ldapgroups_mappings'] = array(
+    'type' => 'text',
+    'not null' => FALSE,
+  );
+  $schema['ldapauth']['fields']['ldapgroups_mappings_filter'] = array(
+    'type' => 'int',
+    'size' => 'tiny',
+    'not null' => TRUE,
+    'default' => '0',
+  );
+  $schema['ldapauth']['fields']['ldapgroups_filter_php'] = array(
+    'type' => 'text',
+    'not null' => FALSE,
+  );
+  $schema['ldapauth']['fields']['ldapgroups_groups'] = array(
+    'type' => 'text',
+    'not null' => FALSE,
+  );
+}
+/**
+ * Implementation of hook_ldap_user_deny_alter.
+ *
+ * User denied if server access limited by group(s) and user is not in one.
+ */
+function ldapgroups_ldap_user_deny_alter( &$denied, $ldap, $name, $dn, $account ) {
+
+  module_load_include('inc', 'ldapgroups', 'ldapgroups');
+
+  $sid = $ldap->getOption('sid');
+
+  $groups_allowed = _ldapgroups_ldap_info($sid, 'ldapgroups_groups');
+  if ( ! ldapgroups_is_configured($sid) || empty($groups_allowed) ) {
+    return;  // Nothing to do here.
+  }
+
+  $user_groups = ldapgroups_groups_load($ldap, $dn, $name);
+  if ( $user_groups === FALSE ) { // Problem getting groups!
+    $denied = TRUE;
+    return;
+  }
+  $access_rules = ldapgroups_access_rules($ldap->getOption('sid'));
+
+  $allowed = FALSE;
+  foreach ( $access_rules as $rule ) {
+    $type = $rule[0];
+    $rule_group = drupal_strtoupper($rule[1]);
+
+    // See if the rule group matches the user.
+    $matched = FALSE;
+    switch ( $rule_group ) {
+      case LDAPGROUPS_GROUP_ALL:
+        $matched = TRUE;
+        break;
+      case LDAPGROUPS_GROUP_EXISTING:
+        if ( $account->ldap_authentified ) {
+          $matched = TRUE;
+        }
+        break;
+      default:
+        foreach ( $user_groups as $group ) {
+          if ( drupal_strtoupper($group) == $rule_group ) {
+            $matched = TRUE;
+            break;
+          }
+        }
+    }
+    // Rule matched, apply action.
+    if ( $matched ) {
+
+      // Handle the match results according to rule type.
+      switch ( $type ) {
+        case LDAPGROUPS_RULE_TYPE_ALLOW:
+          $allowed = TRUE;
+          break;
+        case LDAPGROUPS_RULE_TYPE_ALLOW_X:
+          return;  // Found Allowed exit rule - hook says do nothing
+        case LDAPGROUPS_RULE_TYPE_DENY:
+          $allowed = FALSE;
+          break;
+        case LDAPGROUPS_RULE_TYPE_DENY_X:
+          $denied = TRUE;  // Found DENIED exit rule, deny and exit.
+          return;
+          break;
+        default:
+          drupal_set_message(t("Invalid rule type, @type, found in ldapgroups access rules for server, @server!", array('@type' => $type, '@server' => $ldap->getOption('name'))));
+      }
+    }
+  }
+
+  if ( ! $allowed ) {
+    $denied = TRUE;
+  }
+
+}

@@ -1,0 +1,1132 @@
+body,
+input,
+textarea,
+select { font-family:"Lucida","Lucida Grande","Trebuchet MS",Tahoma,Verdana,sans-serif; }
+
+html{
+    background: url("images/bg-body.gif") repeat-x scroll 0 0 #E4E4E4;
+}
+
+
+body.rubik {
+  color:#333;
+  background:#eee;
+  }
+
+a {
+  color:#39c;
+  text-decoration:none;
+  }
+
+.limiter { width:960px; }
+
+#top { background:url(images/cube.png) 0px -60px repeat-x; }
+
+
+/* Code for cube logo starts */
+#cube-logo {
+	float:left;
+	padding: 0 20px 0 0;
+}
+#cube-logo a {
+	display:block;
+	margin-top:28px;
+}
+
+/**
+ * Branding ===========================================================
+ */
+#branding {
+  -moz-border-radius:5px 5px 0px 0px;
+  -webkit-border-radius:5px 5px 0px 0px;
+  background:url(images/cube.png) 0px 0px repeat-x;
+  font-size:11px;
+  text-shadow:#000 0px 1px 0px;
+  color:#888;
+  /*height:30px;*/
+  }
+
+#branding a {
+  -moz-border-radius:3px;
+  -webkit-border-radius:3px;
+  /* color:#888; */
+  color:#FFF;
+  /* float:left; */
+  padding:0px 10px;
+  }
+
+  #branding a:hover {
+    background:#F09609;
+    color:#000;
+    }
+
+#branding ul.links {
+  float:right;
+  padding:5px 10px;
+  }
+
+#branding .breadcrumb {
+  padding:5px 10px 4px 5px;
+  /*float:left;*/
+  font-weight:normal;
+  }
+
+  #branding .breadcrumb span.breadcrumb-link {
+    float:left;
+    background:url(images/cube.png) 100% -35px no-repeat;
+    padding:0px 20px 0px 5px;
+    }
+
+  #branding .breadcrumb a,
+  #branding .breadcrumb strong {
+    font-weight:normal;
+    /*float:left;*/
+    padding:0px 5px;
+    }
+  
+/* Welcome User block added Code starts */
+#block-block-4 {
+	border:none;
+	background:none;
+}
+#block-block-4 .block-content {
+	padding: 0;
+	background:none;
+}
+
+#block-block-4 .block-content .user-info-container {
+	padding-top:3px;
+	
+}
+
+#branding #block-block-4 .block-content .user-info-container .welcome {
+	float: left;
+}
+#block-block-4 .block-content .user-info-container .help{
+	float:right;
+}
+body #branding #block-block-4 .block-content .user-info-container a {
+	text-transform:uppercase;
+}
+/* Welcome User block added Code ends */ 
+   
+    
+
+/**
+ * Page title =========================================================
+ */
+#page-title-header {
+	margin-top:-30px;
+}
+#page-title {
+  position:relative;
+  padding:0px 0px 0px 30px;
+  color:#fff;
+  text-shadow:#111 0px 1px 0px;
+}
+#page-title a { color:#fff; }
+
+#page .page-title {
+	
+  padding:10px 10px 10px 10px;
+  letter-spacing:-1px;
+  font-size:24px;
+  font-weight:300;
+  }
+
+#page-title .page-title span.icon {
+  float:left;
+  margin-right:10px;
+  }
+
+#page-title ul.links {
+  letter-spacing:1px;
+  text-transform:uppercase;
+  float:right;
+  padding:10px 0px;
+  }
+
+  #page-title ul.links a {
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    color:#888;
+    padding:5px 10px 5px 25px;
+    }
+
+  #page-title ul.links li.active a,
+  #page-title ul.links li a.active {
+    color:#fff;
+    background:#08c url(images/cube.png) 0px -160px repeat-x;
+    }
+
+  #page-title ul.links li a:hover { color:#fff; }
+
+/**
+ * Page elements ======================================================
+ */
+div.pager,
+#header,
+#footer,
+#page,
+#tabs .page-tabs {
+  background:#f8f8f8;
+  -moz-box-shadow:#ccc 0px 0px 3px;
+  -webkit-box-shadow:#ccc 0px 0px 3px;
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  margin:10px auto;
+  }
+
+#header {
+  width:950px;
+  padding:5px;
+  }
+
+/**
+ * Tabs, pagers =======================================================
+ */
+#tabs .page-tabs {
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  margin:10px auto;
+  background:#f8f8f8;
+  }
+
+  div.pager,
+  #page div.pager {
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+
+    background:#fff;
+    line-height:18px;
+    border-width:1px;
+    border-style:solid;
+    border-color:#ccc #ddd #eee;
+    }
+
+  #tabs .page-tabs ul.links {
+    float:none;
+    height:30px;
+    position:static;
+    padding:0px;
+    }
+
+  #tabs .page-tabs li { padding:0px; }
+
+  .pager a,
+  .pager li.pager-current,
+  #tabs .page-tabs li a,
+  #tabs .page-tabs li a:hover,
+  #tabs .page-tabs li.active a,
+  #tabs .page-tabs li a.active {
+    color:#888;
+    font-weight:normal;
+    font-size:13px;
+    -moz-border-radius:0px;
+    -webkit-border-radius:0px;
+    padding:5px 15px;
+    border:0px;
+    background:transparent;
+    }
+
+    .pager a,
+    .pager li.pager-current { padding:5px 10px; }
+
+  #page .pager a:hover,
+  #tabs .page-tabs li a:hover {
+    background:#fff;
+    color:#333;
+    }
+
+    #page .pager a:hover { background:#eee; }
+
+  #page .pager ul.pager-list li:first-child a,
+  #page .pager ul.pager-list li.pager-current:first-child,
+  #tabs .page-tabs li:first-child a {
+    -moz-border-radius:5px 0px 0px 5px;
+    -webkit-border-radius:5px 0px 0px 5px;
+    }
+
+  #page .pager ul.pager-links li:last-child a {
+    -moz-border-radius:0px 5px 5px 0px;
+    -webkit-border-radius:0px 5px 5px 0px;
+    }
+
+  .pager li.pager-current,
+  #tabs .page-tabs li.active a,
+  #tabs .page-tabs li a.active {
+    background:#08c url(images/cube.png) 0px -190px repeat-x;
+    color:#fff;
+    }
+
+/**
+ * Page layout ========================================================
+ */
+#page {
+  width:1004px;
+  padding:5px;
+  background:#f4f4f4;
+  -moz-border-radius:3px;
+  -webkit-border-radius:3px;
+  }
+
+.page-content { padding:4px; }
+
+.content-wrapper { margin:5px; }
+
+/**
+ * Footer =============================================================
+ */
+#footer {
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  background: url("images/cube.png") repeat-x scroll 0 -60px transparent;
+    font-size: 11px;
+    padding:10px 0px;
+    margin-top: -7px;
+    text-shadow: 0 1px 0 #FFFFFF;
+    width: 1024px;
+  }
+
+#footer .footer-message {
+  padding:0px 10px;
+  float:left;
+  color: #C7C7C7;
+}
+#footer .footer-admin-poweredby a {
+	float:right;
+	margin: 10px 15px 0 0;
+}
+
+#footer .feed-icons {
+  margin:0px;
+  padding:2px 5px;
+  background:transparent;
+
+  -moz-border-radius:3px;
+  -webkit-border-radius:3px;
+
+  /* Assume icons are 16x16 like Drupal core. */
+  line-height:16px;
+  float:right;
+  }
+
+  #footer .feed-icons img { display:block; }
+
+  #footer .feed-icons label,
+  #footer .feed-icons a {
+    padding:0px 5px;
+    float:left;
+    }
+
+/**
+ * Form goodness
+ */
+input.form-submit:hover {
+  border-color:#08a #08a #046;
+  background:#08c url(images/cube.png) 0px -190px repeat-x;
+  color:#FFF;
+  }
+
+/**
+ * Blocks
+ */
+div.messages,
+.block { margin:5px; }
+
+.block .block-title {
+  background:#08c url(images/cube.png) 0px -190px repeat-x;
+  color:#fff;
+  }
+
+/**
+ * Help ===============================================================
+ */
+#page-help { background:#404040; }
+
+#page-help .limiter {
+  z-index:1;
+  position:relative;
+  }
+
+a#help-toggler {
+  position:absolute;
+  right:0px;
+  bottom:-15px;
+  left:auto;
+  width:auto;
+  height:auto;
+
+  -moz-border-radius:0px 0px 3px 3px;
+  -webkit-border-radius:0px 0px 3px 3px;
+
+  color:#888;
+  background:#333;
+
+  padding:0px 15px;
+  line-height:15px;
+  height:15px;
+
+  font-size:10px;
+  text-transform:uppercase;
+  text-indent:0px;
+  }
+
+  a#help-toggler:hover { color:#fff; }
+
+div#help-text {
+  -moz-border-radius:0px 0px 0px 3px;
+  -webkit-border-radius:0px 0px 0px 3px;
+  color:#ccc;
+  background:#333;
+  border:0px;
+  }
+
+div#help-text .column-side .help-links { background:#222; }
+
+/**
+ * Content ============================================================
+ */
+.help-page,
+div.comment,
+div.node {
+  border-style:solid;
+  border-width:1px;
+  border-color:#ccc #ddd #eee;
+
+  background:#fff url(../images/vrule.png) 65% 0% repeat-y;
+  margin:0px 0px 10px;
+
+  -moz-box-shadow:#fff 0px 1px 0px;
+  -webkit-box-shadow:#fff 0px 1px 0px;
+  -moz-border-radius:3px;
+  -webkit-border-radius:3px;
+  }
+
+#help-text .column-main .column-wrapper,
+.help-page .column-main .column-wrapper,
+div.comment .column-main .column-wrapper,
+div.node .column-main .column-wrapper { padding:19px; }
+
+  #help-text .column-main .column-wrapper {
+    padding-left:59px;
+    position:relative;
+    }
+
+    #help-text .column-main .column-wrapper span.icon {
+      position:absolute;
+      top:15px;
+      left:15px;
+      }
+
+#help-text .column-side .column-wrapper,
+.help-page .column-side .column-wrapper,
+div.comment .column-side .column-wrapper,
+div.node .column-side .column-wrapper {
+  padding:9px;
+  font-size:11px;
+  }
+
+#help-text .column-side .help-links,
+.help-page .column-side .help-page-links,
+.node-submitted,
+.comment-submitted {
+  padding:10px;
+  background:#f8f8f8;
+  }
+
+ /* View Dataset page code starts */
+ #comments{
+	display: none;
+}
+ 
+ #content .node-links li.rate_quality, 
+ #content .node-links li.rate_accessibility, 
+ #content .node-links li.rate_usability {
+	display: none;
+}
+ 
+ .comment-links,
+.node-links { padding:10px 0px; }
+
+.help-page .help-page-links ul.links {
+  -moz-column-count:2;
+  -webkit-column-count:2;
+}
+
+.column-side ul.links li,
+.column-side ul.links a,
+.column-side ul.links span {
+  float:none;
+}
+
+.column-side ul.links a,
+.column-side ul.links span {
+  padding:0px 5px;
+  display:block;
+  float:none;
+}
+
+.column-side ul.links span a {
+    padding: 0px 24px;
+    text-indent: -9999px;
+}
+
+.column-side ul.links a.active,
+ /* .column-side ul.links a:hover { background:#fff; }*/
+.column-side ul.links a:hover { 
+    background-position:0 0px;
+ }
+.comment-links ul.links a:hover { background:#f4f4f4; }
+
+.comment-title,
+.node-title {
+  margin:0px 0px 20px;
+  font-weight:normal;
+  font-size:16px;
+  } 
+  
+.rate-description {
+	font-size:0.99em;
+}
+.rate-description .item-list ul {
+	height: 30px;
+    padding: 5px 2px 2px 8px;
+    width: 100%;
+}
+.rate-description .item-list ul li {
+	border:none;
+}
+/* View Dataset page code ENDS */
+  
+/*  Menu Block for CUBE Starts    */
+#menu{
+  
+   /* margin-left: 130px;
+   float: left;
+   */
+   width: 100%;
+}
+
+#block-superfish-1 {
+   border: none;
+}
+
+#block-superfish-1 .block-content {
+    background: #214472 !important;
+    background: -moz-linear-gradient(left, #214472 0%, #59718e 60%, #214472 100%) !important; /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,#214472), color-stop(60%,#59718e), color-stop(100%,#214472)) !important; /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(left, #214472 0%,#59718e 60%,#214472 100%) !important; /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(left, #214472 0%,#59718e 60%,#214472 100%)  !important; /* Opera 11.10+ */
+    background: -ms-linear-gradient(left, #214472 0%,#59718e 60%,#214472 100%) !important; /* IE10+ */
+    background: linear-gradient(left, #214472 0%,#59718e 60%,#214472 100%) !important; /* W3C */
+    border-radius: 10px 10px 0px 0px;
+    -moz-border-radius: 10px 10px 0px 0px;
+    -webkit-border-radius: 10px 10px 0px 0px;
+    /*border: 1px transparent solid;*/
+    color: #FFFFFF !important;
+    font-family: Myriad,Helvetica,Tahoma,Arial,clean,sans-serif;
+    height: 54px !important;
+    margin: auto;
+    overflow: visible;
+    padding: 0;
+    /*position: absolute;*/
+    right: 29px;
+    text-align: center;
+    top: 25px;
+    width:100%;
+    float:right;
+}
+
+
+
+#block-superfish-1 ul.primary-navbar li#menu-13076-1 {
+    background: url("images/home.png") no-repeat scroll left 8px transparent !important;
+    padding-left: 35px !important;
+}
+
+#block-superfish-1 .block-content .sf-menu li {
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none !important;
+    display: inline; 
+    overflow: visible;
+    padding: 0 !important;
+    font-size: 14px !important;
+    line-height: 50px !important;
+    margin: 0 15px !important;
+    
+}
+
+#block-superfish-1 .sf-menu a {
+    color:#fff !important;
+    text-decoration:none;
+    font-weight:bolder;
+    padding: 0 !important;
+}
+
+
+#block-superfish-1 ul.menu li a:hover, #block-menu-primary-links ul.menu li a, 
+.primary-navigation .sf-menu li a:hover, .primary-navigation .sf-menu li a  {
+    text-decoration:none;
+}
+
+#block-superfish-1 ul.menu li a.active, .primary-navigation .sf-menu li a.active {
+    color:#fff;
+}
+  
+  
+ /* Primary Navigation Superfish Dropdown Styles
+/-------------------------------------------------------------- */
+#block-superfish-1 ul.primary-navbar li.menuparent:hover, ul.primary-navbar li.menuparent:active, 
+#block-superfish-1 ul.primary-navbar li.sf-no-children:hover, ul.primary-navbar li.sf-no-children:active {
+    border-bottom: 4px solid #f1c851 !important;
+}
+#block-superfish-1 ul.primary-navbar li.active-trail, .primary-navbar .sf-menu li.active-trail {
+    border-bottom: 4px solid #deac1c ;
+}
+#block-superfish-1 ul.primary-navbar li ul {
+    background: #f1c851 !important;
+    margin: 10px 0 0 0 !important;
+    padding: 0 !important;
+    padding-right:15px !important;
+    overflow: visible;
+    text-align:left;
+    line-height:30px !important;
+}
+#block-superfish-1 ul.primary-navbar li ul li a:hover {
+    
+    line-height:30px ;
+    color:#003366 !important;
+    background: url("images/menu-arrow-blue.png") left no-repeat !important;
+    
+    
+}
+
+#block-superfish-1 ul.primary-navbar li ul li.first, ul.primary-navbar li ul li.first:hover,
+#block-superfish-1 ul.primary-navbar li ul li.first:hover,
+#block-superfish-1 ul.primary-navbar li ul li.middle:hover,
+#block-superfish-1 ul.primary-navbar li ul li.last:hover,
+#block-superfish-1 ul.primary-navbar li ul li.sf-no-children:hover, ul.primary-navbar li ul li.sf-no-children:active {
+    margin: 0 !important;
+    padding-left:15px !important;
+    padding-right:15px;
+    background: none ;
+    height:30px !important;
+    border: 0 !important;
+    overflow: visible;
+    text-align:left;
+    font-size: 14px !important;
+    font-weight:500 !important;
+    line-height:30px;
+    color:#214472 !important;
+    font-family: Myriad,Helvetica,Tahoma,Arial,clean,sans-serif;
+}
+
+#block-superfish-1 ul.primary-navbar li ul li a {
+    line-height:30px !important;
+    color: #214472 !important;
+    padding-left:15px !important;
+    font-weight:500 !important;
+    border: 0 !important;
+    
+}
+
+
+.sf-shadow ul {
+    border-bottom-radius: 0 0 0 17px;
+    border-top-radius: 0 17px 0 0;
+    
+}
+.sf-menu ul {
+	border-bottom-left-radius:17px !important;
+	border-top-right-radius:17px !important;
+	width: 13em;
+}
+
+/* Creating Whats the New Block below the Menu of the Home Page */
+
+#menu #block-views-whats_new-block_2 {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #6A6868;
+    float: left;
+    font-size: 10px;
+    height: 24px;
+    margin: 12px 6px 0;
+    overflow: hidden;
+    padding: 0 2px 0 0;
+    vertical-align: middle;
+    width: 800px;
+}
+#menu #block-views-whats_new-block_2 .block-title {
+   display:none;
+}
+#menu #block-views-whats_new-block_2 h2.title {
+    font-size: 120% !important;
+    line-height: 25px !important;
+    margin-top: -10px;
+    overflow: hidden;
+}
+
+#menu #block-views-whats_new-block_2 .ticker-2 {
+    color: #444444;
+    float: left;
+    line-height: 25px;
+    margin-left: 100px;
+    margin-top: -34px;
+    text-align: left;
+    width: 635px;
+
+}
+/*  Creating Whats the New Block below the Menu of the Home Page ENDS  */
+
+
+
+/* Creating Dataset below the Menu of the Home Page */
+#menu .block .block-content {
+	padding:0;
+}
+#menu #block-block-2 {
+    background: url("../images/create-dataset-bg.png") no-repeat scroll right top;
+    border:none;
+    height: 65px;
+    width: 185px !important;
+    float: right;
+    margin: 0px 5px 0 0;
+}
+
+#menu #block-block-2 .block-content{
+    background:none;
+}
+#menu #block-block-2 p {
+    color: #21759B;
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    height: 45px;
+    margin: -6px 0 0 9px;
+}
+#menu #block-block-2 a {
+    display: block;
+    float: left;
+    margin-left: 77px;
+    margin-top: -26px;
+    width: 92px;
+}
+#menu #block-block-2 span.catalog-pointer {
+	background: url("../images/right-open-small.png") no-repeat scroll 0 0 transparent;
+    display: block;
+    float: left;
+    height: 23px;
+    margin-left: 55px;
+    width: 20px;
+}
+span.create-catalog-header {
+	color: green;
+    font-weight: bold;
+    margin-left: 14px;
+}
+/*  Menu Block for CUBE Ends    ************************************************** */
+#welcome-message .pane-content {
+  padding-bottom: 30px;
+}
+
+/**
+* View Dataset Page STARTS ===================================
+*/
+
+.node-content .fieldgroup{
+    margin:0 0 20px 0;
+    border-radius:7px;
+    border:1px solid #eeeeee;
+    width:100%;
+    float:left;
+    padding:0px;
+    /* font-size: 1.3em; */
+}
+.node-content .fieldgroup h2{
+    background:#eeeeee;
+    padding:3px 0 3px 8px;
+    border-radius:7px 7px 0 0;
+    margin-bottom:0 !important;
+}
+.node-content .fieldgroup .content{
+    padding:0px;
+    margin:0px
+} 
+
+.node-content .field {
+    border-bottom:1px solid #cccccc;
+    display:block;
+    width:100%;
+    float:left;
+    font-family:Arial,Helvetica,sans-serif !important;
+    font-size:12px;
+    color:#2b2b2b;
+    
+}
+.node-content .field:last-child {
+    border-top: 0 none;
+    border-bottom:none;
+}
+
+.node-content .field:hover,.feedback .field:hover, .node-content .group-dsat-access-type:hover{
+    background:#eeeeee;
+}
+.node-content .field-last-item{
+    border:0px;
+}
+
+.node-content .description{
+    display:none;
+} 
+
+.node-content .field-label,.field-type-link .field-label {
+    float:left;
+    width:25%;
+    padding:8px 0 8px 8px;
+}
+
+.field-type-flexifield .field-value {
+    margin-left: 13px;
+    margin-top:9px;
+}
+
+.node-content .field-item {
+    display: block;
+}
+.node-content .field-item p{
+    margin:0px;
+    color:#000000;
+} 
+.node-content .field-items{
+    padding:8px 0 0px 0px;
+}
+.node-content .field-field-ds-sector .field-items, 
+.node-content .field-field-ds-ministry-department .field-items,
+.node-content .field-field-rr-adv-roles .field-items  {
+    float: left;
+    padding: 8px 0 0;
+    width: 400px;
+}
+.content .field-field-ds-description .field-item,
+.content .field-field-ds-ministry-department .field-item {
+	margin-left: 158px;
+}
+  
+/* View Dataset Page ENDS ********************************* */
+
+  /* Field width of the Dataset Summary are resized and having fixed width starts on 25th June 2012 */
+th.views-field-title{
+     width:420px;
+}
+th.views-field-field-ds-ministry-department-value {
+     width:160px;
+}
+td.views-field-field-ds-ministry-department-value ul.hierarchical-select-lineages {
+    display: inline;
+    list-style: none outside none;
+  
+}
+th.views-field-changed {
+     width:120px;
+}
+th.views-field-dms-allowed-operations {
+     width:130px;
+}
+/* Field width of the Dataset Summary are resized and having fixed width ends on 25th June 2012 */
+
+  /* Border Added for file upload while Creating a Dataset starts */
+
+  #edit-field-dsat-downloadable-0-value-field-dam-datafile-0-upload {
+    border:1px solid;
+  }
+  /* Border Added for file upload while Creating a Dataset ends */
+
+/* Dashboard Tab Panel Starts ************************************************************ */
+
+.ui-tabs-panel
+{
+    border: 1px solid #808080;
+    float: left;
+    margin-bottom: 1.5em;
+    width:95%;
+}
+.ui-tabs-nav {
+	   border-right: none;
+}
+.ui-tabs-nav li {
+	   border: none;
+	   margin-right: 5px;
+}
+
+.pane-content {
+    font-size: 1em;
+    line-height: 1.5em;
+    /*margin-top: 20px;*/
+}
+
+div.workflow-summary-table .view-content {
+    border: 1px solid #CCCCCC;
+}
+
+/* +++++++++++++ Home Page Tabs Design Code Starts . (For user management used #tabs-center ul.ui-tabs-nav) +++++++++++++++++++++++ */
+
+#tabs-center ul.ui-tabs-nav li {
+	margin-right:5px;
+}
+
+.pane-content ul.tabs li.active a,.pane-content ul.tabs li.ui-tabs-selected a ,
+#tabs-center ul.ui-tabs-nav li.ui-tabs-selected a {  
+   color:#ffffff; 
+   background:blue;
+   
+}
+#home-admin ul.primary {
+	margin-bottom:0px !important;
+}
+.pane-content .ui-tabs-nav li {
+	padding: 0 4px;
+	border-color: #fff;
+    border-style: none;
+}
+
+.pane-content ul.tabs li a ,
+#tabs-center ul.ui-tabs-nav li a {
+    background: none repeat scroll 0 0 #D5D4D4 ;
+    border-radius: 10px 10px 0 0;
+    height: 100%;
+    line-height: 25px;
+    padding: 5px 10px;
+  
+}
+.pane-content ul.tabs a,
+#tabs-center ul.ui-tabs-nav a {
+    color: royalblue;
+    font-size: 1em;
+    font-weight: bold;
+    text-decoration: none !important;
+}
+
+.pane-content ul.tabs li:hover a,
+#tabs-center ul.ui-tabs-nav li:hover a {
+    color:#000; 
+    background:#fff;
+    border-radious:10px 10px 0 0;
+}
+
+
+.pane-content .ui-tabs-nav li.ui-tabs-selected a, .pane-content .ui-tabs-nav li:hover a ,
+#tabs-center ul.ui-tabs-nav li.ui-tabs-selected a , #tabs-center ul.ui-tabs-nav li:hover a {
+    border-color: #D3D3D3;
+    border-radius: 10px 10px 0 0;
+    border-style: solid solid none;
+    border-width: 1px 1px medium;
+    padding: 4px 9px 5px;
+}
+.view-dataset-management #views-bulk-operations-select #views-bulk-operations-submit {
+    padding: 9px 0 0;
+}
+
+
+/* Dashboard Tab Panel ENDS ************************************************************ */
+
+/* +++++++++++++++++++++++  Dataset Edit Page Code Starts +++++++++++++++++++++++++++++++++  */
+.content-multiple-drag {
+	width:30px;
+}
+label[for="edit-field-ds-catlog-type-0"] {
+    display: none;
+}
+
+#edit-field-ds-catlog-type-0-type-wrapper {
+    display: none;
+}
+label[for="edit-field-dsat-downloadable-0"], label[for="edit-field-dsat-access-point-0"] {
+    display: none;
+}
+
+/* +++++++++++++++++++++++  Dataset Edit Page Code Starts +++++++++++++++++++++++++++++++++  */
+
+
+/**
+* Home Dashboard For VRM ADMIN (Quick tab design) STARTS ===================================
+*/
+
+#tabs-mini-panel-minipanel-vrm-admin-dashboard-center ul.ui-tabs-nav {
+	display:none;
+}
+#mini-panel-minipanel-vrm-admin-dashboard-center-tab-2 {
+	margin-top:30px;
+}
+#quicktabs_container_vrm_admin_tabs .quicktabs_tabpage .quicktabs_wrapper {
+	margin-top:30px;
+}
+#quicktabs-vrm_admin_tabs {
+	margin-top: -50px;
+}
+.quicktabs_main{ 
+    clear:both; 
+}
+ .quicktabs_wrapper ul.quicktabs-style-nostyle {
+    position:relative;
+    padding:2px 0 2px 0;
+    margin:0 0 5px !important;
+}
+.quicktabs_wrapper ul.quicktabs-style-nostyle a {
+    color: royalblue;
+    font-size: 1em;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.quicktabs_wrapper ul.quicktabs-style-nostyle li a { 
+  	background: none repeat scroll 0 0 #D5D4D4 ;
+    border-radius: 10px 10px 0 0;
+    height: 100%;
+    line-height: 25px;
+    padding: 5px 10px;
+}
+.quicktabs_wrapper ul.quicktabs-style-nostyle li:hover a,
+.quicktabs_wrapper ul.quicktabs-style-nostyle li.active a:hover {
+  	color:#000; 
+    background:#FFF;
+    border-radious:10px 10px 0 0;
+}
+
+.quicktabs_wrapper ul.quicktabs-style-nostyle li.active a {
+    color:#FFF; 
+   	background:blue;
+}
+.quicktabs_wrapper ul.quicktabs-style-nostyle li.active a, .quicktabs_wrapper ul.quicktabs-style-nostyle li a:hover{
+    border-color: #D3D3D3;
+    border-radius: 10px 10px 0 0;
+    border-style: solid solid none;
+    border-width: 1px 1px medium;
+    padding: 4px 9px 5px;
+}
+
+
+#quicktabs-vrm_admin_tabs_list ul li a:hover {
+    border-bottom: 1px solid #FFFFFF;
+}
+form.views-processed .views-exposed-form .views-widget .date-views-filter-wrapper {
+	margin-top:22px;
+}
+/* Home Dashboard For VRM ADMIN (Quick tab design) ENDS ********************************* */
+
+/* ++++++++++++ Header section with logo and footer logo added for Cube Code starts +++++++++++ */
+.header-anounced-text {
+    background: url("../images/dataportalindiamanagementsystembeta.png") no-repeat scroll 0 0 transparent;
+    display: block;
+    float: left;
+    height: 65px;
+    margin: 19px 0 10px 10px;
+    text-indent: -9999px;
+    width: 388px;
+}
+.searchPan {
+	background: url("../images/emb.png") no-repeat scroll 0 0 transparent;
+    display: block;
+    float: right;
+    height: 81px;
+    width: 47px;
+    margin-top:5px;
+}
+#admin-menu {
+	text-shadow: none;
+}
+hr.footer-hr{
+	background-color: #214472;
+    color: #000000;
+    display: block;
+    height: 5px;
+}
+/* ++++++++++++ Header section with logo and footer logo added for Cube Code starts +++++++++++ */
+
+/* Workflow Summary box height fixed Code starts*/
+#home-admin #edit-sid-wrapper select.form-select {
+	min-height:120px;
+	height: 120px;
+}
+#home-admin #edit-field-request-type-value-many-to-one-wrapper select.form-select {
+	height:70px;
+	padding:4px;
+}
+
+/* Workflow Summary box height fixed Code ends*/
+
+
+/* +++++++++++++++++++=== Backend Cancel anchor has been updated to submit button Code Starts ++++++++++++++++++++++++++==== */
+.confirmation .buttons .container-inline a {
+	background: none repeat scroll 0 0 #FFFFFF;
+    border-color: #DDDDDD #DDDDDD #CCCCCC;
+    border-style: solid;
+    border-width: 1px;
+    color: #333333;
+    padding: 3px 10px;
+}
+.confirmation .buttons .container-inline a:hover {
+	border-color:#08a #08a #046;
+  	background:#08c url(images/cube.png) 0px -190px repeat-x;
+  	color:#fff;
+}
+
+/* +++++++++++++++++++=== Backend Cancel anchor has been updated to submit button Code Ends ++++++++++++++++++++++++++==== */
+
+/* +++++++++++++++++++++++=== Voting Result (Rating) Page Structure changed code starts  +++++++++++++++++++++++++++++++++++++++++++ */
+.voting_content .voting_item {
+    float: left;
+    margin: 20px 0;
+    padding-right: 28px;
+    width: 30%;
+}
+/* +++++++++++++++++++++++=== Voting Result (Rating) Page Structure changed code Ends  +++++++++++++++++++++++++++++++++++++++++++ */
+
+/* +++++++++++++++++++ Create Dataset page-top list alignment Code Starts +++++++++++++++++++++ */
+.page-content-top #block-multistep-dataset .block-title {
+	display:none;
+}
+.page-content-top #block-multistep-dataset .item-list ul {
+	width:997px;
+}
+.page-content-top #block-multistep-dataset .block-content .item-list > ul li {
+    display: inline;
+    float:left;
+    width:30%;
+    background: none repeat scroll 0 0 gray;
+    border-right: 1px solid #FFFFFF;
+    color: #FFFFFF;
+    font-weight:bold;
+    padding: 2px 10px 2px 0;
+    
+}
+.page-content-top #block-multistep-dataset .block-content .item-list > ul li a {
+	color:#FFF;
+}
+#block-multistep-dataset #multistep-dataset-2 {
+	
+	display:block;
+	text-align:center;
+}
+#block-multistep-dataset #multistep-dataset-3 {
+	display:block;
+	text-align:right;
+}
+
+#block-multistep-dataset .multistep-progress-bar-wrapper {
+	clear:both;
+}
+#multistep-group_ds_all_datasets .fieldset-content .hierarchical-select-wrapper-wrapper {
+	border: 1px solid #CCCCCC;
+    padding: 10px;
+    /*width: 35%;*/
+    margin:10px 8px 0 0;
+}
+
+html.js .resizable-textarea textarea {
+    height: 73px;
+}
+.filter-options {
+	float:right;
+}
+/* +++++++++++++++++++ Create Dataset page-top list alignment Code Starts +++++++++++++++++++++ */

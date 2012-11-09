@@ -1,0 +1,178 @@
+<?php
+function form_validation_init() {
+  global $user;
+  if($user->uid != 1) {
+    foreach($_GET as $key=>$req){
+      switch($key) {
+        case 'url':
+          if (!form_validation_validate_url($req)) {
+            $_GET['url']='';
+            drupal_set_message('Invalid URL','error');
+            drupal_not_found();
+            exit();
+          }
+          break;
+        case 'page':
+          if (form_validate_integer($req)) {
+              drupal_set_message('Invalid argument 1','error');
+              drupal_not_found();
+              exit();
+          }
+          break;
+        case 'nid':
+            if (form_validate_integer($req)) {
+              drupal_set_message('Invalid argument 2','error');
+              drupal_not_found();
+              exit();
+            }
+            break;
+        case 'destination':
+          break;
+        default:
+          if (form_validation_validate_input($req) || _check_blacklist($req)) {
+            drupal_set_message('Invalid argument 3','error');
+            drupal_not_found();
+            exit();
+          }
+          break;
+      }
+    }
+  }
+}
+
+/*
+ * Implementation of hook_form_alter()
+*
+*/
+function form_validation_form_alter(&$form, $form_state, $form_id) {
+  $form['#validate'][] = 'cck_form_validate';
+  return $form;
+}
+function form_validate_integer($value){
+  if ($value !== '' && (!is_numeric($value) || intval($value) != $value || $value < 0)) {
+   return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+}
+function cck_form_validate($form, &$form_state) {
+  global $user;
+  $blacklist = array('menu', 'date', 'body', 'op','textsize_element_class', 'comment', 'fld_title');
+  $whitelist = array('title', 'name', 'recipients', 'mail', 'comment');
+
+  $to_be_checked = $form_state['clicked_button']['#post'];
+  if($form['form_id']['#value'] == 'webform_client_form_101') $to_be_checked = $to_be_checked['submitted'];
+  if($form['form_id']['#value'] == 'forum_node_form') $to_be_checked = $to_be_checked['submitted'];
+  foreach ($to_be_checked as $key => $value) {
+    if (in_array($key, $blacklist) or (!substr($key, 0, 6) == 'field_' and !in_array($key, $whitelist))) {
+      continue;
+    }
+    $result = $value;
+    //this has been done twice because of cck fields which have the format $field[0]['value']
+    //there also seems to be some mystery field that has a single key. hence the two individual statements are required.
+    if(is_array($result)) $result = current($result);
+    if(is_array($result)) $result = current($result);
+
+    if (_check_blacklist($result) && $user->uid != 1) {
+      form_set_error($key, t('Invalid character in @key', array('@key' => ucfirst($form[$key]['#title'] ? $form[$key]['#title'] : $key))));
+    }
+  }
+  if($form['form_id']['#value'] == 'search_form')
+  {
+    $result = $form['#post']['keys'];
+    if (_check_blacklist($result) && $user->uid != 1) {
+      form_set_error('keys', t('Invalid character in @key', array('@key' => 'Search')));
+      drupal_set_message('Invalid argument','error');
+      drupal_not_found();
+      exit();
+    }
+  }
+  if($form['form_id']['#value'] == 'comment_form')
+  {
+    
+    $result = $form['#post']['comment'];
+    if (_check_blacklist($result) && $user->uid != 1) {
+      form_set_error('comment', t('Invalid character in @key', array('@key' => 'Comment')));
+    }
+  }
+  if($form['form_id']['#value'] == 'feedback_node_form')
+  {
+    $result = $form['#post']['field_feedback_body'][0]['value'];
+    if (_check_blacklist($result, TRUE) && $user->uid != 1) {
+      form_set_error('field_feedback_body', t('Invalid character in @key', array('@key' => 'Feedback')));
+    }
+  }
+  if($form['form_id']['#value'] == 'forum_node_form')
+  {
+    $results['title'] = $form['#post']['title'];
+    $results['body'] = $form['#post']['body'];
+    foreach($results as $key => $result) {
+      if (_check_blacklist($result) && $user->uid != 1) {
+        form_set_error($key, t('Invalid character in @key', array('@key' => $key)));
+      }
+    }
+  }
+}
+
+function _check_blacklist($str, $strict=FALSE) {
+  if ($strict) {
+     $badch = array(
+        'DELETE',
+        '<a herf',
+        '<a',
+        '[url',
+        '<script>',
+        '<ScRiPt>',
+        '</ScRiPt>',
+        'alert()+',
+        'img+src',
+        'javascript:alert()',
+        '<script>',
+        '</textarea>',
+        '<script/xss+src=',
+        '<iframe/+/onload',
+        'onmouseover',
+        'alert()'
+    );
+  }
+  else {
+   $badch = array(
+      'DELETE',
+      '<script>',
+      '<ScRiPt>',
+      '</ScRiPt>',
+      'alert()+',
+      'img+src',
+      'javascript:alert()',
+      '<script>',
+      '</textarea>',
+      '<script/xss+src=',
+      '<iframe/+/onload',
+      'onmouseover',
+      'alert()'
+    );
+  }
+  if (is_null($str) || trim($str) == "") {
+    return FALSE;
+  }
+  foreach ($badch as $bad) {
+    if (strpos($str, $bad) !== FALSE) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+function form_validation_validate_input($text){
+  return preg_match("/[^a-zA-Z0-9 _\(\)-]+\/+/", $text);
+
+}
+function form_validation_validate_url($text){
+  return preg_match('|^http(s)?://[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i', $text);
+
+}
+function form_validation_validate_input_replace($text){
+  return preg_replace("/[^a-zA-Z0-9 _-]+\/+/", '', $text);
+
+}

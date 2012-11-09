@@ -1,0 +1,144 @@
+<?php
+// $Id$
+
+/**
+ * Implements hook_help().
+ */
+function duplicate_role_help($path, $arg) {
+	$output = '';
+	switch ($path) {
+		case "admin/user/duplirole":
+		$output = '<p>'. t("Duplicate an existing role with the same permissions for modules and taxonomies as the original ones"). '</p>';
+		break;
+	}
+	return $output;
+} // function duplicate_role_help
+
+
+/**
+ * Implements hook_perm().
+ */
+function duplicate_role_perm() {
+  return array('access duplicate role');
+} // function duplicate_role_perm
+
+
+/**
+ * Implements hook_menu().
+ */
+function duplicate_role_menu() {
+  
+  $items = array();
+  
+  $items['admin/user/duplirole'] = array(
+    'title' => t('Duplicate Role'),
+    'description' => t('A module that duplicates an existing role and its permissions.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('duplicate_role_form'),
+    'access arguments' => array('access duplicate role'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  return $items;
+}
+
+
+/**
+ * Form submit. Insert records into database.
+ */
+function duplicate_role_form_submit($form, &$form_state) {
+        $rolnovo_nome = $form_state['values']['nome'];
+        $rolvello_id  = $form_state['values']['varid'];
+		
+	// Create new role
+	if (db_table_exists('role')){
+		$sql = "INSERT INTO {role} (name) VALUES ('%s')";
+		$result = db_query($sql,$rolnovo_nome);
+		
+		// capture new role id
+		$sql = "SELECT r.rid FROM {role} r WHERE name='%s'";
+		$result = db_query($sql,$rolnovo_nome);
+		while ($row = db_fetch_object($result)) {
+			$rolnovo_id = $row->rid;
+		}
+	}
+
+	//Permission for old role in table "permission"	
+    if (db_table_exists('permission')){		
+		$sql = "SELECT p.perm, p.tid FROM {permission} p WHERE rid='%d'";
+		$result = db_query($sql,$rolvello_id);	
+		while ($row = db_fetch_object($result)) {
+			$rolvello_perm = $row->perm;
+			$rolvello_tid = $row->tid;		
+		}	
+
+		//Duplicate module permissions for new rol
+		$sql = "INSERT INTO {permission} (rid,perm,tid) VALUES ('%d','%s','%d')";
+		$result = db_query($sql,$rolnovo_id,$rolvello_perm,$rolvello_tid);	
+	}
+
+
+	//Duplicate taxonomies access permissions for new rol
+	if (db_table_exists('term_access')){	
+		$sql = "INSERT INTO {term_access} 
+		(tid,rid,grant_view,grant_update,grant_delete,grant_create,grant_list) 
+		SELECT tid, '%d',grant_view,grant_update,grant_delete,grant_create,grant_list
+		FROM term_access where rid='%d'";
+		$result = db_query($sql,$rolnovo_id,$rolvello_id);		
+	}	
+	
+	
+	//Duplicate taxonomies access default permissions for new rol
+	if (db_table_exists('term_access_defaults')){	
+		$sql = "INSERT INTO {term_access_defaults} 
+		(vid,rid,grant_view,grant_update,grant_delete,grant_create,grant_list) 
+		SELECT vid, '%d',grant_view,grant_update,grant_delete,grant_create,grant_list
+		FROM {term_access_defaults} where rid='%d'";
+		$result = db_query($sql,$rolnovo_id,$rolvello_id);			
+	}
+
+	drupal_set_message(t('New role added successfully.'));
+}
+
+/**
+ * Module selection interface.
+ */
+function duplicate_role_form() {
+   
+  $form = array();
+  $u_roles = user_roles();
+
+  asort($u_roles);
+
+  $options = array();
+  $options[] = t('-- Please Select One Role --');
+
+  foreach ($u_roles as $key => $value) {
+    $options[$key] = $value;
+  }
+
+  $form['varid'] = array(
+    '#type' => 'select',
+    '#title' => t('Choose role to duplicate'),
+    '#default_value' => variable_get('copiarol_varid', 0),
+    '#description' => t("Select role to duplicate"),
+    '#options' => $options,
+  );
+
+  $form['nome'] = array(
+    '#type' => 'textfield',
+    '#title' => t('New role'),
+    '#default_value' => variable_get('copiarol_nome',''),
+    '#required' => true,
+    '#size' => 40,
+    '#maxlength' => 40,
+    '#description' => t("New role name"),
+  );   
+
+  $form['submit'] = array(
+    '#type' => 'submit', 
+    '#value' => t('Create new role')
+  );
+   
+  return $form;
+} 

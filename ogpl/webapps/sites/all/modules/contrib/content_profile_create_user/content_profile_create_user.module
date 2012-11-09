@@ -1,0 +1,406 @@
+<?php
+
+/**
+ * @file content_profile_create_user.module
+ */
+
+define('CONTENT_PROFILE_CREATE_USER_EMAIL_SUBJECT', 'content_profile_create_user_email_subject');
+define('CONTENT_PROFILE_CREATE_USER_EMAIL_BODY', 'content_profile_create_user_email_body');
+define('CONTENT_PROFILE_CREATE_USER_SEND_EMAIL', 'content_profile_create_user_send_email');
+define('CONTENT_PROFILE_CREATE_USER_SEND_EMAIL_DEFAULT', FALSE);
+define('CONTENT_PROFILE_CREATE_USER_MAP_EXISTING', 'content_profile_create_user_map_existing');
+define('CONTENT_PROFILE_CREATE_USER_MAP_EXISTING_DEFAULT', FALSE);
+define('CONTENT_PROFILE_CREATE_USER_CREATE_PERMISSION', 'create users from content profiles');
+
+/******************************************************************************\
+|                                  * HOOKS *                                   |
+\******************************************************************************/
+/**
+ * Implementation of hook_block().  
+ */
+function content_profile_create_user_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      return array(
+        'create' => array(
+          'info' => t('Content Profile: Create User'),
+        ),
+      );
+      break;
+    case 'view':
+      if (user_access(CONTENT_PROFILE_CREATE_USER_CREATE_PERMISSION)) {
+        $node = node_load(arg(1));
+        // make sure the node exists and that this is not the edit form 
+        // (hook_form_alter already adds a button to the edit form)
+        if ($node && arg(2) != 'edit') {
+          $types = module_invoke('content_profile', 'get_types', 'names');
+          //make sure this is a content profile owned by Anonymous
+          if (array_key_exists($node->type, $types) && $node->uid == 0) {
+            return array(
+              'subject' => t('Create User'),
+              'content' => drupal_get_form('content_profile_create_user_block_create_form', $node->nid),
+            );
+          }
+        }
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function content_profile_create_user_form_alter(&$form, &$form_state, $form_id) {
+  // Only show the create user button on profiles that don't yet have users
+  if (empty($form['uid']['#value'])) {
+    if (user_access(CONTENT_PROFILE_CREATE_USER_CREATE_PERMISSION)) {
+      $types = module_invoke('content_profile', 'get_types', 'names');
+      if (array_key_exists($form['type']['#value'], $types)) {
+        $form['buttons']['create_user'] = array(
+          '#type' => 'submit',
+          '#value' => 'Create User',
+          '#weight' => 20,
+          '#submit' => array(
+            'node_form_submit',
+            'content_profile_create_user_form_submit',
+          ),
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_form_FORM_ID_submit().
+ */
+function content_profile_create_user_form_submit($form, &$form_state) {
+  if (user_access(CONTENT_PROFILE_CREATE_USER_CREATE_PERMISSION)) {
+    $nid = $form_state['values']['nid'];
+    content_profile_create_user_op($nid);
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function content_profile_create_user_menu() {
+  $items = array();
+  
+  $items['admin/settings/content_profile_create_user'] = array(
+    'title' => 'Content Profile: Create User',
+    'description' => 'Configure settings for creating users from content profiles',
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('content_profile_create_user_settings_form'),
+    'access arguments' => array(CONTENT_PROFILE_CREATE_USER_CREATE_PERMISSION),
+    'file' => 'content_profile_create_user.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_node_operations().
+ */
+function content_profile_create_user_node_operations() {
+  $operations = array(
+    'create user' => array(
+      'label' => t('Create user'),
+      'callback' =>  'content_profile_create_user_op_batch',
+    ),
+  );
+  
+  return $operations;
+}
+
+
+/**
+ * Implementation of hook_perm().
+ */
+function content_profile_create_user_perm() {
+  return array(CONTENT_PROFILE_CREATE_USER_CREATE_PERMISSION);
+}
+
+/******************************************************************************\
+|                              * API FUNCTIONS *                               |
+\******************************************************************************/
+/**
+ * Form function for the Conten Profile Create User block 
+ * @param $form_state
+ * @param $nid
+ *   The nid of the Content Profile for which to create a user
+ */
+
+function content_profile_create_user_block_create_form(&$form_state, $nid) {
+  $form_state['storage']['nid'] = $nid;
+
+  $form['create_user'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Create User'),
+    '#description' => t('Create a user from this content profile.'),
+  );
+
+  $form['create_user']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Create User'),
+  );
+
+  return $form;
+}
+
+/**
+ * Submit handler for content_profile_create_user_block_create_form
+ * @param $form
+ * @param $form_state
+ */
+function content_profile_create_user_block_create_form_submit($form, &$form_state) {
+  content_profile_create_user_op($form_state['storage']['nid']);
+}
+
+/**
+ * Sets up creation of users for $nids as a batch operations
+ * 
+ * @param $nids 
+ *   The nids of the nodes for which to create users
+ */
+function content_profile_create_user_op_batch($nids) {
+  $batch = array(
+    'title' => 'Creating Users',
+    'progress_message' => 'Creating user @current of @total',
+    'operation' => array(),
+    'finished' => 'conent_profile_create_user_op__batch_finished',
+  );
+  
+  foreach ($nids as $nid) {
+    $batch['operations'][] = array('content_profile_create_user_op', array($nid));
+  }
+  
+  batch_set($batch);  
+}
+
+/**
+ * Creates all users that can be created from Content Profiles.
+ *   
+ * This function gets the set of Content Profile nids owned by the Anonymous User
+ * and invokes content_profile_create_user_op_batch() on them.
+ */
+function content_profile_create_user_op_all() {
+  if (!user_perm(CONTENT_PROFILE_CREATE_USER_CREATE_PERMISSION)) {
+    drupal_set_message(t('You do not have permission to create users from content profiles'));
+    return FALSE;
+  }
+  
+  $nids = array();
+  $types = module_invoke('content_profile', 'get_types', 'names');
+
+  if (count($types) == 0 ) {
+    drupal_set_message(t('Content Profile Create User requires at least one Content Profile content type to be defined.'), 'error');
+    return FALSE;
+  }
+  
+  $type = array_pop(array_keys($types, 0));
+
+  $results = db_query(db_rewrite_sql("SELECT nid FROM {node} n WHERE uid=%d AND type='%s'"), 0, $type);
+  while ($result = db_fetch_object($results)) {
+    $nids[] = $result->nid;
+  }
+
+  content_profile_create_user_op_batch($nids);
+}
+
+/**
+ * Creates a user from a Content Profile
+ * 
+ * @param $nid 
+ *   The nid of the Content Profile from which to create a user
+ * @param $context 
+ *   Used for error reporting if this function is called as a batch operation
+ */
+function content_profile_create_user_op($nid, &$context = NULL) {
+  if (!user_perm(CONTENT_PROFILE_CREATE_USER_CREATE_PERMISSION)) {
+    drupal_set_message(t('You do not have permission to create users from content profiles'));
+    return FALSE;
+  }
+
+  if (!$node = node_load($nid)) {
+    drupal_set_message(t('The specified content profile could not be found'), 'error');
+    return FALSE;
+  }
+  
+  $types = module_invoke('content_profile', 'get_types', 'names');
+  
+  if (!array_key_exists($node->type, $types)) {
+    drupal_set_message($node->type . ' is not a Content Profile type', 'error');
+    return FALSE;
+  }
+  
+  // Find all of the email fields used by content profile content types
+  include_once('./'. drupal_get_path('module', 'content') .'/includes/content.crud.inc');
+  $profile_types = module_invoke('content_profile', 'get_types', 'names');
+  $email_fields = array();
+  foreach ($profile_types as $type_machine => $type_human) {
+    $type_fields = module_invoke('content', 'field_instance_read', array('type_name' => $type_machine));
+    foreach ($type_fields as $field) {
+      if ($field['type'] == 'email') {
+        $email_fields[] = $field['field_name'];
+      }
+    }
+  }
+  
+  // Attempt to find an email field with a value in it.  This will check the 
+  // current node against all of the email fields in the database, whether they
+  // exist for this node or not.  A more efficient solution should eventually 
+  // be found.
+  while (empty($email) && !empty($email_fields)) {
+    $field_name = array_pop($email_fields);
+    $field = $node->$field_name;
+    $email = $field[0]['email'];    
+  }
+  
+  if (empty($email)) {
+    drupal_set_message(t('Could not create user, no email found for %title', array('%title' => $node->title)), 'error');
+    return FALSE;
+  }
+
+  // Make sure the email address is not blocked
+  if (drupal_is_denied('mail', $email)) {
+    drupal_set_message(t('The e-mail address %email has been denied access.', array('%email' => $newUser['mail'])), 'error');
+    return FALSE;
+  }
+
+  // Check if there is already a user with this email address
+  $user = user_load(db_result(db_query(db_rewrite_sql("SELECT uid FROM {users} u WHERE LOWER(mail) = LOWER('%s')", 'u'), $email)));
+  if (empty($user->uid)) {
+    $username = $node->title;
+    // Check if there is already a user with this name.  If so, append a 
+    // sequential index.
+    if (db_result(db_query(db_rewrite_sql("SELECT uid FROM {users} u WHERE LOWER(u.name) = LOWER('%s')", 'u'), $username)) > 0) {
+      $sql = db_rewrite_sql("SELECT SUBSTRING_INDEX(u.name,'_',-1) FROM {users} u WHERE u.name REGEXP '^%s_[0-9]+$' ORDER BY CAST(SUBSTRING_INDEX(u.name,'_',-1) AS UNSIGNED) DESC", 'u');
+      $nameidx = db_result(db_query_range($sql, $username, 0, 1));
+      $username .= '_' . ($nameidx + 1);
+    }
+
+    // Define the new user
+    $newUser = array(
+      'name' => $username,
+      'mail' => $email,
+      'status' => 1,
+      'init' => 'email address',
+    );
+
+    // Create the new user and assign the user profile to it
+    if ($user = user_save(NULL, $newUser)) {
+      // Assign the node to the new user
+      $uid = $user->uid;
+      $node->uid = $uid;
+      node_save($node);
+
+      // Send one time email
+      _content_profile_create_user_send_email($newUser);
+      drupal_set_message(t('Created user %name (%uid) for %email', array('%name' => $user->name, '%uid' => $user->uid, '%email' => $user->email)));
+    }
+    else {
+      drupal_set_message(t('User creation failed for %title for an unknown reason', array('%title' => $node->title)), 'error');
+      return FALSE;
+    }
+  }
+  else {
+    // Check if we are mapping profiles to existing users
+    if (!variable_get(CONTENT_PROFILE_CREATE_USER_MAP_EXISTING, CONTENT_PROFILE_CREATE_USER_MAP_EXISTING_DEFAULT)) {
+      drupal_set_message(t('User creation failed, the email address %email is already registered.', array('%email' => $newUser['mail'])), 'error');
+      return FALSE;
+    }
+
+    // Check if this user already as a profile of the specified type
+    $profile = module_invoke('content_profile', 'load', $node->type, $user->uid);
+    if (!empty($profile)) {
+      drupal_set_message(t('Profile assignment failed, the email address %email is already registered to a user with a profile of this type', array('%email' => $email)), 'error');
+      return FALSE;
+    }
+
+    // Assign the profile to the user
+    $uid = $user->uid;
+    $node->uid = $uid;
+    node_save($node);
+
+    drupal_set_message(t('Assigned profile %title (%nid) to %name (%uid)', array('%title' => $node->title, '%nid' => $node->nid, '%name' => $user->name, '%uid' => $user->uid)));
+  }
+}
+
+
+/**
+ * Used at the end of batch processing to report results
+ * 
+ * @param $success 
+ *   See Batch API
+ * @param $results 
+ *   See Batch API
+ * @param $operations 
+ *   See Batch API
+ */
+function content_profile_create_user_op_finished($success, $results, $operations) {
+  if ($success) {
+    if (count($results['bad'])) {
+      drupal_set_message(t('Batch failed for: !bad-list', array('!bad-list' => theme('item_list', $results['bad']))), 'error');
+    }
+    
+    if (count($results['good'])) {
+      drupal_set_message(t('Batch succeeded: !good-list', array('!good-list' => theme('item_list', $results['good']))));
+    }
+  } 
+  else {
+    drupal_set_message(t('Content Profile Create User: Batch failed.'), 'error');
+    watchdog('content_profile_create_user', 'Content Profile Create User: Batch failed');
+  }
+}
+
+/******************************************************************************\
+|                            * PRIVATE FUNCTIONS *                             |
+\******************************************************************************/
+/**
+ * Helper function to send an email to a user
+ * 
+ * @param $account 
+ *   The newly created account to which to send the email
+ */
+function _content_profile_create_user_send_email($account) {
+  // Only send an email if the admin setting has been selected
+  if (variable_get(CONTENT_PROFILE_CREATE_USER_SEND_EMAIL, CONTENT_PROFILE_CREATE_USER_SEND_EMAIL_DEFAULT)) {
+    $params = user_mail_tokens($account, user_preferred_language($account));
+    $sent = drupal_mail('content_profile_create_user', 'create', $account->mail, user_preferred_language($account), $params, variable_get('site_mail', NULL), TRUE);
+  }
+}
+
+/**
+ * Implementation of hook_mail().
+ */
+function content_profile_create_user_mail($key, &$message, $params) {
+  $language = $message['language'];
+
+  switch ($key) {
+    case 'create':
+      $message['subject'] = t(variable_get(CONTENT_PROFILE_CREATE_USER_EMAIL_SUBJECT, _content_profile_create_user_default_subject()), $params, $language->language);
+      $message['body'][] = t(variable_get(CONTENT_PROFILE_CREATE_USER_EMAIL_BODY, _content_profile_create_user_default_body()), $params, $language->language);
+      break;
+  }
+}
+
+/**
+ * Provides a default email subject
+ */
+function _content_profile_create_user_default_subject() {
+  return 'Account details for !username at !site';
+}
+
+/**
+ * Provides a default email body
+ */
+function _content_profile_create_user_default_body() {
+  return '!username,
+  
+An account has been created for you at !site. Your username is !username.  Please login at !login_url to choose a password and begin using the site.  This is a one time login, so make sure you change your password once you login.
+
+After logging in, you will be redirected to !edit_uri so you can change your password.
+
+--  !site team';
+}

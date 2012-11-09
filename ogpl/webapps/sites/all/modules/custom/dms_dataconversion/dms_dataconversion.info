@@ -1,0 +1,5 @@
+name= DMS Data Conversion
+description = Used to convert datasets to various format.
+core = 6.x
+dependencies[] = libraries
+dependencies[] = Form Validation

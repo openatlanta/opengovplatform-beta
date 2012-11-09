@@ -1,0 +1,167 @@
+/**
+ * @file
+ * Allows to hide unchosen sub-options and to show chosen sub-options.
+ */
+
+/**
+ * Hide unchosen items.
+ */
+#description_alone_terms.filtered,
+#description_def_links.filtered,
+#description_flat.filtered,
+#description_tree_structure.filtered,
+#description_polyhierarchy.filtered,
+#description_parents.filtered,
+#description_children.filtered,
+#description_relations.filtered,
+#description_synonyms.filtered,
+#description_definitions.filtered,
+#description_descriptions.filtered,
+#description_weights.filtered,
+#description_taxonomy_manager.filtered,
+#description_geotaxonomy.filtered,
+
+#existing_items_alone_terms.filtered,
+#existing_items_def_links.filtered,
+#existing_items_flat.filtered,
+#existing_items_tree_structure.filtered,
+#existing_items_polyhierarchy.filtered,
+#existing_items_parents.filtered,
+#existing_items_children.filtered,
+#existing_items_relations.filtered,
+#existing_items_synonyms.filtered,
+#existing_items_definitions.filtered,
+#existing_items_descriptions.filtered,
+#existing_items_weights.filtered,
+#existing_items_taxonomy_manager.filtered,
+#existing_items_geotaxonomy.filtered,
+
+#help_alone_terms.filtered,
+#help_def_links.filtered,
+#help_flat.filtered,
+#help_tree_structure.filtered,
+#help_polyhierarchy.filtered,
+#help_parents.filtered,
+#help_children.filtered,
+#help_relations.filtered,
+#help_synonyms.filtered,
+#help_definitions.filtered,
+#help_descriptions.filtered,
+#help_weights.filtered,
+#help_taxonomy_manager.filtered,
+#help_geotaxonomy.filtered,
+
+/* #edit-keep-order-wrapper.format_name, */
+
+#import.filtered #edit-text-wrapper,
+#import.filtered #edit-file-wrapper,
+#import.filtered #edit-url-wrapper,
+
+#csv_format.filtered #edit-import-delimiter-soft-tab-width-wrapper,
+#csv_format.filtered #edit-import-delimiter-custom-wrapper,
+#csv_format.filtered #edit-import-enclosure-custom-wrapper,
+#csv_format.filtered #edit-export-delimiter-custom-wrapper,
+#csv_format.filtered #edit-export-enclosure-custom-wrapper,
+
+#edit-check-utf8-wrapper.text,
+
+#destination.filtered #edit-vocabulary-id-wrapper,
+#destination.filtered #edit-delete-terms-wrapper,
+
+#set_hierarchy.filtered,
+
+#edit-export-order-wrapper.filtered,
+#edit-relations.filtered,
+#edit-def-links.filtered,
+
+#specific_info.def_links,
+
+#result_type.first {
+  display: none;
+}
+
+/**
+ * Show chosen items.
+ */
+#description_alone_terms.alone_terms,
+#description_def_links.def_links,
+#description_flat.flat,
+#description_tree_structure.tree_structure,
+#description_polyhierarchy.polyhierarchy,
+#description_parents.parents,
+#description_children.children,
+#description_relations.relations,
+#description_definitions.definitions,
+#description_descriptions.descriptions,
+#description_weights.weights,
+#description_synonyms.synonyms,
+#description_taxonomy_manager.taxonomy_manager,
+#description_geotaxonomy.geotaxonomy,
+
+#existing_items_alone_terms.alone_terms,
+#existing_items_def_links.def_links,
+#existing_items_flat.flat,
+#existing_items_tree_structure.tree_structure,
+#existing_items_polyhierarchy.polyhierarchy,
+#existing_items_parents.parents,
+#existing_items_children.children,
+#existing_items_relations.relations,
+#existing_items_synonyms.synonyms,
+#existing_items_definitions.definitions,
+#existing_items_descriptions.descriptions,
+#existing_items_weights.weights,
+#existing_items_taxonomy_manager.taxonomy_manager,
+#existing_items_geotaxonomy.geotaxonomy,
+
+#help_alone_terms.alone_terms,
+#help_def_links.def_links,
+#help_flat.flat,
+#help_tree_structure.tree_structure,
+#help_polyhierarchy.polyhierarchy,
+#help_parents.parents,
+#help_children.children,
+#help_relations.relations,
+#help_definitions.definitions,
+#help_descriptions.descriptions,
+#help_weights.weights,
+#help_synonyms.synonyms,
+#help_taxonomy_manager.taxonomy_manager,
+#help_geotaxonomy.geotaxonomy,
+
+#import.text #edit-text-wrapper,
+#import.file #edit-file-wrapper,
+#import.url #edit-url-wrapper,
+
+#csv_format.soft_tab #edit-import-delimiter-soft-tab-width-wrapper,
+#csv_format.custom_delimiter #edit-import-delimiter-custom-wrapper,
+#csv_format.custom_enclosure #edit-import-enclosure-custom-wrapper,
+#csv_format.custom_delimiter #edit-export-delimiter-custom-wrapper,
+#csv_format.custom_enclosure #edit-export-enclosure-custom-wrapper,
+
+#edit-check-utf8-wrapper.file,
+#edit-check-utf8-wrapper.url,
+
+#destination.duplicate #edit-vocabulary-id-wrapper,
+#destination.existing #edit-vocabulary-id-wrapper,
+#destination.existing #edit-delete-terms-wrapper,
+
+#edit-export-order-wrapper.alone_terms,
+#edit-export-order-wrapper.def_links,
+#edit-export-order-wrapper.flat,
+#edit-export-order-wrapper.parents,
+#edit-export-order-wrapper.children,
+#edit-export-order-wrapper.relations,
+#edit-export-order-wrapper.synonyms,
+#edit-export-order-wrapper.definitions,
+#edit-export-order-wrapper.descriptions,
+#edit-export-order-wrapper.weights,
+#edit-export-order-wrapper.taxonomy_manager,
+#edit-export-order-wrapper.geotaxonomy,
+#edit-relations.relations,
+#edit-def-links.def_links,
+
+#result_type.warnings,
+#result_type.notices,
+#result_type.infos {
+  display: block;
+}

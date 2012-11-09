@@ -1,0 +1,150 @@
+<?php 
+/**
+ * Implementation of hook_watchdog().
+ */
+function web_myservice_alert_watchdog($log) {
+  global $language;
+  if ($log['type'] == 'ldap' || $log['type'] == 'curl') {
+    $to = variable_get('service_alert_email', variable_get('site_mail', 'nic-ndsap@nic.in'));
+    // Send email alert.
+    drupal_mail('web_myservice_alert', 'alert', $to, $language->language, $log);
+    web_myservice_alert_sms('alert', $log);
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function web_myservice_alert_menu() {
+  $items['admin/settings/logging/servicealert'] = array(
+      'title'             => 'Service alerts',
+      'description'       => 'Settings for logging and alerts to email addresses and SMS.',
+      'page callback'     => 'drupal_get_form',
+      'page arguments'    => array('web_myservice_alert_admin_settings'),
+      'access arguments'  => array('administer site configuration'),
+      'type'              => MENU_NORMAL_ITEM,
+      'file'              => 'web_myservice_alert.admin.inc',
+  );
+  return $items;
+}
+
+function web_myservice_alert_cron(){
+  web_myservice_alert_checkcurl();
+}
+function web_myservice_alert_checkcurl() {
+  $url = 'http://drupal.org';
+  if(!function_exists('curl_init')) {
+    watchdog('curl', 'function curl not available');
+  }
+  else {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+     
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    
+    $retValue = curl_exec($ch);
+    $file_info = curl_getinfo($ch);
+    
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    
+    $status = curl_getinfo($ch, CURLINFO_HTTP_CODE) == 404;
+    $curl_errno = curl_errno($ch);
+    $curl_error = curl_error($ch);
+    curl_close($ch);
+    
+    if ($curl_errno > 0) {
+      watchdog('curl', 'cURL Error (%curl_errno): %curl_error', array('%curl_errno' => $curl_errno, '%curl_error' => $curl_error));
+    }
+  }
+}
+/**
+ * Implementation of hook_theme().
+ */
+function web_myservice_alert_theme() {
+  return array(
+      'service_alert_email' => array(
+          'template' => 'service_alert_email',
+          'arguments' => array('log' => NULL),
+      ),
+  );
+}
+
+function web_myservice_alert_sms($key, $params) {
+  if ($key == 'alert') {
+    $severity_levels = watchdog_severity_levels();
+    $vars = array(
+        '@site_name'      => variable_get('site_name', 'Data Portal India'),
+        '@severity_desc'  => drupal_ucfirst($severity_levels[$params['severity']]),
+        '@dblog_message'  => truncate_utf8(strip_tags(t($params['message'], $params['variables'])), 140, TRUE, TRUE),
+    );
+    $message = t('@severity_desc: @dblog_message', $vars);
+    // $message = "Please check your mail for error";
+    if (function_exists('sms_nic_command')) {
+      $mobile_nos = variable_get('service_alert_sms', NULL);
+      $mobile_no = (!empty($mobile_nos) ? explode(",", $mobile_nos) : array());
+        foreach ($mobile_no as $number) {
+          sms_nic_command('sendmsg', array('number' => $number, 'message' => $message));
+      }
+    }
+  }
+}
+/**
+ * Implementation of hook_mail().
+ */
+function web_myservice_alert_mail($key, &$message, $params) {
+  if ($key == 'alert') {
+    $severity_levels = watchdog_severity_levels();
+    $vars = array(
+        '@site_name'      => variable_get('site_name', 'Data Portal India'),
+        '@severity_desc'  => drupal_ucfirst($severity_levels[$params['severity']]),
+        '@dblog_message'  => truncate_utf8(strip_tags(t($params['message'], $params['variables'])), 60, TRUE, TRUE),
+    );
+    $message['subject'] = t('[@site_name] @severity_desc: @dblog_message', $vars);
+    $message['body'][] = theme('service_alert_email', $params);
+  }
+}
+
+/**
+ * Process variables for service_alert_email.tpl.php.
+ */
+function template_preprocess_service_alert_email(&$variables) {
+  global $base_url;
+  $variables['base_url'] = $base_url;
+
+  $severity_list                     = watchdog_severity_levels();
+  $variables['log']['severity_desc'] = drupal_ucfirst($severity_list[$variables['log']['severity']]);
+  $variables['log']['datetime']      = date('Y-m-d H:i:s', $variables['log']['timestamp']);
+  $variables['log']['uid']           = $variables['log']['user']->uid;
+  $variables['log']['name']          = strip_tags(theme('username', $variables['log']['user']));
+  $variables['log']['link']          = strip_tags($variables['log']['link']);
+  $variables['log']['message']       = strip_tags(t($variables['log']['message'], $variables['log']['variables']));
+
+  $severity = _web_myservice_alert_system_string($severity_list[$variables['log']['severity']]);
+  $variables['template_files'][] = 'service_alert_email-' . $severity;
+  $variables['template_files'][] = 'service_alert_email-' . _web_myservice_alert_system_string($variables['log']['type']);
+  $variables['template_files'][] = 'service_alert_email-' . $severity . '-' . _web_myservice_alert_system_string($variables['log']['type']);
+}
+
+/**
+ * Process variables for service_alert_sms.tpl.php.
+ */
+function template_preprocess_service_alert_sms(&$variables) {
+  global $base_url;
+  $variables['base_url'] = $base_url;
+
+  $severity_list                     = watchdog_severity_levels();
+  $variables['log']['message']       = strip_tags(t($variables['log']['message'], $variables['log']['variables']));
+
+  $severity = _web_myservice_alert_system_string($severity_list[$variables['log']['severity']]);
+  $variables['template_files'][] = 'service_alert_sms-' . $severity;
+  $variables['template_files'][] = 'service_alert_sms-' . _web_myservice_alert_system_string($variables['log']['type']);
+  $variables['template_files'][] = 'service_alert_sms-' . $severity . '-' . _web_myservice_alert_system_string($variables['log']['type']);
+}
+
+/**
+ * Formats string as safe system string.
+ */
+function _web_myservice_alert_system_string($string, $replacement = '_') {
+  return preg_replace('/[^a-z0-9]+/', $replacement, drupal_strtolower($string));
+}

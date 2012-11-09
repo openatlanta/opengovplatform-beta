@@ -1,0 +1,86 @@
+6.x-1.0
+*******
+
+- Fixed issue with PHP notices causing problems with redirection.
+
+- 404s are always ignored.
+
+
+
+6.x-1.0-rc1
+***********
+
+- Issue #1214058 by roderik, dalin: Call to undefined function
+drupal_get_path_alias().
+
+
+
+6.x-1.0-beta2
+*******************
+
+- Added support for i18n.
+
+- Added options for admins to choose if anonymous and/or authenticated users
+should always be redirected.  The module is now a full replacement to
+Secure Pages module.
+
+- Added a cookie to more gracefully handle authenticated users that visit HTTP
+pages.
+
+- Added option to force all pages to use HTTPS.
+
+- Tweaks to documentation and other wording.
+
+- Fixed bug where all pages were redirecting to HTTPS.
+
+- Fixed doubly declared update function.
+
+- Added status report error if settings.php is incorrect.
+
+
+
+6.x-1.0-beta1
+*************
+
+- Added options for how to handle the login block.
+
+- Added support for additional pages that should always be under HTTPS
+(ex. a shopping cart).
+
+- Added support for pages that should always be ignored (ex. AJAX).
+
+- Fixed critical bug where drupal_session_commit() accidentally snuck into the
+D6 version.
+
+- Added hook_help().
+
+
+
+6.x-1.0-alpha3
+**************
+
+- Removed previous method of instant redirects.  Instituted a method where
+anything can indicate a preference during page generation, and any
+preferences are acted upon before the page is rendered.
+
+- Make it easier to disable the redirection by having a setting, rather than
+being always on.  This makes it possible to disable even if Drush is not
+present.
+
+- No longer necessary to edit settings.php
+
+- Removed previous method of using a custom access-denied page.  Now we just
+check HTTP headers before the page is rendered.
+
+
+
+6.x-1.0-alpha2
+**************
+
+- Fixed one-time-login links to use HTTPS
+
+
+
+6.x-1.0-alpha1
+**************
+- Initial release.

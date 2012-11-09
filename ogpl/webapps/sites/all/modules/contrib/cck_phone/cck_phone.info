@@ -1,0 +1,13 @@
+name = Phone Number
+description = "The phone module allows administrators to define a CCK field type for phone numbers."
+package = CCK
+dependencies[] = content
+core = 6.x
+
+
+; Information added by drupal.org packaging script on 2011-02-28
+version = "6.x-1.0"
+core = "6.x"
+project = "cck_phone"
+datestamp = "1298912166"
+

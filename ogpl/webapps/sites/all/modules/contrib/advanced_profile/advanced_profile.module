@@ -1,0 +1,213 @@
+<?php
+// $Id: advanced_profile.module,v 1.26.4.31 2010/10/04 19:12:10 michellec Exp $
+
+/**
+ * @file
+ * Provides building blocks for creating an enhanced user profile pages.
+ */
+
+// DRUPAL HOOKS **************************************************************/
+
+/**
+ * Implementation of hook_perm().
+ */
+function advanced_profile_perm() {
+  return array('administer advanced profile');
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function advanced_profile_menu() {
+  // Add menu entry for settings page
+  $items["admin/settings/advanced-profile"] = array(
+    'title' => 'Advanced Profile Kit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('advanced_profile_settings_page'),
+    'access arguments' => array('administer advanced profile'),
+    'file' => 'advanced_profile.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_menu_alter().
+ */
+function advanced_profile_menu_alter(&$items) {
+  // Get the title from the settings page.
+  $new_title = variable_get('advanced_profile_tab_title', "View");
+
+  // This is user entered input so make sure it's safe.
+  $new_title = check_plain($new_title);
+
+  // Change the menu title.
+  $items['user/%user/view']['title'] = t($new_title);
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function advanced_profile_theme() {
+  $items['advanced_profile_visitors'] = array(
+      'template' => 'advanced_profile_visitors',
+      'arguments' => array('account' => NULL),
+  );
+
+  return $items;
+}
+
+// MASTER INCLUDES ***********************************************************/
+
+if (module_exists('panels')) {
+  module_load_include('inc', 'advanced_profile', 'includes/panels/panels');
+}
+
+if (module_exists('views')) {
+  module_load_include('inc', 'advanced_profile', 'includes/views/views');
+}
+
+// PREPROCESS FUNCTIONS ******************************************************/
+
+/**
+ * Process variables for advanced_profile_visitors.tpl.php
+ *
+ * The $variables array contains the following arguments:
+ * - $account: The full user object.
+ *
+ * @see advanced_profile_visitors.tpl.php
+ */
+function template_preprocess_advanced_profile_visitors(&$variables) {
+  $visitors = advanced_profile_visitors($variables['account']->uid);
+
+  if (!empty($visitors)) {
+    $variables['visitors_list'] = $visitors;
+    $variables['visitors'] = theme_item_list($visitors);
+  }
+  else {
+    $variables['visitors_list'] = array();
+    $variables['visitors'] = t("No recent visitors.");
+  }
+}
+
+/**
+ * Implementation of hook_preprocess_user_profile().
+ *
+ * Makes variables for the author pane and profile visitors available in the 
+ * core user profile template. This is for using APK without Panels.
+ *
+ */
+function advanced_profile_preprocess_user_profile(&$variables) {
+  $variables['author_pane'] = theme('author_pane', $variables['account'], 'advanced_profile');
+  $variables['profile_visitors'] = theme('advanced_profile_visitors', $variables['account']);
+}
+
+/**
+ * Implementation of hook_preprocess_author_pane().
+ *
+ * Enables use of a custom template for Author Pane.
+ *
+ */
+function advanced_profile_preprocess_author_pane(&$variables) {
+  if (!empty($variables['caller']) && $variables['caller'] == 'advanced_profile') {
+    // If we are calling the Author Pane, use our template.
+    $variables['template_files'][] = 'advanced_profile_author-pane';
+  }
+}
+
+/**
+ * Implementation of hook_preprocess_node().
+ *
+ * Adds a redirect from the profile node to the user page.
+ *
+ */
+function advanced_profile_preprocess_node(&$variables) {
+  if (variable_get('advanced_profile_redirect_from_node', TRUE)) {
+    $node = $variables['node'];
+    if ($node->type == 'uprofile' && arg(0) == 'node' && arg(1) == $node->nid && arg(2) == "") {
+      // If we are postitive we are on node/N where N is the NID of a uprofile
+      // node, then redirect to the user profile page instead.
+      drupal_goto("user/$node->uid");
+    }
+  }
+}
+
+// PROFILE VISITORS *************************************************/
+
+/**
+ * Returns recent visitors to a profile page excluding that user and anonymous.
+ */
+function advanced_profile_visitors($uid) {
+  if (module_exists('statistics')) {
+    if (empty($uid)) {
+      $uid = arg(1);
+    }
+
+    // Retrieve the options from the variables
+    $interval_granularity = variable_get('advanced_profile_visitors_interval_granularity', 2);
+    $distinct = variable_get('advanced_profile_visitors_distinct', FALSE);
+    $limit = variable_get('advanced_profile_visitors_limit', 5);
+    $excluded_roles = variable_get('advanced_profile_visitors_excluded_roles', array());
+
+    // This bit is to take the array from the checkboxes on the settings page
+    // and put it into a comma separate string. There may be an array function
+    // that will do this better.
+    $exclude_array = array();
+    foreach ($excluded_roles as $key => $role_id) {
+      if ($key > 0 && $role_id > 0) {
+        $exclude_array[] = $key;
+      }
+    }
+
+    $excluded_users = array();
+
+    if (!empty($exclude_array)) {
+      $placeholders = implode(',', array_fill(0, count($exclude_array), '%d'));
+
+      // Get a list of UIDs in the excluded roles
+      $sql = "SELECT ur.uid
+              FROM {users_roles} ur
+              WHERE ur.rid IN ($placeholders)";
+      $result = db_query($sql, $exclude_array);
+      while ($account = db_fetch_object($result)) {
+        $excluded_users[] = $account->uid;
+      }
+    }
+
+    // TODO: If a "user invisible" module gets written, retrieve a list of
+    // invisible UIDs here.
+
+    // Get the last 1000 visitors to the profile which should give us plenty
+    // to work with.
+    $sql = "SELECT a.uid, u.name, a.timestamp
+            FROM {accesslog} a
+              INNER JOIN {users} u ON a.uid = u.uid
+            WHERE a.uid <> %d
+              AND a.uid > 0
+              AND a.path = 'user/%d'
+            ORDER BY a.timestamp DESC
+            ";
+    $result = db_query_range($sql, $uid, $uid, 0, 1000);
+
+    $items = array();
+    $used_uids = array();
+    $used_items = 0;
+    while (($log = db_fetch_object($result)) && ($used_items < $limit)) {
+      if (!in_array($log->uid, $excluded_users) && (!$distinct || !in_array($log->uid, $used_uids))) {
+        // User isn't an excluded user and we either don't care about distinct
+        // or this user hasn't been added to the list, yet.
+        $used_items++;
+        $used_uids[] = $log->uid;
+        $ago = format_interval(time() - $log->timestamp, $interval_granularity);
+        $items[] = t("!user !ago ago", array("!user" => theme('username', $log), "!ago" => $ago));
+      }
+    }
+  }
+  else {
+    $items[] = t("Warning: Statistics module not enabled.");
+  }
+
+  return $items;
+}
+
+

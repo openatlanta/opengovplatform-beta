@@ -1,0 +1,97 @@
+<?php
+
+/**
+ * @file
+ * 443 Session install file
+ */
+
+/**
+ * Implements hook_enable().
+ */
+function session443_enable() {
+  drupal_set_message(t('Redirects need to be enabled at !settings', array('!settings' => l('admin/settings/session443', 'admin/settings/session443'))));
+
+  // Make sure session443_boot() runs after i18n_boot().
+  db_query("UPDATE {system} SET weight = 11 WHERE name = 'session443'");
+}
+
+/**
+ * Implements hook_disable().
+ */
+function session443_disable() {
+  variable_set('session443_enable', SESSION443_STATUS_DISABLED);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function session443_uninstall() {
+  variable_del('session443_site_403_orig');
+  variable_del('session443_enable');
+  variable_del('session443_user_state_rule');
+  variable_del('session443_login_block');
+  variable_del('session443_additional_pages');
+  variable_del('session443_ignore_pages');
+  variable_del('session443_cookie_name');
+  variable_del('session443_ssl_checks');
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function session443_requirements($phase) {
+  $requirements = array();
+  if ($phase == 'runtime' && file_exists('./'. conf_path() .'/settings.php')) {
+    $settings_php = file_get_contents('./'. conf_path() .'/settings.php');
+    $cookie_secure = preg_match('!if\s*\(.+?\)\s*{\s*ini_set\s*\(\s*[\'"]session.cookie_secure[\'"]\s*,\s*\w*\s*\)\s*;!i', $settings_php);
+    $cookie_secure_required = variable_get('session443_enable', SESSION443_DISABLED) == SESSION443_ENABLED &&
+      variable_get('session443_user_state_rule', SESSION443_USER_MODE_FORCE_HTTPS_AND_HTTP) != SESSION443_USER_MODE_NONE;
+    $if_example = <<<EOD
+      if (!empty(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] != 'off') {
+        ini_set('session.cookie_secure', 1);
+      }
+EOD;
+    if ($cookie_secure_required && !$cookie_secure) {
+      $description = t('Settings.php is not setup correctly. With the current configuration of 443 Session module, the following lines <a href="!help_url"><em>must</em> be in settings.php</a>. <pre><code>!if_example</code></pre>', array('!if_example' => $if_example, '!help_url' => url('admin/help/session443')));
+      $severity = REQUIREMENT_ERROR;
+    }
+    elseif (!$cookie_secure_required && $cookie_secure) {
+      $description = t('Settings.php is not setup correctly. With the current configuration of 443 Session module, the following lines <a href="!help_url"><em>must not</em> be in settings.php</a>. <pre><code>!if_example</code></pre>', array('!if_example' => $if_example, '!help_url' => url('admin/help/session443')));
+      $severity = REQUIREMENT_ERROR;
+    }
+    else {
+      $description = t('Settings.php is setup correctly.');
+      $severity = REQUIREMENT_OK;
+    }
+
+    $requirements['session443'] = array(
+      'title' => t('443 Session'),
+      'value' => t('settings.php'),
+      'severity' => $severity,
+      'description' => $description,
+    );
+  }
+  return $requirements;
+}
+
+/**
+ * Remove the old access-denied variable.
+ */
+function session443_update_6001() {
+  $current_denied = variable_get('site_403', '');
+  if ($current_denied == 'session443/denied') {
+    $original_denied = variable_get('session443_site_403_orig', '');
+    variable_set('site_403', $original_denied);
+    variable_del('session443_site_403_orig');
+  }
+  return array();
+}
+
+/**
+ * Make sure session443_boot() runs after i18n_boot().
+ */
+function session443_update_6002() {
+  db_query("UPDATE {system} SET weight = 11 WHERE name = 'session443'");
+}
+
+// vim: set filetype=php expandtab tabstop=2 shiftwidth=2 autoindent smartindent:

@@ -1,0 +1,61 @@
+<?php
+//$Id$
+
+/**
+* @file
+* Use this module to confirm user logging out.
+*/
+
+/**
+* Implementation of hook_menu_alter().
+*/
+function logoutconfirm_menu_alter(&$items) {
+$items['logout']['page callback'] = 'logoutconfirm_page';
+unset($items['logout']['file']);
+}
+/**
+* Page callback.
+*/
+function logoutconfirm_page() {
+$output = t('Are you sure you wish to logout?');
+$output = $output.drupal_get_form('logoutconfirm_form');
+return '<div id="logout" class="custom-page-content">'. $output .'</div>';
+}
+function logoutconfirm_form($form_state) {
+// Define a submit function.
+$form['logoutconfirm']['submit'] = array(
+  '#type' => 'submit',
+  '#value' => t('Yes'),
+);
+$form['logoutconfirm']['no'] = array(
+  '#type' => 'submit',
+  '#value' => t('No'),
+);
+return $form;
+}
+/**
+* Handle submission of the form.
+*/
+function logoutconfirm_form_submit($form, $form_state) {
+// Store the value of clicked button in a variable.
+$form_values = $form_state['clicked_button']['#value'];
+if ($form_values == 'Yes') {
+global $user;
+
+watchdog('user', 'Session closed for %name.', array('%name' => $user->name));
+
+// Only variables can be passed by reference workaround.
+$null = NULL;
+user_module_invoke('logout', $null, $user);
+// Destroy the current session:
+session_destroy();
+session_regenerate_id(true);
+// Load the anonymous user
+$user = drupal_anonymous_user();
+
+drupal_goto();
+}
+elseif ($form_values == 'No') {
+drupal_goto();
+}
+}

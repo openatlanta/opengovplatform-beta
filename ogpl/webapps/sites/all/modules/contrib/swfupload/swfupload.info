@@ -1,0 +1,17 @@
+; $Id:$
+name = SWFupload Widget
+description = A widget for CCK's Filefield which enables multiple file uploads using the SWFUpload library.
+package = CCK
+version = VERSION
+dependencies[] = filefield
+dependencies[] = jqp
+core = 6.x
+
+
+
+; Information added by drupal.org packaging script on 2010-12-02
+version = "6.x-2.0-beta8"
+core = "6.x"
+project = "swfupload"
+datestamp = "1291307743"
+

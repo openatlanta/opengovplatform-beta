@@ -1,0 +1,87 @@
+<?php 
+function dms_dataconversion_menu() {
+  $items['datafile/%/%'] = array(
+      'title' => 'Dataset Files',
+      'page callback' => 'show_dataset',
+      'page arguments' => array(1,2),
+      'access arguments' => array('access content'),
+      'file' => 'dataconvert.pages.inc',
+      'weight' => 1,
+      'type' => MENU_CALLBACK
+  );
+  return $items;
+}
+
+/*
+ * read_source_dataproxy() is used to get the json output of the file format
+ * url 	URL of data resource, such as XLS or CSV file. This is required
+ * type 	Resource/file type. This overrides autodetection based on file extension. You should also use this if there is no file extension in the URL but you know the type of the resource.
+ * max-results 	Maximum nuber of results (rows) returned
+ * format 	Output format. Currently json and jsonp are supported
+ */
+function read_source_dataproxy($url, $type = NULL, $maxresults = NULL, $format = 'json'){
+  $webservice = 'http://jsonpdataproxy.appspot.com/';
+  $url = $webservice . "?url=" . $url . "&format=".$format;
+  $curl_handle = curl_init();
+  curl_setopt($curl_handle, CURLOPT_URL, $url);
+  curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 30);
+  curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+  curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+  $result= curl_exec($curl_handle);
+  curl_close($curl_handle);
+  return $result;
+}
+
+function document_parser($data, $format = 'xml') {
+  $data = json_decode($data);
+  switch($format) {
+    case 'xml':
+      include 'Array2xml.inc';
+      print_r($data->fields);
+      die();
+      break;
+    case 'xls':
+      break;
+    case 'xls':
+      break;
+  }
+  return $output;
+}
+function process_dataproxyjson_to_xml($json_obj) {
+  $data = json_decode($json_obj);
+  $xml = '<?xml version="1.0" ?>\n';
+  $indent .= "\t";
+  $fields = $data->fields;
+  foreach ($data->data as $value) {
+    $xml .= "<row>";
+    foreach ($value as $key => $data_row) {
+      $xml .=  "<".sanitize_string($fields[$key]).">";
+      $xml .=  "\t<![CDATA[{$data_row}]]>\n";
+      $xml .=  "</".sanitize_string($fields[$key]).">\n";
+    }
+    $xml .= "</row>\n";
+  }
+  //echo "<pre>".print_r($data, TRUE)."</pre>";
+  return $data;
+}
+
+function sanitize_string($string) {
+  $string = str_replace('%', 'Percent', $string);
+  $string = str_replace('(', '', $string);
+  $string = str_replace(')', '', $string);
+  return $string;
+}
+function convert_data($url, $format='json') {
+  $json = read_source_dataproxy($url);
+  switch($format) {
+    case 'json':
+      $output = $json;
+      break;
+    case 'xml':
+      $output = document_parser($json, 'xml');
+      break;
+    case 'xls':
+      break;
+  }
+  return $output;  
+}

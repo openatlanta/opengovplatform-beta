@@ -1,0 +1,182 @@
+<?php
+
+/**
+ * Implementation of hook_help().
+ */
+function twitter_profile_widget_help($path, $arg) {
+  switch ($path) {
+    case 'admin/settings/twitter_profile_widget':
+      return t("Twitter profile widget provides configurable block with user's latest twits.");
+    case 'admin/help#twitter_profile_widget':
+      return '<p>' . t("Twitter profile widget provides configurable block with user's latest twits.") . '</p>';
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function twitter_profile_widget_menu() {
+  $items = array();
+  $items['admin/settings/twitter_profile_widget'] = array(
+    'title'             => 'Twitter profile widget',
+    'page callback'     => 'drupal_get_form',
+    'page arguments'    => array('twitter_profile_widget_admin'),
+    'access arguments'  => array('administer twitter profile widget'),
+    'type'              => MENU_NORMAL_ITEM,
+    'file'              => 'twitter_profile_widget.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function twitter_profile_widget_perm() {
+  return array('administer twitter profile widget');
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function twitter_profile_widget_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+    $block[] = array(
+      'info' => t('Twitter Profile Widget block'),
+      'weight' => 0,
+    );
+    return $block;
+  }
+  elseif ($op == 'view') {
+    $block = array(
+      'subject' => '<ins class = "tpw_title">' . t('Twitter Updates') . '</ins>',
+      'content' => twitter_profile_widget_block_content(),
+    );
+    return $block;
+  }
+}
+
+/**
+ * Implementation of hook_init().
+ */
+function twitter_profile_widget_init() {
+  // Add css file
+  $module_path = drupal_get_path('module', 'twitter_profile_widget');
+  drupal_add_css($module_path . '/twitter_profile_widget.css');
+  // Load internal js
+  if (variable_get('twitter_profile_widget_js', 'external') == 'internal') {
+    drupal_add_js($module_path . '/js/widget.js');
+  }
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function twitter_profile_widget_theme() {
+  return array(
+    'twitter_profile_block' => array(
+      'arguments' => array('twitter_script' => NULL, 'follow_us_enabled' => NULL, 'follow_us_link' => NULL, 'external_js' => NULL),
+      'template' => 'twitter-profile-widget',
+    ),
+  );
+}
+
+/**
+ * Return content for twitter profile block
+ */
+function twitter_profile_widget_block_content() {
+
+  // Main settings
+  $username              = trim(variable_get('twitter_profile_widget_username', 'Twitter'));
+  $external_js           = variable_get('twitter_profile_widget_js', 'external') == 'external' ? TRUE : FALSE;
+
+  // Preferences
+  $post_amount           = variable_get('twitter_profile_widget_post_amount', '5');
+  $widget_behavior       = variable_get('twitter_profile_widget_behavior', 'load_all_tweets') == 'load_all_tweets' ? 'all' : 'default';
+  $loop_results          = $widget_behavior == 'all' ? 'false' : variable_get('twitter_profile_widget_loop_results', FALSE);
+  $loop_results          = $loop_results == 'false' ? 'false' : 'true';
+  $tweet_intervals       = trim(variable_get('twitter_profile_widget_tweet_intervals', 5)) * 1000;
+  $poll_for_new_results  = variable_get('twitter_profile_widget_poll_for_new_results', FALSE) ? 'true' : 'false';
+  $include_scrollbar     = variable_get('twitter_profile_widget_include_scrollbar', FALSE) ? 'true' : 'false';
+  $show_avatars          = variable_get('twitter_profile_widget_show_avatars', FALSE) ? 'true' : 'false';
+  $show_timastamp        = variable_get('twitter_profile_widget_show_timestamp', TRUE) ? 'true' : 'false';
+  $show_hashtags         = variable_get('twitter_profile_widget_show_hashtags', TRUE) ? 'true' : 'false';
+  
+  // Apprearance
+  $shell_bg_color_type   = variable_get('twitter_profile_widget_shell_bg_color_type', 'color');
+  $shell_bg_color        = $shell_bg_color_type == 'transparent' ? 'none' : '#' . trim(variable_get('twitter_profile_widget_shell_bg_color'   , 'FFFFFF'));
+  $shell_text_color      = '#' . trim(variable_get('twitter_profile_widget_shell_text_color' , '425367'));
+  $tweet_bg_color_type   = variable_get('twitter_profile_widget_tweet_bg_color_type', 'color');
+  $tweet_bg_color        = $tweet_bg_color_type == 'transparent' ? 'none' : '#' . trim(variable_get('twitter_profile_widget_tweet_bg_color'   , 'FFFFFF'));
+  $tweet_text_color      = '#' . trim(variable_get('twitter_profile_widget_tweet_text_color' , '3E465B'));
+  $tweet_links_color     = '#' . trim(variable_get('twitter_profile_widget_tweet_links_color', '0178B4'));
+  
+  // Dimensions
+  $width                 = variable_get('twitter_profile_widget_autowidth', FALSE) ? "'auto'" : trim(variable_get('twitter_profile_widget_width', '180'));
+  $height                = trim(variable_get('twitter_profile_widget_height', '300'));
+  
+  // Follow us button
+  $follow_us_enabled     = variable_get('twitter_profile_widget_follow_us_enable', TRUE);
+  $follow_us_text        = trim(variable_get('twitter_profile_widget_follow_us_text', 'Follow us on twitter'));
+  $follow_us_url         = trim(variable_get('twitter_profile_widget_follow_us_link', 'http://twitter.com/twitter'));
+  $follow_us_link        = l($follow_us_text, $follow_us_url, array('absolute' => TRUE));
+
+  // Widget type
+  $widget_type           = variable_get('twitter_profile_widget_type', 'profile');
+  $twitter_list          = trim(variable_get('twitter_profile_widget_twitterlist', ''));
+  $captions              = '';
+  if ($widget_type == 'list') {
+    $set      = "setList('$username', '$twitter_list')";
+    $title    = variable_get('twitter_profile_widget_twitterlist_title', t('Everything we do at'));
+    $subject  = variable_get('twitter_profile_widget_twitterlist_subject', t('the twoffice'));
+    $captions = "
+      title: '$title',
+      subject: '$subject',
+    ";
+  }
+  elseif ($widget_type == 'faves') {
+    $set = "setUser('$username')";
+    $title    = variable_get('twitter_profile_widget_faves_title', t('Best twitts according to'));
+    $subject  = variable_get('twitter_profile_widget_faves_subject', t('Me'));
+    $captions = "
+      title: '$title',
+      subject: '$subject',
+    ";
+  }
+  elseif ($widget_type == 'profile') {
+    $set = "setUser('$username')";
+  }
+
+  // Load twitter widget with custom settings
+  $twitter_script = "
+    new TWTR.Widget({
+      version: 2,
+      type: '$widget_type',
+      rpp:  $post_amount,
+      interval: $tweet_intervals,
+      $captions
+      width: $width,
+      height: $height,
+      theme: {
+        shell: {
+          background: '$shell_bg_color',
+          color: '$shell_text_color'
+        },
+        tweets: {
+          background: '$tweet_bg_color',
+          color: '$tweet_text_color',
+          links: '$tweet_links_color'
+        }
+      },
+      features: {
+        scrollbar: $include_scrollbar,
+        loop: $loop_results,
+        live: $poll_for_new_results,
+        hashtags: $show_hashtags,
+        timestamp: $show_timastamp,
+        avatars: $show_avatars,
+        behavior: '$widget_behavior'
+      }
+    }).render().$set.start();";
+
+  return theme('twitter_profile_block', $twitter_script, $follow_us_enabled, $follow_us_link, $external_js);
+}

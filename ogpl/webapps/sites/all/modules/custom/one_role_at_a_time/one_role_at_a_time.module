@@ -1,0 +1,96 @@
+<?php
+/**
+ * Created by JetBrains PhpStorm.
+ * User: alan_lobo
+ * Date: 5/19/12
+ * Time: 9:55 AM
+ * To change this template use File | Settings | File Templates.
+ */
+
+global $one_role_at_a_time_excluded_roles;
+$one_role_at_a_time_excluded_roles = array(1 => "anonymous user", 2 => "authenticated user");
+
+function one_role_at_a_time_init() {
+  global $user, $one_role_at_a_time_excluded_roles;
+
+  if (in_array(arg(0), array('select_one_role', 'logout', 'user', 'encrypt-submissions'))) {
+    return;
+  }
+
+  if (isset($user->roles[1]) and $user->roles[1] == "anonymous user") {
+    return;
+  }
+  error_log(serialize($user->roles));
+  $user_roles = array_diff($user->roles, $one_role_at_a_time_excluded_roles);
+  if (count($user_roles) == 1) {
+    return;
+  }
+
+  if (isset($_SESSION['one_role_at_a_time_selected_role']) and array_key_exists($_SESSION['one_role_at_a_time_selected_role'], $user->roles)) {
+    $user->roles = array(
+      2 => "authenticated user",
+      $_SESSION['one_role_at_a_time_selected_role'] => $user_roles[$_SESSION['one_role_at_a_time_selected_role']]
+    );
+    user_access('random permission', NULL, TRUE);
+    return;
+  }
+error_log('going via init');
+  drupal_goto('select_one_role');
+
+}
+
+function one_role_at_a_time_menu() {
+  $items['select_one_role'] = array(
+    'title' => 'Select A Role',
+    'access arguments' => array('access content'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('one_role_at_a_time_form'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function one_role_at_a_time_form() {
+  global $user, $one_role_at_a_time_excluded_roles;
+
+  $form = array();
+
+  $form['chosen_role'] = array(
+    '#type' => 'radios',
+    '#required' => TRUE,
+    '#title' => t(''),
+    '#options' => array_diff($user->roles, $one_role_at_a_time_excluded_roles),
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'submit',
+    '#weight' => 2
+  );
+  error_log('in form ' . serialize($user->roles));
+  return $form;
+}
+
+function one_role_at_a_time_form_submit($form, $form_values) {
+  $_SESSION['one_role_at_a_time_selected_role'] = $form_values["values"]["chosen_role"];
+  drupal_set_message(t('Role successfully selected.'));
+  drupal_goto('/');
+}
+
+function one_role_at_a_time_user($op, &$edit, &$account, $category = NULL) {
+  global $one_role_at_a_time_excluded_roles;
+  if ($op <> 'load' or $account->roles[1] == 'anonymous user' or count(array_diff($account->roles, $one_role_at_a_time_excluded_roles)) == 1) {
+    return;
+  }
+
+  if (isset($_SESSION['one_role_at_a_time_selected_role']) and array_key_exists($_SESSION['one_role_at_a_time_selected_role'], $account->roles)) {
+    $account->roles = array(
+      2 => "authenticated user",
+      $_SESSION['one_role_at_a_time_selected_role'] => $account->roles[$_SESSION['one_role_at_a_time_selected_role']]
+    );
+    user_access('random permission', NULL, TRUE);
+    return;
+  }
+  error_log('going via user' . serialize($account->roles));
+  drupal_goto('select_one_role');
+}

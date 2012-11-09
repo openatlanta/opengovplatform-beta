@@ -1,0 +1,14 @@
+; $Id: ahah_style_ensurer.info,v 1.1 2008/12/20 23:23:44 effulgentsia Exp $
+name = AHAH Style Ensurer
+description = Ensures that additional css files needed by content retrieved using AHAH get loaded.
+core = 6.x
+dependencies[] = jquery_aop
+dependencies[] = ahah_page_storage
+dependencies[] = ahah_response
+
+; Information added by drupal.org packaging script on 2009-05-19
+version = "6.x-1.0"
+core = "6.x"
+project = "ahah_style_ensurer"
+datestamp = "1242696609"
+

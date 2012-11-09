@@ -1,0 +1,15 @@
+/*
+#cms-home form#user-login .item-list {
+    height: 344px;
+    
+}
+*/
+#cms-home .form-item br , 
+#cms-home #edit-captcha-response-wrapper br, #cms-home #edit-pass-wrapper br, #cms-home #edit-name-wrapper br {
+	float:left;
+}
+/*
+span.qr-alt{
+   margin: 20px 0 0 -190px;
+}
+*/

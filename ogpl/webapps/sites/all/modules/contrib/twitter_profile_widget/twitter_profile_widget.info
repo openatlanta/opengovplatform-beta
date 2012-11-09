@@ -1,0 +1,11 @@
+name = Twitter Profile Widget
+description = Helps to customize Twitter Profile Widget. Made by <a href = "http://drupalace.ru">SplasH</a>
+package = Drupalace
+core = 6.x
+
+; Information added by drupal.org packaging script on 2011-10-06
+version = "6.x-1.6"
+core = "6.x"
+project = "twitter_profile_widget"
+datestamp = "1317907307"
+

@@ -1,0 +1,13 @@
+name = Content Profile Create User
+description = "Creates a user from an existing content profile"
+package = "Content Profile"
+core = 6.x
+dependencies[] = content_profile
+dependencies[] = email
+
+; Information added by drupal.org packaging script on 2012-04-16
+version = "6.x-1.1"
+core = "6.x"
+project = "content_profile_create_user"
+datestamp = "1334544097"
+

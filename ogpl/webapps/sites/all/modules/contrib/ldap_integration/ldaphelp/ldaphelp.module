@@ -1,0 +1,364 @@
+<?php
+/**
+ * @file
+ * The ldaphelp module is a module to help admins debug ldap_integration modules.
+ *
+ */
+
+
+global $_ldaphelp_ldaps;
+
+$default_fields['server-settings']['port'] = 389;
+$default_fields['server-settings']['tls'] = 1;
+$default_fields['server-settings']['encrypted'] = 0;
+$default_fields['login-procedure']['user_attr'] = 'uid';
+$default_fields['login-procedure']['mail_attr'] = 'mail';
+
+// http://msdn.microsoft.com/en-us/library/aa705886(VS.85).aspx
+$_ldaphelp_ldaps['ad']['name'] = t('Active Directory LDAP');
+$_ldaphelp_ldaps['ad']['description'] = t('Microsoft Active Directory');
+$_ldaphelp_ldaps['ad']['fields'] = $default_fields;
+$_ldaphelp_ldaps['ad']['fields']['login-procedure']['user_attr'] = 'sAMAccountName';
+$_ldaphelp_ldaps['ad']['person_object_class'] = 'person';
+$_ldaphelp_ldaps['ad']['fingerprint_attribute'] = 'mS-DS-CreatorSID';
+
+// http://www.novell.com/documentation/edir873/index.html?page=/documentation/edir873/edir873/data/h0000007.html
+$_ldaphelp_ldaps['novell_edir']['name'] = t('Novell eDirectory');
+$_ldaphelp_ldaps['novell_edir']['description'] = t('Novell eDirectory LDAP');
+$_ldaphelp_ldaps['novell_edir']['fields'] = $default_fields;
+$_ldaphelp_ldaps['novell_edir']['person_object_class'] = 'person';
+
+$_ldaphelp_ldaps['openldap']['name'] = t('openLDAP');
+$_ldaphelp_ldaps['openldap']['description'] = t('openLDAP default configuration');
+$_ldaphelp_ldaps['openldap']['fields'] = $default_fields;
+$_ldaphelp_ldaps['openldap']['fields']['login-procedure']['user_attr'] = 'cn';
+$_ldaphelp_ldaps['openldap']['person_object_class'] = 'person';
+
+
+// http://images.apple.com/server/macosx/docs/Open_Directory_Admin_v10.5_3rd_Ed.pdf
+$_ldaphelp_ldaps['macosxldap']['name'] = t('Mac OS X Server LDAP');
+$_ldaphelp_ldaps['macosxldap']['description'] = t('A variation on OpenLDAP');
+$_ldaphelp_ldaps['macosxldap']['fields'] = $default_fields;
+$_ldaphelp_ldaps['macosxldap']['fields']['login-procedure']['user_attr'] = 'uid';
+$_ldaphelp_ldaps['macosxldap']['person_object_class'] = 'person';
+$_ldaphelp_ldaps['macosxldap']['fingerprint_attribute'] = 'apple-generateduid';
+
+/**
+ * Implementation of hook_init().
+ */
+function ldaphelp_init() {
+  module_load_include('inc', 'ldapauth', 'ldapauth.admin');
+  module_load_include('inc', 'ldapauth', 'includes/ldap.core');
+  module_load_include('inc', 'ldapauth', 'includes/LDAPInterface');
+  drupal_add_css(drupal_get_path('module', 'ldaphelp') .'/ldaphelp.css', 'module');
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function ldaphelp_menu() {
+  $items = array();
+  $items['admin/settings/ldap/help'] = array(
+    'title' => t('LDAP Help'),
+    'description' => t('Debugging and Configuration Help with LDAP'),
+    'page callback' => 'ldaphelp_main',
+    'access arguments' => array('administer ldap modules'),
+  );
+
+  $items['admin/settings/ldap/help/resources'] = array(
+    'title' => t('Resources'),
+    'description' => t('Some help resources for LDAP modules'),
+    'page callback' => 'ldaphelp_main',
+    'access arguments' => array('administer ldap modules'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  $items['admin/settings/ldap/help/status'] = array(
+    'title' => t('Status'),
+    'description' => t('LDAP status page'),
+    'page callback' => 'ldaphelp_status',
+    'access arguments' => array('administer ldap modules'),
+    'file' => 'ldaphelp_status.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 4,
+  );
+
+  $items['admin/settings/ldap/help/watchdog'] = array(
+    'title' => t('Watchdog'),
+    'description' => t('LDAP watchdog logs'),
+    'page callback' => 'ldaphelp_watchdog',
+    'access arguments' => array('administer ldap modules'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 5,
+  );
+
+  $items['admin/settings/ldap/help/addcommon'] = array(
+    'title' => t('Common LDAPs'),
+    'description' => 'Add a new LDAP starting with common defaults such as Active Directory defaults.',
+    'page callback' => 'ldaphelp_addcommon',
+    'access arguments' => array('administer ldap modules'),
+    'type' => MENU_LOCAL_TASK,
+     'weight' => 7,
+  );
+
+  $items['admin/settings/ldap/help/wizard'] = array(
+    'title' => t('Wizard'),
+    'description' => t('A multi step form to help figure out LDAP server configuration.'),
+    'access arguments' => array('administer ldap modules'),
+    'file' => 'ldaphelp_wizard.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 13,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ldaphelp_wizard_form'),
+  );
+
+
+  return $items;
+}
+
+
+function _ldaphelp_bind_test($ldapserver) {
+    global $_ldapauth_ldap;
+    $test = array();
+    $_ldapauth_ldap = new LDAPInterface();
+    foreach ($ldapserver as $key => $value) {
+      $_ldapauth_ldap->setOption($key, $value);
+    }
+
+    if ($_ldapauth_ldap->getOption('binddn') && $_ldapauth_ldap->getOption('bindpw')) {
+      $test['bind_result'] = $_ldapauth_ldap->connectAndBind($_ldapauth_ldap->getOption('binddn'), $_ldapauth_ldap->getOption('bindpw'));
+      $test['bind_type'] = "non-anon";
+
+    }
+    else {
+      $test['bind_result'] = $_ldapauth_ldap->connectAndBind();
+      $test['bind_type'] = "anon";
+    }
+
+    if ($test['bind_result']) {
+      $test['bind_result_text'] =  "Success";
+      $test['bind_success'] = TRUE;
+    }
+    else {
+      $test['bind_result_error'] = ldap_error($_ldapauth_ldap->connection);
+      $test['bind_result_errno'] = ldap_errno($_ldapauth_ldap->connection);
+      $test['bind_result_text'] =  "Fail";
+      $test['bind_success'] = FALSE;
+    }
+
+    return $test;
+
+}
+
+function ldaphelp_bind_trial_message($trial) {
+  $tls = ($trial['tls']) ? "1" : "0";
+  $text = "Failed to bind to server: ". $trial['server'] .", port=". $trial['port'] .", tls=$tls <br/>";
+  $text .= "error: ". $trial['results']['bind_result_error'];
+  return $text;
+}
+
+
+function ldaphelp_addcommon() {
+
+  if (!module_exists('ldapauth')) {
+    drupal_set_message('Links below will not work until ldapauth module is not enabled.', 'warning');
+  }
+  global $_ldaphelp_ldaps;
+  $content = '<h3>'. t('LDAP Integration Default LDAPs') .'</h3>';
+  $content .= '<p>'. t('These links simply start an Add LDAP Server form with some common defaults.') .'</p>';
+  $content .= '<ul>';
+
+  foreach ($_ldaphelp_ldaps as $ldap_type => $default_data) {
+    $content .= "<li>". l($default_data['name'] . t(' Common Settings: '), 'admin/settings/ldap/ldapauth/add/'. $ldap_type) ."<br/><code>";
+    $content .= ldaphelp_display_settings_short($_ldaphelp_ldaps[$ldap_type]['fields']);
+    $content .= "</code></li>";
+  }
+  $content .= "</ul>";
+  return $content;
+}
+
+
+function ldaphelp_form_ldapauth_admin_form_alter(&$form, $form_state) {
+
+  global $_ldaphelp_ldaps;
+
+  if (in_array(arg(4), array_keys($_ldaphelp_ldaps))) {
+    $ldap_type = arg(4);
+
+    foreach ($_ldaphelp_ldaps[$ldap_type]['fields'] as $fieldset => $pairs) {
+      foreach ($pairs as $fieldname => $value ) {
+        $form[$fieldset][$fieldname]['#default_value'] = $value;
+      }
+    }
+  }
+
+  // don't hide/collapse login fieldset if data in it.
+  if ($form['login-procedure']['basedn']['#default_value']  ||
+      $form['login-procedure']['user_attr']['#default_value']  ||
+      $form['login-procedure']['mail_attr']['#default_value'] ) {
+    $form['login-procedure']['#collapsed'] = FALSE;
+  }
+}
+
+
+function _ldaphelp_get_configuration($admin_settings = TRUE, $sids = NULL) {
+
+  if ($admin_settings) {
+    $form = ldapauth_admin_settings();
+    $data['admin_settings'] = _ldaphelp_get_form_values($form);
+  }
+
+  $data['ldaps'] = array();
+
+  if ( ! (is_array($sids) && count($sids) == 0)) {
+    if ($sids == NULL) {
+      $result = db_query("SELECT sid FROM {ldapauth} ORDER BY name");
+      while ($row = db_fetch_object($result)) {
+        $sids[] = $row->sid;
+      }
+    }
+    if (count($sids) > 0) {
+      foreach ($sids as $sid) {
+        $form = ldapauth_admin_form($form_state, 'edit', $sid);
+        $data['ldaps'][$sid] = _ldaphelp_get_form_values($form);
+        unset($data['ldaps'][$sid]['bindpw_clear']);
+      }
+    }
+  }
+  return $data;
+}
+
+function _ldaphelp_get_form_values(&$form) {
+  $values = array();
+  foreach ($form as $key => $item) {
+    if ($form[$key]['#type'] == 'fieldset') {
+      foreach ($form[$key] as $subskey => $subitem) {
+        if ( drupal_substr($subskey, 0, 1) != '#') {
+          $values[$subskey] = ($subitem['#value']) ? $subitem['#value'] : $subitem['#default_value'];
+        }
+      }
+    }
+    elseif (drupal_substr($key, 0, 1) != '#' && $key != 'submit' && $key != 'reset') {
+      $values[$key] = ($item['#value']) ? $item['#value'] : $item['#default_value'];
+    }
+  }
+  return $values;
+}
+
+function ldaphelp_display_settings_short($ldap) {
+  foreach ( $ldap as $fieldset => $pairs) {
+    foreach ($ldap[$fieldset] as $fieldname => $value ) {
+      $ret .= "$fieldname = $value; ";
+    }
+  }
+  return $ret;
+}
+
+function ldaphelp_arraytohtmllist($array) {
+  foreach ($array as $key => $value) {
+    $text .= "<li>$key: $value</li>\r\n";
+  }
+  return "<ul>$text</ul>";
+}
+
+function ldaphelp_arraytohtml($array) {
+  foreach ($array as $key => $value) {
+    $text .= "<br/>$key: $value";
+  }
+  return $text;
+}
+
+function ldaphelp_arraytotxt($array) {
+  foreach ($array as $key => $value) {
+    $text .= "$key: $value\r\n";
+  }
+  return $text;
+}
+
+function ldaphelp_get_export_comments($export_conf_data) {
+  if ($export_conf_data['admin_settings']) {
+    $text = "\r\nAdmin Settings: \r\n".  ldaphelp_arraytotxt($export_conf_data['admin_settings']);
+  }
+  foreach ($export_conf_data['ldaps'] as $sid => $ldap) {
+    $text .= "\r\n" . ldaphelp_arraytotxt($ldap);
+  }
+  return $text;
+}
+
+function ldaphelp_main() {
+
+  $text = '<h3>'. t('LDAP Help Module') .'</h3><p>'.
+  t('This module is meant to assist Drupal admins in configuring, debugging, sharing, and submitting
+  support and bug request related to LDAP integration modules.') .'<strong><em>'.
+  t(' LDAP Help Module should be disabled unless you are debugging or configuring ldap problems.') .'</em></strong>'.
+  t(' It adds no functionality to the LDAP modules.') .'</p>';
+
+  $path = drupal_get_path("module", "ldapauth");
+
+  $text .= <<<EOT
+
+  <h3>LDAP Integration Module Resources</h3>
+  <ul>
+  <li>The <a href="/$path/README.txt">readme file</a> covers basics of module.</li>
+  <li><a href="http://drupal.org/node/62217">LDAP Integration Contributed Module Documentation</a>
+  overviews ldapauth, ldapgroups, and ldapdata modules and their installation and configuration.
+  Sometimes out of date.  Be sure that documentation matches the version you are using.  This
+  is a great opportunity for new users to contribute to the module:  when  you first use the
+  documentation take notes on what needs to be clarified.
+  </li>
+  <li>Search <a href="http://drupal.org/project/issues/search/ldap_integration">issue que</a>  For best results,
+  select version and category before searching.</li>
+  <li><a href="http://drupal.org/project/issues/ldap_integration">View all issues</a></li>
+  </ul>
+
+   <h3>General Drupal Support Help</h3>
+
+  <ul>
+  <li><a href="http://drupal.org/node/314185">How to report a problem in Drupal</a></li>
+  <li><a href="http://drupal.org/node/19279">How to report bugs in Drupal</a></li>
+  <li><a href="http://drupal.org/Troubleshooting-FAQ">Drupal Troubleshooting FAQ</a></li>
+  </ul>
+
+  <h3>General LDAP Resources</h3>
+  <ul>
+  <li><a href="http://us.php.net/manual/en/book.ldap.php">PHP LDAP</a></li>
+  <li><a href="http://directory.apache.org/studio/">Apache Directory Studio</a> LDAP Browser and Directory Client.</li>
+  <li><a href="http://www.novell.com/documentation/edir873/index.html?page=/documentation/edir873/edir873/data/h0000007.html">Novell Edirectory</a></li>
+  <li><a href="http://images.apple.com/server/macosx/docs/Open_Directory_Admin_v10.5_3rd_Ed.pdf">Apple Open Directory</a></li>
+  <li><a href="http://msdn.microsoft.com/en-us/library/aa705886(VS.85).aspx">Microsoft Active Directory LDAP</a></li>
+  </ul>
+
+EOT;
+
+
+  return $text;
+}
+
+function ldaphelp_watchdog() {
+
+  /* watchdog table */
+  drupal_add_css(drupal_get_path('module', 'ldaphelp') .'/ldaphelp.css', 'module', 'all', FALSE);
+  $path =    drupal_get_path("module", "ldapauth");
+  $_content = "";
+  if (module_exists('dblog')) {
+    include_once(drupal_get_path('module', 'dblog') .'/dblog.admin.inc');
+
+    $_SESSION['dblog_overview_filter']['type'] = Array('ldapauth' => 'ldapauth');
+    if (! ($_SESSION['dblog_overview_filter'] || $_SESSION['dblog_overview_filter']['severity'])) {
+      $_SESSION['dblog_overview_filter']['severity'] = array();
+    }
+
+    $_content .= "<h3>". t('LDAP Watchdog Errors and Notifications') ."</h3>";
+    $_content .= dblog_overview();
+    $_content .= l('...more watchdog', 'admin/reports/dblog');
+  }
+  else {
+    $_content .= "<h3>". t('LDAP Help Watchdog Errors and Notifications') ."</h3>";
+    $_content .= 'This feature requires <code>Database logging</code> module to be turned on. ';
+    $_content .= l('Module enable page', 'admin/build/modules');
+  }
+
+
+  return $_content;
+}

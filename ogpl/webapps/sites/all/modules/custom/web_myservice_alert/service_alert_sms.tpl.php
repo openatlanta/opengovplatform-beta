@@ -1,0 +1,1 @@
+Error message: <?php print $log['message']; ?>

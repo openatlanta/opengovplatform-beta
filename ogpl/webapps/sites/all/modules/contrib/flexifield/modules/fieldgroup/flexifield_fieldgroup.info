@@ -1,0 +1,12 @@
+name = FlexiField Fieldgroup Integration
+description = Enables a field group to be used inside of a flexifield.
+dependencies[] = flexifield
+dependencies[] = fieldgroup
+package = CCK
+core = 6.x
+; Information added by drupal.org packaging script on 2011-02-25
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "flexifield"
+datestamp = "1298619280"
+

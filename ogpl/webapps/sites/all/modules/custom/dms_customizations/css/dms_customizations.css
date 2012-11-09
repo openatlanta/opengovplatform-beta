@@ -1,0 +1,33 @@
+/**
+   * Custom Code for flexifield to get autocpmplete and date js to load 
+   * on page by adding a node reference field and date field and hide by javascript or css
+   * 
+   */
+  /*
+   * TODO: Find a alter nate solution of the above 
+   */
+   
+#field-test-node-ref-multi-items, #edit-field-test-date-0-value-wrapper {
+	display: none;
+}
+
+.url_loading_content {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+.url_loading {
+	 background: url("../images/loading.gif") no-repeat center center;
+	 height: 100%;
+	 width: 100%;
+}
+
+.link-field-url .dms_link_tick {
+	 background: url("../images/tick.png") no-repeat right center;
+}
+
+.link-field-url .dms_link_cancel {
+   background: url("../images/cancel.png") no-repeat right center;
+}

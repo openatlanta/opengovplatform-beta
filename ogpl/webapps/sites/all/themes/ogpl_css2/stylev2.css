@@ -1,0 +1,491 @@
+
+/* +++++++++++++++++++++++ Top Block COde Starts +++++++++++++++++++ */
+#logoPanel .mid , #logoPanel .left {
+	background:none;
+}
+.homePage #headerPan {
+	border:none;
+	margin:0;
+}
+.homePage #outerContainer { 
+	background: url("images/header-panel_v2.jpg") repeat-x scroll 0 0 transparent;
+}
+
+/* ++++++++++++++ Design For Menu - Code Starts +++++++++++++++ */
+#navPanel {
+    margin: 0 auto;
+}
+#navPanel ul ul {
+	top: 25px;
+}
+#navPanel ul ul ul {
+	margin-top: -25px;
+}
+
+#navPanel ul li a { 
+	line-height: 24px;
+    padding: 3px 36px;
+}
+#navPanel .menu-40264.menu-path-search-apachesolr_search.odd.last a {
+    padding: 3px 42px;
+}
+#outerContainer #navPanel ul li.menu-path-front a {
+    background: url("images/icon-home.gif") no-repeat scroll 12px -4px transparent !important;
+}
+#outerContainer #navPanel ul li.menu-path-front a:hover {
+    background: url("images/icon-home.gif") no-repeat scroll 12px -34px transparent !important;
+}
+
+/* ++++++++++++++ Design For Menu - Code Ends +++++++++++++++ */
+
+/* +++++++++ Previous and Next in Whats New Single Panel Code Starts ++++++++++ */
+#mini-panel-whats_new_single_panel .views_slideshow_singleframe_controls,
+#community  .views_slideshow_singleframe_controls {
+    display: block;
+}
+#mini-panel-whats_new_single_panel .views-slideshow-controls-bottom,
+#community .views-slideshow-controls-bottom {
+    float: right;
+    margin-right: 10px;
+    margin-top: -42px;
+    position: relative;
+    width: 104px;
+    z-index: 10;
+}
+#mini-panel-whats_new_single_panel .views_slideshow_singleframe_previous ,
+#community .views_slideshow_singleframe_previous {
+    background: url("images/left.png") repeat scroll 0 0 transparent;
+    display: table-caption;
+    float: left;
+    font-size: 0;
+    height: 25px;
+    width: 27px;
+}
+#mini-panel-whats_new_single_panel .views_slideshow_singleframe_pause,
+#community .views_slideshow_singleframe_pause{
+    background: url("images/pause.png") no-repeat scroll 0 0 transparent;
+    display: table-caption;
+    float: left;
+    font-size: 0;
+    height: 25px;
+    margin: 0 5px;
+    width: 27px;
+}
+#mini-panel-whats_new_single_panel .views_slideshow_singleframe_next,
+#community .views_slideshow_singleframe_next {
+    background: url("images/right.png") repeat scroll 0 0 transparent;
+    display: table-caption;
+    float: left;
+    font-size: 0;
+    height: 25px;
+    width: 27px;
+}
+/* +++++++++ Previous and Next in Whats New Single Panel Code Starts ++++++++++ */
+
+/* +++++++++ Previous and Next in Slider Home Page Code Starts ++++++++++++++++ */
+.homePage #views_slideshow_singleframe_teaser_section_Rotating_Panel_CSS2_Theme-block_1 {
+	position:absolute;
+}
+.views_slideshow_singleframe_controls{
+	display:block;
+}
+.homePage .views_slideshow_singleframe_previous {
+   background: url("images/arrowleft_hader.png") no-repeat scroll 0 0 transparent;
+   float: left;
+   font-size: 0;
+   height: 33px;
+   margin-top: 100px;
+   position: absolute;
+   width: 32px;
+   z-index: 10;
+}
+.homePage .views_slideshow_singleframe_pause {
+	display:none;
+}
+.homePage .views_slideshow_singleframe_next {
+   background: url("images/arrowright_hader.png") no-repeat scroll 0 0 transparent;
+   float: right;
+   font-size: 0;
+   height: 33px;
+   margin: 100px 0 0 966px;
+   position: absolute;
+   width: 32px;
+   z-index: 10;
+}
+/* +++++++++ Previous and Next in Slider Home Page Code Starts ++++++++++++++++ */
+
+/* +++++++++ Previous and Next in Whats New Single Panel Code Starts ++++++++++ */
+#mini-panel-whats_new_double_panel .views_slideshow_singleframe_controls{
+    display: block;
+}
+#mini-panel-whats_new_single_panel .views-slideshow-controls-bottom ,
+#mini-panel-whats_new_double_panel .views-slideshow-controls-bottom{
+    float: right;
+    margin-right: 10px;
+    margin-top: -42px;
+    position: relative;
+    width: 104px;
+    z-index: 10;
+}
+#mini-panel-whats_new_single_panel .views_slideshow_singleframe_previous,
+#mini-panel-whats_new_double_panel .views_slideshow_singleframe_previous {
+    background: url("images/left.png") repeat scroll 0 0 transparent;
+    display: table-caption;
+    float: left;
+    font-size: 0;
+    height: 25px;
+    width: 27px;
+}
+#mini-panel-whats_new_single_panel .views_slideshow_singleframe_pause ,
+#mini-panel-whats_new_double_panel .views_slideshow_singleframe_pause{
+    background: url("images/pause.png") no-repeat scroll 0 0 transparent;
+    display: table-caption;
+    float: left;
+    font-size: 0;
+    height: 25px;
+    margin: 0 5px;
+    width: 27px;
+}
+
+#mini-panel-whats_new_single_panel .views_slideshow_singleframe_play,
+#mini-panel-whats_new_double_panel .views_slideshow_singleframe_play {
+    background: url("images/play.png") no-repeat scroll 0 0 transparent;
+    float: left;
+    display: table-caption;
+    width: 27px;
+    height: 25px;
+    font-size: 0;
+    margin: 0 5px;
+}
+#mini-panel-whats_new_single_panel .views_slideshow_singleframe_next ,
+#mini-panel-whats_new_double_panel .views_slideshow_singleframe_next{
+    background: url("images/right.png") repeat scroll 0 0 transparent;
+    display: table-caption;
+    float: left;
+    font-size: 0;
+    height: 25px;
+    width: 27px;
+}
+
+[if Webkit] #mini-panel-whats_new_single_panel .views-slideshow-controls-bottom {
+	margin-top:-170px ;
+}
+
+/* +++++++++ Previous and Next in Whats New Single Panel Code Starts ++++++++++ */
+
+.homePage #bodyPan {
+	background:none;
+	margin-top: 8px;
+}
+
+.homePage .contentPanel {
+	background:none;
+}
+
+.homePage #homev2 .panels-flexible-region-first {
+}
+
+.homePage #homev2 .panels-flexible-region-55-block2 {
+  float: left;
+}
+
+.homePage #homev2 .panels-flexible-region-55-block3 {
+  float: left;
+}
+#homev2 .panels-flexible-region-first .inside,
+#homev2 .panels-flexible-region-55-block2 .inside, 
+#homev2 .panels-flexible-region-55-block3 .inside,
+#homev2 .panels-flexible-region-53-block1 .inside,
+#homev2 .panels-flexible-region-53-block2 .inside,
+#homev2 .panels-flexible-region-53-block3 .inside {
+    min-height: 143px;
+}
+#homev2 .panels-flexible-region-53-home_bottom_left1 {
+	 background: #5B5B5B;
+}
+.homePage #homev2 #mini-panel-css_2_v2_home_panel .topBlocks {
+	width:102%;
+}
+.homePage #homev2 #mini-panel-css_2_v2_home_panel .topBlocks .panels-flexible-region-first {
+	width: 326px;
+	margin-right: 10px;
+}
+.homePage #homev2 #mini-panel-css_2_v2_home_panel .topBlocks .panels-flexible-region-55-block2 {
+	width: 326px;
+	margin-right: 10px;
+}
+#homev2 #mini-panel-css_2_v2_home_panel .panels-flexible-row-53-1 .panels-flexible-region {
+	margin-right: 10px;
+  	min-height: 17em;
+  	width: 326px;
+}
+.homePage #homev2 #mini-panel-css_2_v2_home_panel .topBlocks .panels-flexible-region-last {
+	width: 326px;
+	margin:0;
+}
+.homePage #homev2 #mini-panel-css_2_v2_home_panel .home-panel-bottom {
+	width:102%;
+}
+.homePage #homev2 #mini-panel-css_2_v2_home_panel .home-panel-bottom .home-bottom-1 {
+	width: 326px;
+	margin-right: 10px;
+}
+.homePage #homev2 #mini-panel-css_2_v2_home_panel .home-panel-bottom .home-bottom-region {
+	width: 326px;
+	margin-right: 10px;
+}
+.homePage #homev2 #mini-panel-css_2_v2_home_panel .home-panel-bottom .home-bottom-3 {
+	width: 326px;
+	margin:0;
+	background: none repeat scroll 0 0 #5B5B5B;
+}
+#mini-panel-css_2_v2_home_panel .panels-flexible-region {
+  float: left;
+}
+
+#mini-panel-css_2_v2_home_panel .panels-flexible-region-last {
+  margin: 0px;
+}
+
+.panels-flexible-row-55-1 .panels-flexible-region {
+  background:#FFF;
+}
+#homev2 h2.dataset-header-icon , #homev2 h2.apps-header-icon {
+	display:none;
+}
+.homePage #homev2 .dataset-img {
+    background: url("images/datasetsicon.gif") no-repeat scroll 0 0 transparent;
+    display: block;
+    height: 17px;
+    text-indent: -9999px;
+    width: 105px;
+    margin-left:15px;
+    margin-top:20px;
+}
+h2.dataset-header-icon {
+	left: 70px;
+    top: 25px;
+    font-size: 16px;
+    position: relative;
+    text-indent: 0;
+    width:150px;
+}
+h2.apps-header-icon {
+	font-size: 16px;
+    left: 61px;
+    position: relative;
+    text-indent: 0;
+    top: 23px;
+    width:150px;
+}
+.homePage #homev2 .apps-img {
+    background: url("images/appsicon.gif") no-repeat scroll 0 0 transparent;
+    display: block;
+    height: 17px;
+    text-indent: -9999px;
+    width: 68px;
+    margin-left:15px;
+    margin-top:20px;
+}
+.homePage #homev2 .topBlocks .panels-flexible-region-last h2 {
+	background: url("images/announcements.gif") no-repeat scroll 0 16px transparent;
+    display: block;
+    font-size: 16px;
+    height: 17px;
+    width:186px;
+    margin:4px 0 0 15px;
+    padding:24px 0 0 47px;
+    text-indent:-99999px;
+    text-transform: uppercase;
+}
+.homePage #homev2 .blocks {
+    color: #423f3f;
+    background:#FFF;
+}
+.homePage #homev2 .panels-flexible-row {
+  padding: 0 0 1em 0;
+  margin: 0;
+}
+.homePage #homev2 .community-img {
+	background: url("images/community.gif") no-repeat scroll 0 0 transparent;
+    display: block;
+    height: 24px;
+    width: 138px;
+    text-indent:-9999px;
+}
+.homePage #homev2 .topBlocks .view-whats-new .view-content {
+    padding: 3px 20px 0 20px;
+    font-size: 1.28em;
+    line-height: 1.5em;
+}
+.homePage #homev2 .topBlocks .view-whats-new .view-footer {
+	margin: -8px 0 0 0;
+}
+.homePage #homev2 .topBlocks .blocks ul li {
+    margin: 10px 0 0 10px;
+}
+.homePage #homev2 #mini-panel-css_2_v2_home_panel ul.lists li span {
+    font-size: 1.2em;
+    font-weight: bold;
+    line-height: 1.45em;
+}
+.homePage #homev2 .topBlocks .panels-flexible-region-last .view-whats-new .view-content span {
+    color: #383939;
+    font-size: 1.2em;
+    font-weight: bold;
+    line-height: 1.45em;
+    display: block;
+    margin-left: 0px;
+    margin-right: 5px;
+    width: 278px;
+}
+.homePage #homev2 .topBlocks .panels-flexible-region-last .view-whats-new .view-content span a {
+	color: #383939;
+	font-weight: bold;
+    background: url("images/blt-faq.gif") no-repeat 1.1em 0.4em transparent;
+    display: block;
+    margin-bottom: 5px;
+    padding: 0 0 0 26px;
+    width:278px;
+}
+.home-bottom-3 {
+    float: left;
+    background: none repeat scroll 0 0 #FFFFFF;
+}
+.home-bottom-3 .panels-flexible-region-inside-last {
+    min-height: 127px !important;
+    padding: 8px;
+}
+.home-bottom-3 .panels-flexible-region-inside-last p {
+    margin: 8px 0 0 32px;
+    color: #FFFFFF;
+}
+.home-bottom-region {
+	float:left;
+}
+.homePage #homev2 .suggest-v2 {
+	float: left;
+  margin-right: 4px;
+}
+.homePage #homev2 .wwdatasite-v2 {
+	float:left;
+}
+.homePage #homev2 #suggest-header-text a {
+    background: url("images/recentsuggestions.gif") no-repeat scroll 0 0 #5B5B5B;
+    float: left;
+    height: 17px;
+    margin: 0 10px;
+    position: absolute;
+    text-indent: -99999px;
+    width: 202px;
+}
+.homePage #homev2 .container-ds {
+    background: none repeat scroll 0 0 #5B5B5B;
+    height:143px;
+}
+#suggested-datasets-header-container {
+	padding: 8px 0 0;
+	height: 22px;
+	
+}
+#feedbackscroller {
+    height: 90px;
+    margin: 5px 10px 0 35px;
+    overflow: auto;
+    width: 290px;
+}
+.container-ds #feedbackscroller #scroll-content {
+	width: 280px;
+	overflow:none;
+	height: 80px;
+}
+
+h2.community-header-icon {
+	display:none;
+}
+.homePage #homev2 .suggest-dataset-image {
+    background: none;
+    
+}
+.homePage #homev2 #bodyPan {
+	margin-bottom:0;
+}
+.homePage #homev2 #scroll-content li {
+	margin-leftL:25px !important;
+}
+/* +++++++++++++++++++++++ Top Block Code Starts +++++++++++++++++++ */
+/* +++++++++++++++++++++++++++++++ Whats New Double Frame Block Code Starts ++++++++++++++++++++ */
+
+#mini-panel-whats_new_double_panel .whatsnew_top {
+	height:130px;
+}
+
+#mini-panel-whats_new_double_panel .panels-flexible-row-last {
+	width:100%;
+}
+#mini-panel-whats_new_double_panel .whats_new_left {
+	border: 1px solid gray;
+    float: left;
+    min-height: 200px;
+    width: 49%;
+    margin-right: 10px;
+    background: none repeat scroll 0 0 #EFEFEF;
+}
+#mini-panel-whats_new_double_panel h2 {
+	text-align:center;
+	padding: 5px 0;
+}
+#mini-panel-whats_new_double_panel .whats_new_right {
+	border: 1px solid gray;
+    float: left;
+    min-height: 200px;
+    width: 49%;
+    margin-left: 5px;
+     background: none repeat scroll 0 0 #EFEFEF;
+    
+}
+#block-panels_mini-whats_new_double_panel {
+	font-size: 1.28em;
+    line-height: 1.5em;
+    
+}
+#mini-panel-whats_new_double_panel .view-whats-new .views-row span.field-content {
+	background-color: transparent;
+    background-image: url("images/blt-faq.gif");
+    background-position: 0 0.4em;
+    background-repeat: no-repeat;
+    color: #022C99;
+    margin-bottom: 5px;
+    padding: 0 0 0 10px;
+    display:block;
+}
+#mini-panel-whats_new_double_panel .pane-whats-new {
+	margin:10px;
+}
+#mini-panel-whats_new_double_panel .more-link a {
+	background: url("images/join_btn.png") no-repeat scroll 0 0 transparent;
+    color: #000000;
+    cursor: pointer;
+    display: block;
+    font-weight: bold;
+    height: 26px;
+    overflow: hidden;
+    padding: 6px 0;
+    text-align: center;
+    text-transform: lowercase;
+    width: 102px;
+    float: right;
+    margin: 30px 80px 0 0px;
+    
+}
+/**
+ * This hack targets the Webkit browser engine
+ * which includes Safari and Chrome.
+ */
+@media screen and (-webkit-min-device-pixel-ratio:0) { 
+   	#mini-panel-whats_new_double_panel .views-slideshow-controls-bottom { 
+   		margin-top: 90px; 
+  	}
+}
+
+/* +++++++++++++++++++++++++++++++ Whats New Double Frame Block Code Ends ++++++++++++++++++++ */

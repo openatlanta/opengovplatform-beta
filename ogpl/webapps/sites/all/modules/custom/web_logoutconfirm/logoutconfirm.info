@@ -1,0 +1,5 @@
+; $Id$
+name = Logout confirm
+description = To confirm logging out of user.
+package = Drupal custom modules
+core = 6.x

@@ -1,0 +1,514 @@
+$content['type']  = array (
+  'name' => 'User Profile',
+  'type' => 'uprofile',
+  'description' => 'Holds the data for a user\'s profile. This type is provided by Advanced Profile Kit as an import file and can be changed or deleted as needed. If you don\'t want it to have a title, look at the Automatic Nodetitles module.  If you don\'t see a "Content profile" tab at the top, be sure "Use this content type as a content profile for users" is checked. Commenting is off by default but can be turned on in the Comment Settings section.',
+  'title_label' => 'Profile Title',
+  'body_label' => '',
+  'min_word_count' => '0',
+  'help' => '',
+  'node_options' => 
+  array (
+    'status' => true,
+    'promote' => false,
+    'sticky' => false,
+    'revision' => false,
+  ),
+  'old_type' => 'uprofile',
+  'orig_type' => '',
+  'module' => 'node',
+  'custom' => '1',
+  'modified' => '1',
+  'locked' => '0',
+  'og_content_type_usage' => 'omitted',
+  'og_max_groups' => '',
+  'content_profile_use' => 1,
+  'comment' => '0',
+  'comment_default_mode' => '4',
+  'comment_default_order' => '1',
+  'comment_default_per_page' => '50',
+  'comment_controls' => '3',
+  'comment_anonymous' => '0',
+  'comment_subject_field' => '0',
+  'comment_preview' => '0',
+  'comment_form_location' => '0',
+  'ant' => '1',
+  'ant_pattern' => 'Profile for [author-name]',
+  'ant_php' => 0,
+);
+$content['groups']  = array (
+  0 => 
+  array (
+    'label' => 'Social Networks',
+    'group_type' => 'standard',
+    'settings' => 
+    array (
+      'form' => 
+      array (
+        'style' => 'fieldset',
+        'description' => '',
+      ),
+      'display' => 
+      array (
+        'description' => '',
+        'teaser' => 
+        array (
+          'format' => 'fieldset',
+          'exclude' => 0,
+        ),
+        'full' => 
+        array (
+          'format' => 'fieldset',
+          'exclude' => 0,
+        ),
+        4 => 
+        array (
+          'format' => 'fieldset',
+          'exclude' => 0,
+        ),
+        2 => 
+        array (
+          'format' => 'fieldset',
+          'exclude' => 0,
+        ),
+        3 => 
+        array (
+          'format' => 'fieldset',
+          'exclude' => 0,
+        ),
+        'token' => 
+        array (
+          'format' => 'fieldset',
+          'exclude' => 0,
+        ),
+        'label' => 'above',
+      ),
+    ),
+    'weight' => '2',
+    'group_name' => 'group_social_networks',
+  ),
+);
+$content['fields']  = array (
+  0 => 
+  array (
+    'label' => 'Facebook',
+    'field_name' => 'field_uprofile_facebook',
+    'type' => 'link',
+    'widget_type' => 'link',
+    'change' => 'Change basic information',
+    'weight' => '-7',
+    'description' => '',
+    'default_value' => 
+    array (
+      0 => 
+      array (
+        'url' => '',
+      ),
+    ),
+    'default_value_php' => '',
+    'default_value_widget' => NULL,
+    'group' => 'group_social_networks',
+    'required' => 0,
+    'multiple' => '0',
+    'validate_url' => 1,
+    'url' => 0,
+    'title' => 'value',
+    'title_value' => 'Facebook',
+    'enable_tokens' => 0,
+    'display' => 
+    array (
+      'url_cutoff' => '80',
+    ),
+    'attributes' => 
+    array (
+      'target' => '_blank',
+      'rel' => 'nofollow',
+      'class' => 'links-facebook',
+      'title' => '',
+    ),
+    'op' => 'Save field settings',
+    'module' => 'link',
+    'widget_module' => 'link',
+    'columns' => 
+    array (
+      'url' => 
+      array (
+        'type' => 'varchar',
+        'length' => 2048,
+        'not null' => false,
+        'sortable' => true,
+      ),
+      'title' => 
+      array (
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => false,
+        'sortable' => true,
+      ),
+      'attributes' => 
+      array (
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => false,
+      ),
+    ),
+    'display_settings' => 
+    array (
+      'weight' => '-7',
+      'parent' => 'group_social_networks',
+      'label' => 
+      array (
+        'format' => 'hidden',
+      ),
+      'teaser' => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+  ),
+  1 => 
+  array (
+    'label' => 'Twitter',
+    'field_name' => 'field_uprofile_twitter',
+    'type' => 'link',
+    'widget_type' => 'link',
+    'change' => 'Change basic information',
+    'weight' => '-6',
+    'description' => '',
+    'default_value' => 
+    array (
+      0 => 
+      array (
+        'url' => '',
+      ),
+    ),
+    'default_value_php' => '',
+    'default_value_widget' => 
+    array (
+      'field_uprofile_twitter' => 
+      array (
+        0 => 
+        array (
+          'url' => '',
+        ),
+      ),
+    ),
+    'group' => 'group_social_networks',
+    'required' => 0,
+    'multiple' => '0',
+    'validate_url' => 1,
+    'url' => 0,
+    'title' => 'value',
+    'title_value' => 'Twitter',
+    'enable_tokens' => 0,
+    'display' => 
+    array (
+      'url_cutoff' => '80',
+    ),
+    'attributes' => 
+    array (
+      'target' => '_blank',
+      'rel' => 'nofollow',
+      'class' => 'links-twitter',
+      'title' => '',
+    ),
+    'op' => 'Save field settings',
+    'module' => 'link',
+    'widget_module' => 'link',
+    'columns' => 
+    array (
+      'url' => 
+      array (
+        'type' => 'varchar',
+        'length' => 2048,
+        'not null' => false,
+        'sortable' => true,
+      ),
+      'title' => 
+      array (
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => false,
+        'sortable' => true,
+      ),
+      'attributes' => 
+      array (
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => false,
+      ),
+    ),
+    'display_settings' => 
+    array (
+      'weight' => '-6',
+      'parent' => 'group_social_networks',
+      'label' => 
+      array (
+        'format' => 'hidden',
+      ),
+      'teaser' => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      4 => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      2 => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      3 => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+  ),
+  2 => 
+  array (
+    'label' => 'LinkedIn',
+    'field_name' => 'field_uprofile_linkedin',
+    'type' => 'link',
+    'widget_type' => 'link',
+    'change' => 'Change basic information',
+    'weight' => '-5',
+    'description' => '',
+    'default_value' => 
+    array (
+      0 => 
+      array (
+        'url' => '',
+      ),
+    ),
+    'default_value_php' => '',
+    'default_value_widget' => 
+    array (
+      'field_uprofile_linkedin' => 
+      array (
+        0 => 
+        array (
+          'url' => '',
+        ),
+      ),
+    ),
+    'group' => 'group_social_networks',
+    'required' => 0,
+    'multiple' => '0',
+    'validate_url' => 1,
+    'url' => 0,
+    'title' => 'value',
+    'title_value' => 'LinkedIn',
+    'enable_tokens' => 0,
+    'display' => 
+    array (
+      'url_cutoff' => '80',
+    ),
+    'attributes' => 
+    array (
+      'target' => '_blank',
+      'rel' => 'nofollow',
+      'class' => 'links-linkedin',
+      'title' => '',
+    ),
+    'op' => 'Save field settings',
+    'module' => 'link',
+    'widget_module' => 'link',
+    'columns' => 
+    array (
+      'url' => 
+      array (
+        'type' => 'varchar',
+        'length' => 2048,
+        'not null' => false,
+        'sortable' => true,
+      ),
+      'title' => 
+      array (
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => false,
+        'sortable' => true,
+      ),
+      'attributes' => 
+      array (
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => false,
+      ),
+    ),
+    'display_settings' => 
+    array (
+      'weight' => '-5',
+      'parent' => 'group_social_networks',
+      'label' => 
+      array (
+        'format' => 'hidden',
+      ),
+      'teaser' => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      4 => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      2 => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      3 => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+  ),
+  3 => 
+  array (
+    'label' => 'Friendfeed',
+    'field_name' => 'field_uprofile_friendfeed',
+    'type' => 'link',
+    'widget_type' => 'link',
+    'change' => 'Change basic information',
+    'weight' => '-4',
+    'description' => '',
+    'default_value' => 
+    array (
+      0 => 
+      array (
+        'url' => '',
+      ),
+    ),
+    'default_value_php' => '',
+    'default_value_widget' => 
+    array (
+      'field_uprofile_friendfeed' => 
+      array (
+        0 => 
+        array (
+          'url' => '',
+        ),
+      ),
+    ),
+    'group' => 'group_social_networks',
+    'required' => 0,
+    'multiple' => '0',
+    'validate_url' => 1,
+    'url' => 0,
+    'title' => 'value',
+    'title_value' => 'FriendFeed',
+    'enable_tokens' => 0,
+    'display' => 
+    array (
+      'url_cutoff' => '80',
+    ),
+    'attributes' => 
+    array (
+      'target' => '_blank',
+      'rel' => 'nofollow',
+      'class' => 'links-friendfeed',
+      'title' => '',
+    ),
+    'op' => 'Save field settings',
+    'module' => 'link',
+    'widget_module' => 'link',
+    'columns' => 
+    array (
+      'url' => 
+      array (
+        'type' => 'varchar',
+        'length' => 2048,
+        'not null' => false,
+        'sortable' => true,
+      ),
+      'title' => 
+      array (
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => false,
+        'sortable' => true,
+      ),
+      'attributes' => 
+      array (
+        'type' => 'text',
+        'size' => 'medium',
+        'not null' => false,
+      ),
+    ),
+    'display_settings' => 
+    array (
+      'weight' => '-4',
+      'parent' => 'group_social_networks',
+      'label' => 
+      array (
+        'format' => 'hidden',
+      ),
+      'teaser' => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'full' => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      5 => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      4 => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      2 => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      3 => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+      'token' => 
+      array (
+        'format' => 'default',
+        'exclude' => 0,
+      ),
+    ),
+  ),
+);
+$content['extra']  = array (
+  'title' => '-5',
+  'revision_information' => '5',
+  'author' => '4',
+  'options' => '6',
+  'comment_settings' => '8',
+  'menu' => '3',
+  'path' => '7',
+);

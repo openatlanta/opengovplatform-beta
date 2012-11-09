@@ -1,0 +1,11 @@
+<?php
+
+function web_contact_owner_install()
+{
+	drupal_set_message(st('Installed Contact Owner module'));
+}
+
+function web_contact_owner_uninstall()
+{
+	drupal_set_message(st('Uninstalled Contact Owner module'));
+}

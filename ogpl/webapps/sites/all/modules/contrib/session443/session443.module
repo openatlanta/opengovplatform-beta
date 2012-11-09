@@ -1,0 +1,546 @@
+<?php
+
+/**
+ * @file
+ * 443 Session module file
+ *
+ * @todo simpletests.
+ */
+
+/**
+ * Options for redirection status.
+ */
+define('SESSION443_DISABLED', 0);
+define('SESSION443_ENABLED', 1);
+define('SESSION443_ALL', 2);
+
+/**
+ * Options for how to handle the login block.
+ */
+define('SESSION443_LOGIN_BLOCK_FORCE_HTTPS', 0);
+define('SESSION443_LOGIN_BLOCK_CHANGE_FORM_ACTION', 1);
+define('SESSION443_LOGIN_BLOCK_NONE', 2);
+
+/**
+ * Options for user-state rule.
+ */
+define('SESSION443_USER_MODE_NONE', 0);
+define('SESSION443_USER_MODE_FORCE_HTTPS', 1);
+define('SESSION443_USER_MODE_FORCE_HTTPS_AND_HTTP', 2);
+
+/**
+ * Options for redirecting authenticated users that visit HTTP pages.
+ */
+define('SESSION443_AUTHENTICATED_HTTP_REDIRECT_LOGIN', 1);
+define('SESSION443_AUTHENTICATED_HTTP_REDIRECT_AND_COOKIE', 2);
+
+/**
+ * Implements hook_help().
+ */
+function session443_help($section) {
+  switch ($section) {
+    case 'admin/help#session443':
+      // Return a line-break version of the module README.txt
+      $readme = file_get_contents(drupal_get_path('module', 'session443') . "/README.txt");
+      if (function_exists('filter_filter')) {
+        $readme = filter_filter('process', 1, 0,  $readme);
+        $readme = filter_filter('process', 1, 1,  $readme);
+      }
+      return $readme;
+    case 'admin/settings/session443':
+      return 'Redirects certain pages to always be HTTP or HTTPS based on certain rules.';
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function session443_menu() {
+  $items['admin/settings/session443'] = array(
+    'title' => '443 Session',
+    'description' => 'Configure HTTPS redirects',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('session443_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'session443.admin.inc'
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_boot().
+ */
+function session443_boot() {
+  global $base_url, $base_root, $language, $user;
+
+  // Change various globals to HTTP(S).
+  $should_be_secure = session443_is_page_secure();
+  $base_url = _session443_modify_url_scheme($base_url, $should_be_secure);
+  $base_root = _session443_modify_url_scheme($base_root, $should_be_secure);
+  if (!empty($language->domain) && variable_get('language_negotiation', LANGUAGE_NEGOTIATION_NONE) == LANGUAGE_NEGOTIATION_DOMAIN) {
+    // This counters the effects of language_url_rewrite():
+    $language->domain = _session443_modify_url_scheme($language->domain, $should_be_secure);
+  }
+
+  $appears_authenticated = isset($_COOKIE[variable_get('session443_cookie_name', 'LOGGED_IN')]);
+
+  // Act on, or cleanup the LOGGED_IN cookie.
+  // We must do this here in hook_boot() so that redirects happen even if the
+  // page is cached.
+
+  // Are we forcing all pages to use HTTPS?
+  if (variable_get('session443_enable', SESSION443_DISABLED) == SESSION443_ALL) {
+    session443_set_page_should_be_secure(TRUE);
+    // Cleanup old cookies.
+    if ($appears_authenticated) {
+      _session443_bake_cookie(FALSE);
+    }
+  }
+  else {
+
+    // User-state rule.
+    if (variable_get('session443_user_state_rule', SESSION443_USER_MODE_FORCE_HTTPS_AND_HTTP) == SESSION443_USER_MODE_NONE) {
+      // Cleanup old cookies.
+      if ($appears_authenticated) {
+        _session443_bake_cookie(FALSE);
+      }
+    }
+    else {
+      if ($user->uid) {
+        session443_set_page_should_be_secure(TRUE);
+      }
+
+      // On HTTP pages, if the user appears to be authenticated, then redirect.
+      if (!session443_is_page_secure() && !$user->uid && $appears_authenticated) {
+        session443_set_page_should_be_secure(TRUE);
+      }
+      elseif (session443_is_page_secure()) {
+        // On HTTPS for users that appeared to be authenticated, but are actually
+        // anonymous, eat the cookie.
+        if (!$user->uid && $appears_authenticated) {
+          _session443_bake_cookie(FALSE);
+        }
+        // On HTTPS for users that are authenticated, but don't have the cookie,
+        // bake the cookie.
+        elseif ($user->uid && !$appears_authenticated) {
+          _session443_bake_cookie(TRUE);
+        }
+      }
+    }
+
+  }
+
+  session443_redirect_if_neccesary();
+}
+
+/**
+ * Implements hook_preprocess_page().
+ *
+ * Test to see if we need to redirect the user.
+ *
+ * This needs to happen after forms have opportunity to trigger a redirect. So
+ * in order to make redirects as efficient as possible, redirect here before
+ * rendering takes place.
+ */
+function session443_preprocess_page() {
+  global $user;
+
+  $appears_authenticated = isset($_COOKIE[variable_get('session443_cookie_name', 'LOGGED_IN')]);
+
+  // Is the current page one of the additional pages to make secure?
+  if (_session443_is_additional_page()) {
+    session443_set_page_should_be_secure(TRUE);
+  }
+
+  // Force anonymous users to HTTP if previous rules don't state otherwise.
+  if (!$user->uid && variable_get('session443_user_state_rule', SESSION443_USER_MODE_FORCE_HTTPS_AND_HTTP) == SESSION443_USER_MODE_FORCE_HTTPS_AND_HTTP) {
+    session443_set_page_should_be_secure(FALSE, FALSE);
+  }
+
+  session443_redirect_if_neccesary();
+}
+
+/**
+ * Bake / Eat the special LOGGED_IN cookie.
+ *
+ * @param boolean $set
+ *  TRUE to bake, FALSE to eat.
+ */
+function _session443_bake_cookie($bake) {
+  global $cookie_domain;
+  if ($bake) {
+    // 0 means session cookie.
+    $time = 0;
+  }
+  else {
+    // Time in the past means to delete the cookie.
+    $time = $_SERVER['REQUEST_TIME'] - 42000;
+  }
+  setcookie(variable_get('session443_cookie_name', 'LOGGED_IN'), TRUE, $time, '/', $cookie_domain, FALSE);
+}
+
+/**
+ * If something has designated the current page's intended state, and the page
+ * is not already in that state, then redirect.
+ */
+function session443_redirect_if_neccesary() {
+  $should_be_secure = session443_get_page_should_be_secure();
+  if (isset($should_be_secure)) {
+    $is_secure = session443_is_page_secure();
+    if ($should_be_secure xor $is_secure) {
+      _session443_redirect($should_be_secure);
+    }
+  }
+}
+
+/**
+ * Register a preference about if the current page should be (in)secure.
+ *
+ * @param boolean $should_be_secure
+ *  TRUE/FALSE to designate what the current page should be.
+ * @param boolean $override
+ *  If something has already registered a preference, should it be overridden?
+ * @param boolean $reset
+ *  Reset the static variable.
+ */
+function session443_set_page_should_be_secure($should_be_secure, $override = TRUE, $reset = FALSE) {
+  static $secure;
+  if ($reset) {
+    $secure = NULL;
+  }
+  if (!isset($should_be_secure)) {
+    return $secure;
+  }
+  if ($override || !isset($secure)) {
+    $secure = $should_be_secure;
+  }
+}
+
+/**
+ * Based on preferences registered thus far, should the current page be
+ * (in)secure?
+ *
+ * @return mixed
+ *  TRUE if should be secure, FALSE if should not be, NULL if not determined.
+ */
+function session443_get_page_should_be_secure() {
+  return session443_set_page_should_be_secure(NULL);
+}
+
+/**
+ * Is the current page secure?
+ *
+ * @return boolean
+ */
+function session443_is_page_secure() {
+  $default_server_keys = array(
+    'HTTPS' => array('on', '1'),
+    'HTTP_X_FORWARDED_PROTO' => 'https',
+  );
+  $server_keys = variable_get('session443_ssl_headers', $default_server_keys);
+  foreach ($server_keys as $key => $value) {
+    if (isset($_SERVER[$key]) && is_array($value) && in_array($_SERVER[$key], $value)) {
+      return TRUE;
+    }
+    elseif (isset($_SERVER[$key]) && $_SERVER[$key] == $value) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Is the current page is one of the "additional secure pages"?
+ *
+ * @return boolean
+ */
+function _session443_is_additional_page() {
+  $additional_pages = variable_get('session443_additional_pages', "cart*\ndonat*");
+  return _session443_match_path($_GET['q'], $additional_pages);
+}
+
+/**
+ * Is the current page is one of the "ignored pages"?
+ *
+ * @return boolean
+ */
+function _session443_is_ignored_page() {
+  // Always ignore 404s.
+  // This may be called during hook_boot() in which case we don't have HTTP
+  // status codes yet.
+  if (function_exists('drupal_set_header')) {
+    // Call drupal_set_header() since Pressflow/Drupal drupal_get_header() behave
+    // even more differently.
+    $headers = drupal_set_header();
+    // Pressflow
+    if (is_array($headers)) {
+      $not_found = isset($headers[':status']) && $headers[':status'] == '404 Not Found';
+    }
+    // Stock Drupal.
+    else {
+      $not_found = preg_match('!^HTTP.*404!m', $headers);
+    }
+    if ($not_found) {
+      return TRUE;
+    }
+  }
+
+  // Admin-defined pages to ignore.
+  $ignored_pages = variable_get('session443_ignore_pages', "*/autocomplete/*\n*/ajax/*\n*/ahah/*");
+  // q is usually absent on the homepage.
+  $q = isset($_GET['q']) ? $_GET['q'] : '';
+  return _session443_match_path($q, $ignored_pages);
+}
+
+/**
+ * Does the given internal path (or its aliases) match the given pattern
+ * (just like block visibility rules).
+ *
+ * @param string $path
+ * @param string $pattern
+ *
+ * @return boolean
+ */
+function _session443_match_path($path, $pattern) {
+  global $language;
+  $original_path = $path;
+  // Compare with the internal and path alias (if any).
+  // This may be called during hook_boot() so the path system may not have been
+  // loaded yet.
+  if (!function_exists('drupal_get_path_alias')) {
+    require './includes/path.inc';
+  }
+  // If language doesn't yet exist it means that we are in hook_boot,
+  // which means that an ignored path is being checked,
+  // which means that the patterns are 99% likely not to have an alias,
+  // which means English can be used as the language.
+  $path_language = isset($language->language) ? $language->language : 'en';
+  $path = drupal_get_path_alias($original_path, $path_language);
+  $page_match = drupal_match_path($path, $pattern);
+  // q is often not set on the front page. 
+  $q = isset($_GET['q']) ? $_GET['q'] : '';
+  if ($path != $q) {
+    $page_match = $page_match || drupal_match_path($original_path, $pattern);
+  }
+  return $page_match;
+}
+
+/**
+ * Redirect to the (in)secure version of the current URL.
+ *
+ * @param boolean $should_be_secure
+ * @param string $url
+ *  The URL to redirect to.  If none is given then the current URL is used.
+ *
+ * Do not call this function directly.
+ * @see session443_redirect_if_neccesary()
+ * @see session443_set_page_should_be_secure()
+ */
+function _session443_redirect($should_be_secure, $url = NULL) {
+  global $base_root, $user;
+
+  if (!_session443_is_enabled()) {
+    return;
+  }
+
+  switch (variable_get('session443_enable', SESSION443_DISABLED)) {
+    case SESSION443_DISABLED:
+      return;
+    case SESSION443_ENABLED:
+      if (_session443_is_ignored_page()) {
+        return;
+      }
+      break;
+  }
+
+  if (empty($url)) {
+    $url = $base_root . request_uri();
+  }
+  $url = _session443_modify_url_scheme($url, $should_be_secure);
+
+  // Remove newlines from the URL to avoid header injection attacks.
+  $url = str_replace(array("\n", "\r"), '', $url);
+
+  // Even though session_write_close() is registered as a shutdown function,
+  // we need all session data written to the database before redirecting.
+  session_write_close();
+
+  // @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+  header('Location: ' . $url, TRUE, 302);
+
+  // Don't invoke hook_exit().  There's no need to collect stats or cache the
+  // page, and we must avoid sending any (possibly sensitive) content over an
+  // insecure connection.  Just quit.
+  exit();
+}
+
+/**
+ * Has the module been enabled?  Also confirm that we are not in CLI mode.
+ *
+ * @return boolean
+ */
+function _session443_is_enabled() {
+  return variable_get('session443_enable', SESSION443_DISABLED) != SESSION443_DISABLED && !drupal_is_cli();
+}
+
+/**
+ * Convert a URL to be (in)secure.
+ *
+ * @param string $url
+ *  The URL, or a string containing multiple URLs.
+ * @param boolean $should_be_secure = TRUE
+ *  Should the URLs be (in)secure?
+ *
+ * @return string
+ */
+function _session443_modify_url_scheme($url, $should_be_secure = TRUE) {
+  if ($should_be_secure) {
+    $from = 'http://';
+    $to = 'https://';
+  }
+  else {
+    $from = 'https://';
+    $to = 'http://';
+  }
+  return str_replace($from, $to, $url);
+}
+
+/**
+ * Test if the current site is accessible over HTTPS.
+ *
+ * @param $reset
+ *  Reset a static variable.
+ *
+ * @return boolean
+ */
+function _session443_test_https($reset = FALSE) {
+  static $test;
+
+  if (isset($test) && !$reset) {
+    return $test;
+  }
+
+  // If we are in an HTTPS page then assume that HTTPS is configured correctly.
+  if (session443_is_page_secure()) {
+    return $test = TRUE;
+  }
+
+  // Otherwise attempt to fetch the current page over HTTPS.
+  $url = _session443_modify_url_scheme(url($_GET['q'], array('absolute' => TRUE)));
+  $response = drupal_http_request($url);
+  return $test = ($response->code == 200);
+}
+
+/**
+ * Implements hook_FORMID_alter().
+ */
+function session443_form_user_login_alter(&$form, $form_state) {
+  // Only redirect if our user state rule allows it.
+  if (variable_get('session443_user_state_rule', SESSION443_USER_MODE_FORCE_HTTPS_AND_HTTP) != SESSION443_USER_MODE_NONE) {
+    session443_set_page_should_be_secure(TRUE);
+  }
+}
+
+/**
+ * Implements hook_FORMID_alter().
+ */
+function session443_form_user_register_alter(&$form, $form_state) {
+  // Only redirect if our user state rule allows it.
+  if (variable_get('session443_user_state_rule', SESSION443_USER_MODE_FORCE_HTTPS_AND_HTTP) != SESSION443_USER_MODE_NONE) {
+    session443_set_page_should_be_secure(TRUE);
+  }
+}
+
+/**
+ * Implements hook_FORMID_alter().
+ */
+function session443_form_user_login_block_alter(&$form, $form_state) {
+  // Only redirect if our user state rule allows it.
+  if (variable_get('session443_user_state_rule', SESSION443_USER_MODE_FORCE_HTTPS_AND_HTTP) == SESSION443_USER_MODE_NONE) {
+    return;
+  }
+
+  switch (variable_get('session443_login_block', SESSION443_LOGIN_BLOCK_FORCE_HTTPS)) {
+    case SESSION443_LOGIN_BLOCK_FORCE_HTTPS:
+      session443_set_page_should_be_secure(TRUE);
+      break;
+
+    case SESSION443_LOGIN_BLOCK_CHANGE_FORM_ACTION:
+      if (!_session443_is_enabled()) {
+        return;
+      }
+
+      $action = parse_url($form['#action']);
+
+      if (!$action) {
+        // Parsing the URL failed.  Bail.
+        return;
+      }
+      elseif (!empty($action['scheme'])) {
+        if ($action['scheme'] == 'https') {
+          // The form action points to a secured path.
+          // Do nothing, we're in the clear.
+        }
+        elseif ($action['scheme'] == 'http') {
+          // The form action points to an unsecured path.
+          $form['#action'] = _session443_modify_url_scheme($form['#action']);
+        }
+        else {
+          // Unknown scheme. Do nothing.
+        }
+      }
+      elseif (!empty($action['host'])) {
+        // This is a schema-relative URL.
+        $form['#action'] = _session443_modify_url_scheme('https:' . $form['#action']);
+      }
+      else {
+        // The form action points to a relative or internal URL.
+
+        // Strip off the base path.
+        $action['path'] = preg_replace('#^' . preg_quote(base_path()) . '#', '', $action['path']);
+
+        // Ensure that the parsed URL has all parts.
+        $action_default = array(
+          'path' => '',
+          'query' => '',
+          'fragment' => '',
+        );
+        $action = array_merge($action_default, $action);
+
+        // Compile an absolute URL.
+        $form['#action'] = url($action['path'], array('absolute' => TRUE, 'query' => $action['query'], 'fragment' => $action['fragment']));
+        $form['#action'] = _session443_modify_url_scheme($form['#action']);
+      }
+      break;
+  }
+}
+
+/**
+ * Implements hook_mail_alter().
+ *
+ * This ensures that the one-time-login link (as well as other links) is
+ * always HTTPS.
+ *
+ * @todo For D7 this could possibly be done in hook_url_alter_outbound()
+ *       for better reliability.
+ */
+function session443_mail_alter(&$message) {
+  $module = drupal_substr($message['id'], 0, 5);
+  if ($module == 'user_') {
+    $message['body'] = _session443_modify_url_scheme($message['body']);
+  }
+}
+
+if (!function_exists('drupal_is_cli')) {
+  /**
+   * Detect whether the current script is running in a command-line environment.
+   *
+   * Backport of D7 function.  Conditionally included because it's in Pressflow.
+   */
+  function drupal_is_cli() {
+    return (!isset($_SERVER['SERVER_SOFTWARE']) && (php_sapi_name() == 'cli' || (is_numeric($_SERVER['argc']) && $_SERVER['argc'] > 0)));
+  }
+}
+
+// vim: set filetype=php expandtab tabstop=2 shiftwidth=2 autoindent smartindent:

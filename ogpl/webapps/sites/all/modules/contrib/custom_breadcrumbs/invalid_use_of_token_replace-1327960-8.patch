@@ -1,0 +1,19 @@
+diff --git a/custom_breadcrumbs.module b/custom_breadcrumbs.module
+index a409b53..f2dd185 100644
+--- a/custom_breadcrumbs.module
++++ b/custom_breadcrumbs.module
+@@ -369,8 +369,12 @@ function _custom_breadcrumbs_get_breadcrumb($breadcrumb, $objs, &$locations) {
+   if (module_exists('token')) {
+     // Do token replacement.
+     $types = custom_breadcrumbs_token_types($objs);
+-    $titles = token_replace_multiple($titles, $types);
+-    $paths = token_replace_multiple($paths, $types);
++    foreach($titles as $key => $value) {
++      $titles[$key] = token_replace_multiple($value, $types);
++    }
++    foreach($paths as $key => $value) {
++      $paths[$key] = token_replace_multiple($value, $types);
++    }
+   }
+ 
+   // Optionally append the page title

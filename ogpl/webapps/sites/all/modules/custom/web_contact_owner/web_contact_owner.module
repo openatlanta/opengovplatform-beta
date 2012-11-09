@@ -1,0 +1,158 @@
+<?php
+function web_contact_owner_form()
+{
+	if ( arg(0) == 'node' && is_numeric(arg(1)) && ! arg(2)) {
+		$node = node_load(arg(1));
+	}
+	
+	$max_len = 300;
+	$nid = $node->nid;
+	$title = $node->title;
+	$form['purpose']=array(
+	  '#type'=>'select',
+	  '#required' =>true,
+	  '#options'=>array(''=>'Please Select','Copyright Violation'=>'Copyright Violation','Offensive Content'=>'Offensive Content','Spam or Junk'=>'Spam or Junk','Personal Information'=>'Personal Information','Need More Info'=>'Need More Info','Query'=>'Query'),
+	  '#default_value'=>'Query',
+	  '#title'=>'Purpose',
+         '#weight'=>'-2',
+	  );
+	 $form['subject']=array(
+	  '#type'=>'hidden',
+	  '#required'=>false,
+	  '#title'=>'Subject',
+	  //'#size' => 58,
+	  '#maxlength' => 1000,
+	  '#default_value'=>'data.gov.in: Feedback about "'.$title.'" dataset',
+         '#weight'=>'-1',
+
+	  );
+	 $form['message']=array(
+	  '#type'=>'textarea',
+	  '#required'=>true,
+	  '#title'=>'Short Message',
+	  '#description' => '<span id="shrt-textarea-limit-count"> '.$max_len.' </span> characters left.',
+	  '#attributes' => array('onkeydown'=>'return textCounter(300,"edit-message","shrt-textarea-limit-count")','onkeyup'=>'return textCounter(300,"edit-message","shrt-textarea-limit-count")','maxlength' => '300'),
+	  '#weight'=>'0',
+
+         );
+	 $form['emailid']=array(
+	  '#type'=>'textfield',
+	  '#required'=>true,
+	  '#title'=>'Your E-mail Address',
+	 '#rules' => array('email',),
+          '#weight'=>'1',
+	  );
+	  $form['cc']=array(
+	  '#type'=>'checkbox',
+	  '#title'=>'Send copy to me',
+          '#weight'=>'2',
+
+	  );
+	 $form['nodeid']=array(
+	  '#type'=>'hidden',
+	  '#default_value'=>$nid,
+          '#weight'=>'3',
+
+	  );
+	 $form['dataset-title']=array(
+	  '#type'=>'hidden',
+	  '#default_value'=>$title,
+          '#weight'=>'5',
+
+	  );
+	  $path = drupal_get_path_alias($_GET['q']);
+	  $form['url']=array(
+	  '#type'=>'hidden',
+	  '#value'=>$path,
+          '#weight'=>'6',
+
+	  );
+	$form['contact-owner']['#weight']='7';
+	$form['contact-owner']['submit'] = array ('#type'=> 'submit','#weight'=>'3', '#value'=>'Submit','#attributes' => array('title'=>'Click here to submit the form'));
+	return $form;
+}
+function web_contact_owner_form_validate($form,&$form_state){
+$emailid = $form_state['values']['emailid'];
+if(!valid_email_address($emailid))
+{
+	form_set_error('emailid', t('You must enter a valid e-mail address.'));
+	return false;
+}
+return true;
+}
+function web_contact_owner_form_submit($form,&$form_state){
+	$nodeid = $form_state['values']['nodeid'];
+	$subject = $form_state['values']['subject'];
+	$message = $form_state['values']['message'];
+	$purpose = $form_state['values']['purpose'];
+	$email_sender = $form_state['values']['emailid'];
+	$workflow_info = dms_customizations_get_dataset_validator_details($nodeid);
+	$user_info = user_load($workflow_info->uid);
+	$email = $user_info->mail;
+	$status = 0;
+	$headers = 'From: '.$form_state['values']['emailid']."\r\n";
+	if($form_state['values']['cc'])
+		$headers.= 'Cc: '.$form_state['values']['emailid'];
+	if (mail($email,$subject,$message,$headers)) $status=1;
+	
+	// create object to store data to feedback node
+	$node = node_load($nodeid);
+	if ($node->field_ds_catlog_type[0]['type'] == 'catalog_type_raw_data') {
+	  $category = 8;
+	}
+	else if($node->field_ds_catlog_type[0]['type'] == 'catalog_type_data_apps') {
+	  $category = 7;
+	}
+	$node = new stdClass();
+	$node->type = 'feedback';
+	$node->uid = $workflow_info->uid;
+	$node->revision_uid = $workflow_info->uid;
+	$node->field_feedback_subject[0]['value'] = check_plain($subject);
+	$node->field_purpose[0]['value'] = check_plain($purpose);
+	$node->field_email[0]['email'] = check_plain($email_sender);
+	$node->field_feedback_body[0]['value'] = check_plain($message);
+	$node->field_source[0]['value'] = 3003;
+	$node->field_category[0]['value'] = $category;
+	$node->field_assigned_to[0]['uid'] = $workflow_info->uid;
+	$node->_workflow = 27;
+	node_save($node);
+	drupal_goto('contact-ownerack');
+
+}
+/*
+function web_contact_owner_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  if ($node->type == 'feedback' and $op == 'insert') {
+    if(!empty($node->field_assigned_to[0]['uid'])) {
+      workflow_execute_transition($node->nid, 26, 'Updated by Data Controller', TRUE);
+      workflow_execute_transition($node->nid, 27, 'Updated by Data Controller', TRUE);
+      drupal_goto('contact-ownerack');
+    }
+  }
+}
+*/
+/*function web_contact_owner_ack ()
+{
+	global $base_url;
+	$content = '<p>The dataset owner has been notified.</p> <br/><br/><p><a href="'.$base_url.'">Back to web page.</a></p> ';
+	return($content);
+}*/
+function web_contact_owner_block($op = 'list', $delta = 'form', $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $blocks[0]['info'] = t('Contact Dataset Owner Block');
+      $blocks[0]['cache'] = BLOCK_NO_CACHE;
+      return $blocks;
+    case 'view':
+      switch ($delta) {
+        case 'form':
+          $block['subject'] = t('Contact Dataset Owner');
+          $block['content'] = drupal_get_form('web_contact_owner_form');
+          break;
+        default:
+          $block['subject'] = t('Contact Dataset Owner');
+          $block['content'] = drupal_get_form('web_contact_owner_form');
+          break;
+      }
+      return $block;      
+  }
+}

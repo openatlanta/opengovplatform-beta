@@ -1,0 +1,5 @@
+name = Taxonomy Syndication Using json/XML
+description = Makes it possible to import as well as syndicate taxonomy terms via XML or json on cron.
+dependencies[] = taxonomy
+package = "Taxonomy"
+core=6.x

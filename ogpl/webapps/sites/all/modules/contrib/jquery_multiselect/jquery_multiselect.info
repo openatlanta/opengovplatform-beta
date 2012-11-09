@@ -1,0 +1,11 @@
+name = Jquery Multiselect
+description = Integrates the jquery multiselect plugin 
+core = 6.x
+dependencies[] = jquery_ui
+dependencies[] = jquery_update
+; Information added by drupal.org packaging script on 2010-06-07
+version = "6.x-1.1"
+core = "6.x"
+project = "jquery_multiselect"
+datestamp = "1275913819"
+

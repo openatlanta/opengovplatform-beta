@@ -1,0 +1,14 @@
+; $Id$
+name = Synchronization
+description = Implements LDAP users sync with Drupal
+package = LDAP integration
+dependencies[] = ldapauth
+core = 6.x
+
+
+; Information added by drupal.org packaging script on 2012-06-28
+version = "6.x-1.0-beta3"
+core = "6.x"
+project = "ldap_integration"
+datestamp = "1340919401"
+

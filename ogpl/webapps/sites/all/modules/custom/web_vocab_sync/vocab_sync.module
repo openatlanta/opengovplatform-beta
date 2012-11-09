@@ -1,0 +1,218 @@
+<?php
+/** 
+ * Implementation of hook_menu: Define menu links.
+ * 
+ * @note See hook_menu for a description of return values.
+ */
+function vocab_sync_menu() {
+  if (!module_exists('taxonomy')) {
+    return;
+  }
+  $items = array();
+
+  $items['admin/content/taxonomy/vocabsync'] = array(
+    'title' => t('vocabsync'),
+    'access arguments' => array('administer taxonomy'),
+    'page callback' => 'vocab_sync_process',
+    'type' => MENU_LOCAL_TASK);
+
+
+  return $items;
+}
+
+/** 
+ * helper function to read source url
+ * 
+ * 
+ */
+function _read_url($path) {
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $path);
+  curl_setopt($ch, CURLOPT_FAILONERROR, 1);
+  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+  $retValue = curl_exec($ch);                      
+  curl_close($ch);
+  return $retValue;
+}
+function _process_json($url, $depth=0) {
+  $oXML = _read_url($url);
+  $obj = json_decode($oXML, TRUE);
+  return $obj;
+}
+
+function _taxonomy_get_term_by_name($name, $vid = null) {
+  $db_result = db_query(db_rewrite_sql("SELECT t.tid, t.* 
+      FROM {term_data} t 
+      WHERE LOWER(t.name) = LOWER('%s')" . ($vid?" AND t.vid =  %d":''), 't', 'tid'), trim($name), $vid);
+  
+  $result = array();
+  
+  while ($term = db_fetch_object($db_result)) {
+    $result[] = $term;
+  }
+
+  return $result;
+}
+function _taxonomy_get_synonym_root($synonym,  $vid = null) {
+  return db_fetch_object(db_query("SELECT * 
+      FROM {term_synonym} s, {term_data} t 
+      WHERE t.tid = s.tid AND s.name = '%s'". ($vid?" AND t.vid =  %d":''), $synonym, $vid));
+}
+function _taxonomy_is_exists($term_name,  $vid) {
+  $term = _taxonomy_get_term_by_name($term_name, $vid);
+  if (count($term)) {
+    return TRUE;
+  } 
+  else {
+    return FALSE;
+  }
+}
+
+/*function process_json_array($json_array, $vid, $term_key) {
+  foreach ($json_array as $key=>$value) {
+    if (is_array($value)) {
+     process_json_array($value, $vid, $term_key);
+    }
+  else {
+      if ($key==$term_key && !_taxonomy_is_exists($value)) {
+        $term = array( 
+        'vid' => $vid,  // Voacabulary ID
+        'name' => $value, // Term Name
+		'parent' => 3, // (Optional) Term ID of a parent term  
+      );
+      taxonomy_save_term($term);
+    }
+    }
+  }
+}*/
+
+function process_json_array($json_array, $vid, $parent_array, $term_key, $term_synonyms, $term_desc = null,$parent_term_key = NULL) {
+  foreach ($json_array as $key => $value) {
+    if (is_array($value) && $key !== $parent_array) {
+      process_json_array($value, $vid, $parent_array, $term_key, $term_synonyms, $term_desc, $parent_term_key);
+    }
+    else {
+      if ( !_taxonomy_is_exists($value[$term_key], $vid) && !empty($value[$term_key])) {
+        $term = array( 
+          'vid'         => $vid,  // Voacabulary ID
+          'name'        => trim($value[$term_key]), // Term Name
+          'synonyms'    => trim($value[$term_synonyms]) // (Optional) Synonym of this term
+        );
+        
+        if(!empty($term_desc) && !empty($value[$term_desc])) {
+          $term['description'] = trim($value[$term_desc]);
+        }
+        
+        if ( !empty($parent_term_key) &&  !empty($value[$parent_term_key])) {
+          $synonym = _taxonomy_get_synonym_root($value[$parent_term_key], $vid);
+          if($synonym)
+            $term['parent'] = $synonym->tid;
+        }
+        
+        if ($value[$parent_term_key] != trim($value[$term_synonyms]))
+          taxonomy_save_term($term);
+      } 
+    }
+  }
+}
+function vocab_sync_process() {
+  return drupal_get_form('vocab_sync_form');
+}
+function vocab_sync_form($form_state) {
+  foreach (module_invoke('taxonomy', 'get_vocabularies') as $vid => $voc) {
+    $vocs[$vid] = $voc->name;
+  }
+  $vocs[-1] = t('[Create new]');
+  $form['vid'] = array(
+    '#type' => 'select',
+    '#title' => t('Target vocabulary'),
+    '#default_value' => variable_get('taxonomy_xml_vid', 0),
+    '#options' => $vocs,
+    '#description' => t('The vocabulary into which terms should be loaded.'),
+  );
+ $form['url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('URL to import from'),
+    '#description' => t('Enter the URL of a file or web service containing a vocabulary definition.'),  
+    '#default_value' => variable_get('vocal_sync_url', ''),
+  );
+  $form['parent_element'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Parent Element'),
+    '#description' => t('Enter the name of the parent Variable.'),  
+    '#default_value' => variable_get('vocal_parent_var', ''),
+  );
+  $form['term_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Key name'),
+    '#description' => t('Enter the key name to be used as taxonomy term.'),  
+    '#default_value' => variable_get('vocal_sync_kay', ''),
+  );
+  $form['term_synonyms'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Term synonyms'),
+    '#description' => t('Enter the key name to be used as taxonomy synonyms.'),  
+    '#default_value' => variable_get('vocal_synonyms_kay', ''),
+  );
+  $form['term_description'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Term Description'),
+      '#description' => t('Enter the key name to be used as taxonomy Description.'),
+      '#default_value' => variable_get('vocal_desc_kay', ''),
+  );
+  $form['parent_term_key'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Parent Key Name'),
+      '#description' => t('Enter the key name to be used as taxonomy term Parent.'),
+      '#default_value' => variable_get('vocal_parent_sync_kay', ''),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Import'),
+  );
+
+  return $form;
+}
+function vocab_sync_form_submit($form, &$form_state) {
+  variable_set('taxonomy_xml_vid', $form_state['values']['vid']);
+  variable_set('vocal_sync_url', $form_state['values']['url']);
+  variable_set('vocal_sync_kay', $form_state['values']['term_key']);
+  variable_set('vocal_parent_var', $form_state['values']['parent_element']);
+  variable_set('vocal_synonyms_kay', $form_state['values']['term_synonyms']);
+  variable_set('vocal_desc_kay', $form_state['values']['term_description']);
+  variable_set('vocal_parent_sync_kay', $form_state['values']['parent_term_key']);
+  $vid = $form_state['values']['vid'];
+  $json_array = _process_json(variable_get('vocal_sync_url', ''));
+  process_json_array(
+    $json_array, 
+    $vid, 
+    variable_get('vocal_parent_var', ''), 
+    variable_get('vocal_sync_kay', ''), 
+    variable_get('vocal_synonyms_kay', ''),
+    variable_get('vocal_desc_kay', ''),
+    variable_get('vocal_parent_sync_kay', '')
+  );
+  drupal_set_message('Taxonomy suscessfully imported');
+}
+
+function vocab_sync_get_vocabulary_by_name($vocabulary_name) {
+  $vocabs = taxonomy_get_vocabularies(NULL);
+  foreach ($vocabs as $vocab_object) {
+    if ($vocab_object->name == $vocabulary_name) {
+      return $vocab_object->vid;
+    }
+  }
+  return NULL;
+}
+
+function vocab_sync_get_tid_by_name($term_name, $vid) {
+  $terms = taxonomy_get_term_by_name($term_name);
+  foreach ($terms as $terms_object) {
+    if ($terms_object->vid == $vid) {
+      return $terms_object->tid;
+    }
+  }
+  return NULL;
+}

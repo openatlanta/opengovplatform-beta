@@ -1,0 +1,12 @@
+name = Watchdog Triggers
+description = Provides Trigger and Actions integration to watchdog events.
+package = Logging and alerts
+core = 6.x
+dependencies[] = trigger
+
+; Information added by drupal.org packaging script on 2012-02-01
+version = "6.x-2.1"
+core = "6.x"
+project = "logging_alerts"
+datestamp = "1328058350"
+

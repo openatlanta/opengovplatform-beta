@@ -1,0 +1,58 @@
+/* $Id*/
+
+/**
+ * @file
+ * Contains styling for the user page when overridden by APK.
+*/
+
+/*** SECTION HEADINGS ********************************************************/
+
+/* Styles titles of each content pane. */
+#user-profile h2.pane-title {
+  font-size: 120%;
+  font-weight: bold;
+  padding: 3px 0px 3px 5px;
+}
+
+/*** DEFAULT PANES ***********************************************************/
+
+#user-profile #profile-author-pane {
+}
+
+#user-profile #profile-contact{
+}
+
+#user-profile #profile-links {
+}
+
+#user-profile #profile-stats {
+}
+
+#user-profile #profile-wall {
+}
+
+#user-profile #profile-basic {
+}
+
+#user-profile #profile-posts {
+}
+
+#user-profile #profile-friends {
+}
+
+/*** AUTHOR PANE  ************************************************************/
+#user-profile .author-pane .author-pane-label {
+  font-weight: bold;
+}
+
+/*** FRIEND'S GALLERY  ******************************************************/
+.view-apk-ur-friends-gallery .picture {
+  clear: none;
+  float: none;
+  padding-left: 0;
+}
+
+.view-apk-ur-friends-gallery .picture img {
+  width: 85px;
+  height: 85px;
+}

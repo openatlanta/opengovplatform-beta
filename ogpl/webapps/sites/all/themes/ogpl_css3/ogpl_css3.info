@@ -1,0 +1,39 @@
+name = OGPL with CSS3 Theme - I
+description = Theme based on OGPL CSS3 template
+version = VERSION
+core = 6.x
+engine = phptemplate
+
+stylesheets[all][] = style.css
+stylesheets[all][] = css/dataset-tab.css
+
+scripts[] = js/jquery.li-scroller.1.0.js
+scripts[] = js/jquery.vticker-min.js
+scripts[] = js/script.js
+scripts[] = js/scroll.js
+
+regions[color_options] = Color Options Block
+regions[contrast_options] = Contrast Options Block
+regions[header_flag] = Header Flag Block
+regions[text_resize] = Text Resize Block
+regions[header_options] = Header Options
+regions[header_flags] = Header Flags
+;regions[search_field] = Search Field
+regions[banner] = Banner
+regions[banner_left] = Banner left
+regions[banner_right] = Banner right
+regions[banner_links] = Banner Links
+regions[metrics_menu] = Metrics Menu
+regions[search_filter] = Search Filter
+regions[home_content] = Home page content
+regions[content] = Content
+regions[footer] = Footer
+regions[footer_sitemap] = Footer Sitemap
+regions[footer_links] = Footer Links
+regions[site_hosting_details] = Site Hosting Details
+regions[site_ownership_details] = Site Ownership Details
+regions[hidden_content] = Hidden Content
+regions[sidebar_first] = sidebar first
+regions[dms_header_primary] = dms header primary menu
+regions[dms_header_whatsnew] = dms header whats new
+regions[dms_header_dataset] = dms header dataset

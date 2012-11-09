@@ -1,0 +1,440 @@
+<?php 
+/**
+ * Implementation of hook_perm().
+ */
+
+function web_ldap_role_management_user($op, &$edit, &$account, $category = NULL) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+  switch ($op) {
+    case'login':
+      $uid = $account->uid;
+      $roles = $account->roles;
+      $email_domain = '@'.variable_get('email_domain', 'nic.in');
+      $user_nid = _check_nid_for_field('field_cc_email', $account->name);
+      if(!empty($user_nid) && is_cms_url()){
+        $node = node_load($user_nid);
+         $new_role[2] = 'authenticated user';
+         $new_role[3] = 'Contributor';
+         $account->roles = $new_role;
+         $account->name = str_replace($email_domain, '', $account->name);
+         menu_rebuild();
+         user_save($account, array('name' => $account->name, 'roles' => $new_role));
+         global $_ldapdata_ldap;
+         _ldapdata_user_load($account, TRUE);
+         $user_object = content_profile_load('role_request', $node->uid);
+         $ministry_temp = $node->field_cc_organization;
+          $parent_ministry = $user_object->field_ds_ministry_department;
+          if(empty($ministry_temp[0]['value'])) {
+            $ministry = $parent_ministry;
+          }
+          else{
+            $ministry = array_merge($ministry_temp,$parent_ministry);
+          }
+         $profile_data = array(
+             'field_rr_first_name'=> web_ldap_role_management_get_profile('profile_first_name', $uid),
+             'field_rr_last_name'=> web_ldap_role_management_get_profile('profile_last_name', $uid),
+             'field_rr_designation'=> web_ldap_role_management_get_profile('profile_designation', $uid),
+             'field_rr_address_office'=> web_ldap_role_management_get_profile('profile_address_office', $uid),
+             'field_rr_phone_office'=> web_ldap_role_management_get_profile('profile_phone_office', $uid),
+             'field_rr_mobile'=> web_ldap_role_management_get_profile('profile_mobile', $uid),
+             'field_ds_ministry_department' => $ministry
+         );
+         _create_role_request($account, $profile_data, $node->uid);
+         menu_rebuild();
+      }
+      else if (count($roles) == 1 && is_cms_url()) {
+        $new_role[2] = 'authenticated user';
+        $new_role[20] = 'External User';
+        $account->roles = $new_role;
+        $account->name = str_replace($email_domain, '', $account->name);
+        menu_rebuild();
+        user_save($account, array('name' => $account->name, 'roles' => $new_role));
+        global $_ldapdata_ldap;
+        _ldapdata_user_load($account, TRUE);
+      }
+      if(is_frontend_url() && in_array("Non Verified User", $account->roles)) {
+        if(!$account->logintoboggan_email_validated)
+        {
+          if(preg_match('/^user\/validate\//', trim($_SERVER['REQUEST_URI'],'/'))){
+            drupal_goto('user/'. $uid .'/edit/My%20Information');
+          } 
+          else if(preg_match('/^user\/reset\//', trim($_SERVER['REQUEST_URI'],'/'))){
+            drupal_goto('user/'. $uid .'/edit');
+          }
+          else 
+          {
+            watchdog('user', 'Session closed for %name.', array('%name' => $account->name));
+            // Only variables can be passed by reference workaround.
+            $null = NULL;
+            user_module_invoke('logout', $null, $account);
+            // Destroy the current session:
+            session_destroy();
+            session_regenerate_id(true);
+            // Load the anonymous user
+            $account = drupal_anonymous_user();
+            drupal_goto('node/3025');
+          }
+        }
+      }
+      if(is_cms_url()) drupal_goto();
+      break;
+    case'update':
+        if(is_frontend_url() && $account->logintoboggan_email_validated) {
+          if(!in_array("Portal User", $account->roles)) {
+            $new_role[2] = 'authenticated user';
+            $new_role[19] = 'Portal User';
+            $account->roles = $new_role;
+            user_save($account, array('roles' => $new_role));
+          }
+        }
+      break;
+    case'insert':
+        if(is_frontend_url() && !in_array("Non Verified User", $account->roles)) {
+          $new_role[2] = 'authenticated user';
+          $new_role[19] = 'Portal User';
+          $account->roles = $new_role;
+          user_save($account, array('roles' => $new_role));
+      }
+      break;
+  }
+}
+function web_ldap_role_management_perm() {
+  $perms = array('approve role');
+  return $perms;
+}
+function web_ldap_role_management_get_ministry($i=0) {
+  global $user;
+  $user_object = content_profile_load('role_request', $user->uid);
+  return $user_object->field_ds_ministry_department[$i][value];
+}
+
+function web_ldap_role_management_get_profile($field_name, $uid = NULL) {
+  if ($uid == NULL){
+  global $user;
+  $uid = $user->uid;
+  }
+  $user_object = user_load($uid);
+  return $user_object->$field_name;
+}
+/**
+ * Implementation of hook_menu()
+ */
+function web_ldap_role_management_menu() {
+  $items['node/%node/approve'] = array(
+  'title' => 'Approve',
+  'page callback' => 'drupal_get_form',
+  'page arguments' => array('role_approve_confirm', 1),
+  'access arguments' => array('approve role'),
+  'file' => 'roleapprove.pages.inc',
+  'weight' => 1,
+  'type' => MENU_CALLBACK
+   );
+  
+  $items['node/%node/decline'] = array(
+      'title' => 'Decline',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('role_decline_confirm', 1),
+      'access arguments' => array('approve role'),
+      'file' => 'roleapprove.pages.inc',
+      'weight' => 1,
+      'type' => MENU_CALLBACK
+  );
+  
+  return $items;
+}
+function _get_user_approval_status($uid){
+  $_result = db_result(db_query('SELECT status FROM {role_approvals} WHERE uid = %d ORDER BY aid DESC', $uid));
+  if ($_result['status']) {
+    return $_result['status'];
+  }
+  
+  return FALSE;
+}
+
+function _get_user_is_approved($uid) {
+  $status = _get_user_approval_status($uid);
+  if($status == 1)
+    return true;
+  return false;
+}
+
+function _get_user_is_declined($uid) {
+  $status = _get_user_approval_status($uid);
+  if($status == 2)
+    return true;
+  return false;
+}
+
+function _get_user_approval_text($status) {
+  switch ($status) {
+    case 1:
+      return 'Approved';
+      break;
+    case 2:
+      return 'Declined';
+      break;
+    default:
+      return null;
+  }  
+}
+
+function _get_user_approval_status_text($uid) {
+  return _get_user_approval_text(_get_user_approval_status($uid));
+}
+
+function web_ldap_role_management_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL){
+  global $user;
+  switch ($op) {
+    case 'insert':
+    case 'update':
+      if ($node->type == 'role_request') {
+        db_query("INSERT INTO {role_approvals} (uid, approver_id, status, timestamp) VALUES (%d, %d, %d, %d)", $node->uid, $node->uid, 0, time());
+      }
+      if ($node->type == 'create_contributor') {
+        $user_type = $node->field_cc_user_type['0']['value'];
+        //the users email address
+        $email = $node->field_cc_email[0]['email'];
+        // 1 : LDAP USer 2: Database User
+        if ($user_type == '2') {
+          $user_object = content_profile_load('role_request', $node->uid);
+          $ministry_temp = $node->field_cc_organization;
+          $parent_ministry = $user_object->field_ds_ministry_department;
+          if(empty($ministry_temp[0]['value'])) {
+            $ministry = $parent_ministry;
+          }
+          else{
+            $ministry = array_merge($ministry_temp,$parent_ministry);
+          }
+          //the user name of the new user
+          $user_name = $node->field_cc_email[0]['email'];
+          //set up the user fields using a random 8 character password
+          $fields = array(
+            'name' => $user_name,
+            'mail' => $email,
+            'pass' => user_password(8),
+            'status' => 1,
+          );
+          // profile data
+          $user_profile = array(
+            'profile_first_name'=> $node->field_cc_first_name[0]['value'],
+            'profile_last_name'=> $node->field_cc_last_name[0]['value'],
+            'profile_designation'=> $node->field_rr_address_office[0]['value'],
+            'profile_address_office'=> $node->field_cc_designation[0]['value'],
+            'profile_mobile'=> $node->field_cc_mobile[0]['value'],
+            'profile_phone_office'=> $node->field_cc_phone[0]['value']
+          ); 
+          $profile_data = array(
+              'field_rr_first_name'=> $node->field_cc_first_name[0]['value'],
+              'field_rr_last_name'=> $node->field_cc_last_name[0]['value'],
+              'field_rr_designation'=> $node->field_cc_designation[0]['value'],
+              'field_rr_address_office'=> $node->field_rr_address_office[0]['value'],
+              'field_rr_phone_office'=> $node->field_cc_mobile[0]['value'],
+              'field_rr_mobile'=> $node->field_cc_phone[0]['value'],
+              'field_ds_ministry_department' => $ministry
+          );
+          //you can give a user roles if necessary based on the role name
+          $fields['roles'] = array('3' => 'Contributor');
+          //the first parameter is left blank so a new user is created
+          $account = user_save('', $fields);
+         
+          // Manually set the password so it appears in the e-mail.
+          $account->password = $fields['pass'];
+          if ($account != NULL ) {
+          // Send the e-mail through the user module.
+           drupal_mail('user', 'register_admin_created', $email, NULL, array('account' => $account), variable_get('site_mail', 'nic-ndsap@nic.in'));
+          _user_save_profile($user_profile, $account, 'Personal Information'); 
+          _create_role_request($account, $profile_data, $node->uid);
+          }
+        }
+        else if($user_type == '1') {
+          // Send the e-mail through the Role Management module.
+          $message  = drupal_mail('web_ldap_role_management', 'contributor_notice', $email, $language->language, $params);
+        }
+      }
+      break;
+  }
+}
+function _user_save_profile($edit, $user, $category, $register = FALSE) {
+  $result = _profile_get_fields($category, $register);
+  while ($field = db_fetch_object($result)) {
+    if (_profile_field_serialize($field->type)) {
+      $edit[$field->name] = serialize($edit[$field->name]);
+    }
+    db_query("DELETE FROM {profile_values} WHERE fid = %d AND uid = %d", $field->fid, $user->uid);
+    db_query("INSERT INTO {profile_values} (fid, uid, value) VALUES (%d, %d, '%s')", $field->fid, $user->uid, $edit[$field->name]);
+    // Mark field as handled (prevents saving to user->data).
+    $edit[$field->name] = NULL;
+  }
+}
+function _create_role_request($new_user, $profile_data, $cteator_id) {
+  $user_object = content_profile_load('role_request', $cteator_id);
+  $new_user_object = content_profile_load('role_request', $new_user->uid);
+  if (empty($new_user_object)) {
+    $profile_node = new stdClass();
+    $profile_node->title = $new_user->name;
+    $profile_node->body = '';
+    $profile_node->type = 'role_request';   // Your specified content type
+    $profile_node->created = $time;
+    $profile_node->changed = $time;
+    $profile_node->status = 1;
+    $profile_node->promote = 0;
+    $profile_node->sticky = 0;
+    $profile_node->format = 1;       // Filtered HTML
+    $profile_node->uid = $new_user->uid; // UID of content owner
+    $profile_node->field_rr_dms_role[0]['value'] = '3';
+    $profile_node->field_rr_first_name[0]['value'] = $profile_data['field_rr_first_name'];
+    $profile_node->field_rr_last_name[0]['value'] = $profile_data['field_rr_last_name'];
+    $profile_node->field_rr_designation[0]['value'] = $profile_data['field_rr_designation'];
+    $profile_node->field_rr_address_office[0]['value'] = $profile_data['field_rr_address_office'];
+    $profile_node->field_rr_phone_office[0]['value'] = $profile_data['field_rr_phone_office'];
+    $profile_node->field_rr_mobile[0]['value'] = $profile_data['field_rr_mobile'];
+    $profile_node->field_ds_ministry_department = $profile_data['field_ds_ministry_department'];
+    node_save($profile_node);
+    db_query('UPDATE {role_approvals} SET status = %d WHERE uid = %d',1, $new_user->uid);
+  }
+}
+function web_ldap_role_management_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'create_contributor_node_form') {
+    $parent_term = $form['field_cc_organization']['tids']['#config']['params']['tid'];
+    $children = taxonomy_get_children($parent_term);
+    if (count($children) == 0 ) {
+      unset($form['field_cc_organization']);
+    }
+    $form['#validate'][] = '_contributor_check';
+  }
+  return $form;
+}
+function _contributor_check($form, &$form_state) {
+  $email_in = check_plain($form['#post']['field_cc_email'][0]['email']);
+  $user_type = check_plain($form['#post']['field_cc_user_type']['value']);
+  $email_in_domain = explode('@', $email_in);
+  if ($error = user_validate_mail($email_in)) {
+    $status = array(error => TRUE, message => t('The e-mail address '. $email_in .'is not valid.'));
+  }
+  else if ($user_type == '1' && $email_in_domain[1] != variable_get('email_domain', 'nic.in')) {
+    $status = array(error => TRUE, message => t('The e-mail address '. $email_in .' is not in valid domain.'));
+  }
+  else if (db_result(db_query("SELECT COUNT(*) FROM {users} WHERE LOWER(mail) = LOWER('%s')", $email_in)) > 0) {
+    $account = user_load(array('mail' => $email_in));
+    $user_id = $account->uid;
+    $user_object = content_profile_load('role_request', $user_id);
+    /*if (function_exists('_get_user_roles')){
+      $user_roles = _get_user_roles($user_id);
+    }
+    else {
+      $user_roles = $account->roles;
+    }*/
+    $user_roles = $account->roles;
+    foreach ($user_roles as $role) {
+      if ($role != 'authenticated user') $role_list .= $role.", ";
+    }
+    foreach ($user_object->taxonomy as $office) {
+      $office_list .= $office->name.", ";
+    }
+    $role_list = trim($role_list, ', ');
+    $office_list = trim($office_list, ', ');
+    $status = array(error => TRUE, message => t('The e-mail address @email is already registered with <strong>@role_list</strong> role(s) from @ministry.', array ('@email' => $email_in, '@role_list' => $role_list, '@ministry' => $office_list)));
+  }
+  else {
+    $status = array(error => FALSE, message => t('Ready to create account.'));
+  }
+  if($status['error']) {
+    form_set_error('field_cc_email',$status['message']);
+  }
+}
+function _check_nid_for_field($field_name, $field_value) {
+  $field = content_fields($field_name);
+  $db_info = content_database_info($field);
+  $table = $db_info['table'];
+  $row = $db_info['columns']['email']['column'];
+  $nid = db_result(db_query("SELECT nid FROM {" . $table . "} WHERE LOWER(" . $row . ") = LOWER('%s')", $field_value));
+  return $nid;
+}
+
+function _user_details_tokens($account, $language) {
+  global $base_url;
+  $tokens = array(
+      '!username' => $account->name,
+      '!site' => variable_get('site_name', 'Drupal'),
+      '!login_url' => user_pass_reset_url($account),
+      '!uri' => $base_url,
+      '!uri_brief' => preg_replace('!^https?://!', '', $base_url),
+      '!mailto' => $account->mail,
+      '!date' => format_date(time(), 'medium', '', NULL, $language->language),
+      '!login_uri' => url('user', array('absolute' => TRUE, 'language' => $language)),
+      '!edit_uri' => url('user/'. $account->uid .'/edit', array('absolute' => TRUE, 'language' => $language)),
+      '!name' => web_ldap_role_management_get_profile('profile_first_name')." ".web_ldap_role_management_get_profile('profile_last_name'),
+      '!desig' => web_ldap_role_management_get_profile('profile_designation'),
+  );
+  return $tokens;
+}
+function web_ldap_role_management_mail($key, &$message, $params) {
+  $language = $message['language'];
+  switch($key) {
+    case 'roleapproved':
+      $variables = _user_details_tokens($params['account'], $language);
+      $message['subject'] = t('Role Approval Notification from !site', $variables, $language->language);
+      $message['body'][] = t("Dear User\n\n Your role is approved by !name, !desig. \n\n Thank You \n\n --  !site team", $variables, $language->language);
+      break;
+    case 'contributor_notice':
+      $variables = _user_details_tokens($params['account'], $language);
+      $message['subject'] = t('User Creation Notification from !site', $variables, $language->language);
+      $message['body'][] = t("Dear User\n\n Welcome to !site ! \n\n Your account is created as Contributor by !name, !desig. Please login using your NICEmail at !uri for contributing datasets of your organization. \n\n Thank You \n\n --  !site team", $variables, $language->language);
+      break;
+    case 'roledeclined':
+      $variables = _user_details_tokens($params['account'], $language);
+      $message['subject'] = t('Role Decline Notification from !site', $variables, $language->language);
+      $message['body'][] = t("Dear User\n\n Your account is Declined by !name, !desig. \n\n Thank You \n\n --  !site team", $variables, $language->language);
+      break;
+  }
+}
+function _allowed_roles() {
+  if(function_exists('_role_delegation_roles')) {
+    $current_roles = isset($account->roles) ? $account->roles : array();
+    $rids_default = array();
+    $rids_preserve = array(DRUPAL_AUTHENTICATED_RID => DRUPAL_AUTHENTICATED_RID);
+    $roles_preserve = array('authenticated user');
+    $roles_options = array();
+    $roles = _role_delegation_roles();
+    foreach ($roles as $rid => $role) {
+      if (user_access('assign all roles') || user_access(_role_delegation_make_perm($role))) {
+        if (array_key_exists($rid, $current_roles)) {
+          $rids_default[] = $rid;
+        }
+        $roles_options[$rid] = $role;
+      }
+      else {
+        if (array_key_exists($rid, $current_roles)) {
+          $rids_preserve[$rid] = $rid;
+          $roles_preserve[] = $role;
+        }
+      }
+    }
+    return $roles_options;
+  }
+}
+
+function _get_user_role_name_by_role_id($roleid) {
+  $role_result = db_result(db_query('SELECT name FROM {role} WHERE rid = %d', $roleid));
+  if ($role_result['name']) {
+    return $role_result;
+  }
+  return FALSE;
+}
+
+if (!function_exists('user_unblock_user_action')) {
+  function user_unblock_user_action(&$object, $context = array()) {
+    if (isset($object->uid)) {
+      $uid = $object->uid;
+    }
+    elseif (isset($context['uid'])) {
+      $uid = $context['uid'];
+    }
+    else {
+      global $user;
+      $uid = $user->uid;
+    }
+    db_query("UPDATE {users} SET status = 1 WHERE uid = %d", $uid);
+    sess_destroy_uid($uid);
+    watchdog('action', 'Unblocked user %name.', array('%name' => check_plain($user->name)));
+  }
+}

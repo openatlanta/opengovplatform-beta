@@ -1,0 +1,4 @@
+name = Email and SMS alert for essential services
+description = Sends logs and alerts to email addresses as well as SMS.
+package = Logging and alerts
+core = 6.x

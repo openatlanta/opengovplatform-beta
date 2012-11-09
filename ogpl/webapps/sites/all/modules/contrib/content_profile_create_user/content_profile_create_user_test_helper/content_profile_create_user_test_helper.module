@@ -1,0 +1,3 @@
+<?php
+
+include_once('content_profile_create_user_test_helper.features.inc');

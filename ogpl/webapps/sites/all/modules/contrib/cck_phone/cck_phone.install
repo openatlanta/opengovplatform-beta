@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * @file
+ * Defines phone number fields for CCK.
+ * Installation file
+ */
+
+
+/**
+ * Implementation of hook_install().
+ */
+function cck_phone_install() {
+  drupal_load('module', 'content');
+  content_notify('install', 'cck_phone');
+  drupal_set_message(st('Phone number module installed successfully.'));
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function cck_phone_uninstall() {
+  drupal_load('module', 'content');
+  content_notify('uninstall', 'cck_phone');
+  variable_del('cck_phone_custom_cc');
+}
+
+/**
+ * Implementation of hook_enable().
+ *
+ * Notify content module when this module is enabled.
+ */
+function cck_phone_enable() {
+  // TODO: Migration path for phone.module to cck_phone
+  drupal_load('module', 'content');
+  content_notify('enable', 'cck_phone');
+}
+
+/**
+ * Implementation of hook_disable().
+ *
+ * Notify content module when this module is disabled.
+ */
+function cck_phone_disable() {
+  drupal_load('module', 'content');
+  content_notify('disable', 'cck_phone');
+}
+
+/**
+ * Remove the variable 'cck_phone_custom_cc'.
+ */
+function cck_phone_update_6000() {
+  variable_del('cck_phone_custom_cc');
+  return array();
+}

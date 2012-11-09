@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * @file
+ * ldapauth module installation and upgrade code.
+ */
+
+//////////////////////////////////////////////////////////////////////////////
+// Core API hooks
+
+/**
+ * Implementation of hook_install().
+ */
+function web_ldap_role_management_install() {
+  drupal_install_schema('web_ldap_role_management');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function web_ldap_role_management_uninstall() {
+  // Remove tables.
+  drupal_uninstall_schema('web_ldap_role_management');
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Schema API hooks
+
+/**
+ * Implementation of hook_schema().
+ */
+function web_ldap_role_management_schema() {
+  $schema['role_approvals'] = array(
+    'fields' => array(
+      'aid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => 'The {users}.uid that created this version.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0
+       ),
+       'approver_id' => array(
+        'description' => 'The {users}.uid who approved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0
+       ),
+      'status' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'timestamp' => array(
+        'description' => 'A Unix timestamp indicating when this user was approved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0
+      )
+    ),
+    'primary key' => array('aid'),
+  );
+  return $schema;
+}

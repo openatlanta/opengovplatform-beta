@@ -1,0 +1,14 @@
+
+body {
+  background: url(images/page_wrapper.png) top center repeat-y;
+}
+
+#page-wrapper {
+  width: 979px;
+  margin: 0 auto;
+  padding: 0 0 0 10px;
+}
+
+#page-wrapper-content {
+  width: 969px;
+}

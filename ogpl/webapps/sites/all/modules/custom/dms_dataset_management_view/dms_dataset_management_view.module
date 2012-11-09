@@ -1,0 +1,10 @@
+<?php
+
+include_once('dms_dataset_management_view.features.inc');
+
+
+/* Added dataset-operation.css through module for reflecting in all the theme */
+
+function dms_dataset_management_view_init() {
+  drupal_add_css(drupal_get_path('module', 'dms_dataset_management_view') . '/css/dataset-operation.css');
+}

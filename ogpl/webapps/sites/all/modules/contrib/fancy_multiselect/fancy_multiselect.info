@@ -1,0 +1,12 @@
+name = Fancy Multiselect
+description = Defines a fancy CCK multiple selection field widget, to allow easier multi-selection for users.
+dependencies[] = optionwidgets
+dependencies[] = jquery_multiselect
+package = CCK
+core = "6.x"
+; Information added by drupal.org packaging script on 2010-06-10
+version = "6.x-1.3"
+core = "6.x"
+project = "fancy_multiselect"
+datestamp = "1276179609"
+

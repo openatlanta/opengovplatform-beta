@@ -1,0 +1,83 @@
+
+LDAP Integration Changelog
+==========================
+Issue #1664384 by cgmonroe Fatal error on viewing a user profile
+Issue #1525752 by cgmonroe Original issue solution needed additional logic to allow for mixed mode users. 
+by cgmonroe Allow Drupal name to be null in ldapauth_drupal_user_lookup
+by cgmonroe Made sure role lookup querys were case insensitive
+by cgmonroe Added hook_ldap_user_groups_alter and hook_ldap_user_roles_alter to ldapgroups and ldapgroups.api.php doc. 
+by cgmonroe Allowed multiple Drupal roles to be defined in the group to role mapping area.
+by cgmonroe Added a test user group mappings option to ldapgroups admin that displays groups found, access rights, and roles for a specific user.
+by cgmonroe Converted ldapgroups "account creation" to ldap access rules.
+by cgmonroe Improved ldapgroups admin screen layout and text
+Issue #492082 by rjmackay, cgmonroe Provide option to disallow changing Username on user edit form
+by cgmonroe Added ability to convert ldap users back to local users (on user profile page).
+Issue #1279166 by cgmonroe Enabling groups overrides roles
+by cgmonroe ldapsync now has a User Conflict resolution option to deal with existing drupal users who match LDAP users
+by cgmonroe added a Sync Existing user only option to ldapsync
+by cgmonroe ldapsync's optional search filter can now contain multiple filters and optionally have the default filter appended.
+by cgmonroe Included ldapauth_users table removal in ldapauth uninstall function.
+Issue #1550504 by superhenne,cgmonroe ldapauth_users table not created on update/installation
+by cgmonroe Convert ldapgroups from $user to recommended $account for user handling.
+Issue #805752 by cgmonroe Detecting Groups failing (when user has no groups and only allow from these groups defined).
+by cgmonroe Restructured ldapgroups to support hook_ldap_user_deny_alter
+Issues #897222 and #949560 by cgmonroe Added hook_ldap_user_deny_alter so ldapgroups (and other modules) could deny an ldap user access to server before account creation/login.
+by cgmonroe Fixed features api so it worked with the new ldap.core structure
+by cgmonroe Restructured ldapsyn to use new core functions and fix multiple issues 
+by cgmonroe Added caching to ldapauth_lookup_user_by_dn
+Issue #862930 by cgmonroe LDAP should not be queried on every hook_user_view call
+Issue #688502 by cgmonroe Changed "sync passwords" option text to be clearer about behaviour.
+by cgmonroe Moved from authmap to checking account settings in a lot of places
+by cgmonroe Converted from include and requires to module_load_include
+by cgmonroe Fixed ldapdata bug that caused non-LDAP admin accounts to "blank out" profile info if they clicked on "Edit"
+by cgmonroe Added hooks for site specific modules to create PUIDs and influence LDAP user id to Drupal User id mapping - See ldapauth.api.php
+by cgmonroe Added/Restructured code to use ldapauth_drupal_user_lookup (map ldap ID to Drupal id) and ldapauth_drupal_user_create (create new Drupal user logic).
+by cgmonroe Refactored ldapauth so "core" functions (used by other modules) are in includes\ldap.core.inc file.
+by cgmonroe (Related to many issues) Added support for Persistent and Unique IDs (PUID) - Requires update.php to be run
+by cgmonroe Fix problem with server name and or machine name not being stored if they are changed in admin screens.
+by cgmonroe Cache attributes needed by sid and op rather than just op.
+Issue #1537556 by macman824,cgmonroe Lastest dev breaks ability to change AD password.
+Issue #1475228 by antgiant LDAP Sync Block Missing Users is Case Sensitive
+Issue #1475234 by antgiant LDAP Sync does show username of enabled users
+by cgmonroe Create D7 style ldapauth.api.php doc
+by cgmonroe Added machine_name as an LDAPInterface option/updated init code
+by cgmonroe Optimized server info caching by converting to ldapauth_server_load calls.
+Issue #1031425 by joelstein,johnbarclay,cgmonroe Return only specific attributes from ldap_read
+Issue #1525752 by msielski,cgmonroe If "Remove email field from form" is selected, user email address can not be changed.
+Issue #1209556 by johnbarclay,ericksm,cgmonroe Need to check for existing emails in ldapauth.module
+by cgmonroe Feature revert now correctly uses machine names to identify existing server entries.
+by cgmonroe Fixed PhP errors that occur if ldapdata attribute mapping still exist when the related *profile module is disabled.
+by cgmonroe Updated field description to include default port numbers.
+by cgmonroe Fixed bug with bindpw being cleared on save
+Issue #1400154 by cgmonroe Ldapdata module support for updating LDAP attributes from Content Profile Nodes
+by cgmonroe Added machine_name to database (requires Update.php run!) and support in admin screens.
+by cgmonroe Fix coder complaints about messages.
+by cgmonroe Added some common CRUD functions for accessing server info..
+by cgmonroe Add server import / export via admin GUI if ctools enabled.
+Issue #692670 by cgmonroe Integration with Features Module
+Issue #62784 by adzuledu,cgmonroe: Mapping image-type attribute from LDAP
+Issue #256226 by paolomainardi: Option to prevent new accounts from LDAP from being added to Drupal 
+Issue #1435486 by eiriksm: Coding Standards
+by cgmonroe: Fixed arraymerge error if no profile fields defined
+Issue #580786 by retsamedoc Standard LDAP Password Encryption
+Issue #1253020 by superhenne,cgmonroe  $profile_fields / $content_profile_fields messed up in ldapdata.module
+Issue #594598 by eporama.  Updated original to work on login page & test for admin.
+Issue #1243564 by wadmiraal.  translation fix.
+Issue #594598 by eporama.  Fix of error message on failed logon when reset password disabled.
+Issue #514986.  Error in error message when start tls fails.
+Issue #3918612 by pembertona.  Content Profile support additions and profile fixes.
+Issue #514986 by jlea9378. Bad error catching when start tls fails.  Produced extra errors.
+Issue #406038.  Fixed wording on fieldset for LDAP groups which allow automatic account creation
+Issue #655918 by sutch.  Fixed working of ldap server directions.
+Issue #821776 by gibus.  fixed use of t() function.
+Issue #953744 by erikwebb.  SQL error in ldap synch fixed.
+Brought last head into synch http://drupalcode.org/project/ldap_integration.git/commit/b16d5e2fd87f99d9abb4c35211da5be8e7977abe.  Primary change was addition of ldap synch.
+Issue #641558 by ShutterFreak :  password field should not be trimmed.
+Issue #171763 by retsamedoc : date support in profile
+Issue #793586 by robb: error catching for fail to connect
+Issue #986322 by lavamind: since email field is simply hidded, don't change in ldap
+Issue #339821 by presleyd: Fix encoding for AD passwords.
+Issue #636150 by patrizio:  allow non ldap users to request new password.
+Issue #417892 by johnbarclay: changed explode on , to ldap_explode_dn function to deal with escaping characters
+Merged Head and Beta2 into head for 6.x-1.x-dev
+Issue #514986 by jlea9378:  start tls not working because of incorrect check.  Patch by catfink.

@@ -1,0 +1,3 @@
+name= LDAP role management
+description = Handles the role management for users coming from LDAP
+core = 6.x

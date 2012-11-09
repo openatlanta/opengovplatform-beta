@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Adds the jQuery Multiselect plugin to a page.
+ */
+function jquery_multiselect_plugin_add() {
+	$path = drupal_get_path('module', 'jquery_multiselect') .'/jquery/js/';
+  drupal_add_js($path . 'jquery-ui-1.8.custom.min.js');
+  drupal_add_js($path . 'ui.multiselect.js');
+}
+
+/**
+ * Implementation of hook requirements
+ */
+function jquery_multiselect_plugin_requirements() {
+  //TODO fill in hook requirements
+}

@@ -1,0 +1,20 @@
+<?php
+// $Id: advanced_profile.install,v 1.1.2.2 2010/10/04 19:12:10 michellec Exp $
+
+/**
+ * @file
+ * Contains install and update functions for Advanced Profile Kit.
+ */
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function advanced_profile_uninstall() {
+  //Remove variables.
+  variable_del('advanced_profile_redirect_from_node');
+  variable_del('advanced_profile_tab_title');
+  variable_del('advanced_profile_visitors_limit');
+  variable_del('advanced_profile_visitors_distinct');
+  variable_del('advanced_profile_visitors_interval_granularity');
+  variable_del('advanced_profile_visitors_excluded_roles');
+}

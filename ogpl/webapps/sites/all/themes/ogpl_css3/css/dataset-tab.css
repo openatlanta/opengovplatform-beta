@@ -1,0 +1,96 @@
+/*================ Datset filedgroup tabing style==============start==============*/
+
+.dataset-page .dataset{
+	margin-left: 28px;
+}
+.dataset-page .pane-dataset {
+    background-color: #FFFFFF;
+    position: absolute;
+    width: 904px;
+    /*height: 428px;*/
+    border: none;
+    font-size: 1.4em;
+    border-radius: 0px;
+}
+
+
+.dataset-page .panels-flexible-region-inside {
+    margin-left: 28px;
+}
+
+.dataset-page .pane-dataset h2 {
+  display: block;
+  font-size: 1.06em;
+  height: 90px;
+  width: 15px;
+  margin-left: -27px;
+  padding: 5px;
+  position: absolute;
+  text-align: center;
+  cursor: pointer;
+  text-indent: -99999px;
+  background-position: left center;
+  border-radius: 0px;
+}
+.dataset-page .basic-info, .dataset-page .basic-info h2{ 
+  background-color: #F5ECCE;
+} 
+.dataset-page .contact-info, .dataset-page .contact-info h2{ 
+  background-color: #E9F2EC;
+}
+.dataset-page .more-info, .dataset-page .more-info h2{ 
+  background-color: #FBEFF5;
+}
+
+.dataset-page .basic-info h2{
+	background-image: url(../images/tab/core_tab.png);	
+	background-repeat: no-repeat;
+	background-position: left 
+}
+
+.dataset-page .contact-info h2{
+	background-image: url(../images/tab/contact.png);
+	background-repeat: no-repeat;	
+}
+
+.dataset-page .more-info h2 {
+	background-image: url(../images/tab/additional_tab.png);
+	background-repeat: no-repeat;	
+}
+
+
+body.dataset-page .content-bottom {
+	margin-left: 25px;
+}
+body.dataset-page #comments {
+	margin-left: 25px;
+}
+body.dataset-page .block-web_contact_owner {
+	margin-left: 25px;
+}
+body.dataset-page .block-vrm_customization {
+	margin-left: 25px;
+}
+
+
+.dataset-page .views-row > div {
+    border-bottom: 1px solid #CCCCCC;
+    display: block;
+    width: 100%;
+    clear: both;
+}
+.dataset-page .views-row > div label{
+    display: block;
+    float: left;
+    padding: 8px 0 8px 8px;
+    width: 20%;
+    font-weight: bold;
+}
+.dataset-page .views-row > div .field-content{
+    display: block;
+    float: left;
+    margin: 0 0 0 20px;
+    padding: 8px 0 8px 8px;
+    width: 75%;
+}
+/*================ Datset filedgroup tabing style==============end==============*/

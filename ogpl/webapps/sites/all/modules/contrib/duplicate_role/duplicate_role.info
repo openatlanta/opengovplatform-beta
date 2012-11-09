@@ -1,0 +1,9 @@
+name = "Duplicate Role"
+description = "A module that duplicates an existing role and its permissions."
+core = 6.x
+; Information added by drupal.org packaging script on 2011-08-31
+version = "6.x-2.0"
+core = "6.x"
+project = "duplicate_role"
+datestamp = "1314815518"
+

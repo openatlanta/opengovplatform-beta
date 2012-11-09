@@ -1,0 +1,338 @@
+<?php
+
+/**
+ * @file
+ * Allows users to select multiple items in an easier way than the normal node-reference widget.
+ */
+
+
+/**
+ * Implementation of hook_help().
+ */
+function fancy_multiselect_help($path, $arg) {
+  $output = '';
+  switch ($path) {
+    case 'admin/help#fancy_multiselect':
+      $output = '<p>'. t('Provides a fancy CCK widget for editing fields that allows users to select from a list of options in a left box and have them visually moved into the right box when options are chosen.') .'</p>';
+      break;
+  }
+  return $output;
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function fancy_multiselect_form_alter(&$form, $form_state, $form_id) {
+  // Provide additional help for the field settings form.
+  if ($form_id == 'content_field_edit_form' && isset($form['widget'])) {
+    $widget_type = $form['#field']['widget']['type'];
+    $field_type = $form['#field']['type'];
+    $label = $form['#field']['widget']['label'];
+
+    $output = '<p>'. t('Create a list of options as a list in <strong>Allowed values list</strong> or as an array in PHP code. These values will be the same for %field in all content types.', array('%field' => $label)) .'</p>';
+
+    if (in_array($widget_type, array('fancy_multiselect_select'))) {
+
+      if (in_array($field_type, array('text', 'number_integer', 'number_float', 'number_decimal'))) {
+        $form['field']['allowed_values_fieldset']['#collapsed'] = FALSE;
+        $form['field']['allowed_values_fieldset']['#description'] = $output;
+
+        // If no 'allowed values' were set yet, add a remainder in the messages area.
+        if (empty($form_state['post']) && empty($form['field']['allowed_values_fieldset']['allowed_values']['#default_value']) && empty($form['field']['allowed_values_fieldset']['advanced_options']['allowed_values_php']['#default_value'])) {
+          drupal_set_message(t("You need to specify the 'allowed values' for this field."), 'warning');
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_widget_info().
+ * This specifies the label and that it is a widget for the different field types.
+ */
+function fancy_multiselect_widget_info() {
+  return array(
+    'fancy_multiselect_select' => array(
+      'label' => t('Fancy Multiselect'),
+      'field types' => array('nodereference', 'text', 'number_integer', 'number_decimal', 'number_float', 'userreference', 'content_taxonomy'),
+      'multiple values' => CONTENT_HANDLE_MODULE,
+      'callbacks' => array(
+        'default value' => CONTENT_CALLBACK_DEFAULT,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implementation of FAPI hook_elements().
+ *
+ * Any FAPI callbacks needed for individual widgets can be declared here,
+ * and the element will be passed to those callbacks for processing.
+ */
+function fancy_multiselect_elements() {
+  return array(
+  'fancy_multiselect_select' => array(
+      '#input' => TRUE,
+      '#columns' => array('uid'),
+      '#delta' => 0,
+      '#process' => array('fancy_multiselect_select_process'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_widget().
+ *
+ * hook_widget is a CCK hook
+ *
+ * Attach a single form element to the form. It will be built out and
+ * validated in the callback(s) listed in hook_elements. We build it
+ * out in the callbacks rather than here in hook_widget so it can be
+ * plugged into any module that can provide it with valid
+ * $field information.
+ *
+ * Content module will set the weight, field name and delta values
+ * for each form element. This is a change from earlier CCK versions
+ * where the widget managed its own multiple values.
+ *
+ * If there are multiple values for this field, the content module will
+ * call this function as many times as needed.
+ *
+ * @param $form
+ *   the entire form array, $form['#node'] holds node information
+ * @param $form_state
+ *   the form_state, $form_state['values'] holds the form values.
+ * @param $field
+ *   the field array
+ * @param $delta
+ *   the order of this item in the array of subelements (0, 1, 2, etc)
+ *
+ * @return
+ *   the form item for a single element for this field
+ */
+function fancy_multiselect_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+  switch ($field['widget']['type']) {
+    case 'fancy_multiselect_select':
+      $element = array(
+        '#type' => 'fancy_multiselect_select',
+        '#default_value' => $items,
+      );
+      break;
+  }
+  return $element;
+}
+
+/**
+ * Process an individual element.
+ *
+ * Build the form element. When creating a form using FAPI #process,
+ * note that $element['#value'] is already set.
+ *
+ * The $fields array is in $form['#field_info'][$element['#field_name']].
+ */
+function fancy_multiselect_select_process($element, $edit, &$form_state, $form) {
+
+  // Insert Javascript and CSS for this widget.
+  $path = drupal_get_path('module', 'fancy_multiselect');
+  $jquery_path = drupal_get_path('module', 'jquery_ui');
+
+  drupal_add_css($path .'/css/ui.multiselect.css');
+  drupal_add_css($jquery_path.'/jquery.ui/themes/base/ui.all.css');
+
+  
+  if (module_exists('jq')) {    
+    jq_add('multiSelect');  
+  }
+  else {
+    jquery_multiselect_plugin_add();
+  }
+  
+  //TODO make configurable by ckk widget
+  drupal_add_js('$(function(){$(".fancy-multiselect").multiselect({
+      sortable: true, 
+      searchable: true, 
+      animated: "fast",
+      show: "slideDown",
+      hide: "slideUp",
+      dividerLocation: 0.5
+    });});','inline','header'
+  );  
+
+  $field_name = $element['#field_name'];
+  $field = $form['#field_info'][$field_name];
+  $field_key  = $element['#columns'][0];
+
+  // See if this element is in the database format or the transformed format,
+  // and transform it if necessary.
+  if (is_array($element['#value']) && !array_key_exists($field_key, $element['#value'])) {
+    $element['#value'] = optionwidgets_data2form($element, $element['#default_value'], $field);
+  }
+
+  // Get a list of all options for this field.
+  $options = optionwidgets_options($field, FALSE);
+
+  // For this specific widget, HTML should be filtered out and entities left unencoded.
+  // See content_allowed_values / content_filter_xss / filter_xss.
+  content_allowed_values_filter_html($options);
+
+  // Create some arrays for use later in the function.
+  $unselected_options = array();
+  $selected_options = array();
+  
+    // Add selected items to the array first
+  if (is_array($element['#value'][$field_key])) {
+    foreach ($element['#value'][$field_key] as $key => $value) {
+      if (isset($options[$value])) {
+        $selected_options[$value] = $value;
+        $order[] = $value;
+      }
+    }
+  }
+  
+  $element[$field_key] = array(
+    '#type' => 'select',
+    '#title' => t($element['#title']),
+    '#description' => $element['#description'],
+    '#required' => isset($element['#required']) ? $element['#required'] : $field['required'],
+    '#multiple' => isset($element['#multiple']) ? $element['#multiple'] : $field['multiple'],
+    '#options' => $options,
+    '#attributes' => array('class' => "fancy-multiselect"),
+    '#default_value' => $selected_options,
+    '#order' => $order,
+    '#theme' => 'multiselect_select',
+  );
+
+  // Set #element_validate in a way that it will not wipe out other
+  // validation functions already set by other modules.
+  if (empty($element['#element_validate'])) {
+    $element['#element_validate'] = array();
+  }
+  array_unshift($element['#element_validate'], 'optionwidgets_validate');
+
+  // Make sure field info will be available to the validator which
+  // does not get the values in $form.
+
+  // TODO for some reason putting the $field array into $form_state['storage']
+  // causes the node's hook_form_alter to be invoked twice, garbling the
+  // results. Need to investigate why that is happening (a core bug?), but
+  // in the meantime avoid using $form_state['storage'] to store anything.
+  $form_state['#field_info'][$field['field_name']] = $field;
+  return $element;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function fancy_multiselect_theme() {
+  return array(
+    'fancy_multiselect_select' => array(
+      'arguments' => array('element' => NULL),
+    ),
+    'multiselect_select' => array(
+      'arguments' => array('element' => NULL),  
+    ),
+  );
+}
+
+/**
+ * FAPI theme for an individual elements.
+ *
+ * The textfield or select is already rendered by the
+ * textfield or select themes and the html output
+ * lives in $element['#children']. Override this theme to
+ * make custom changes to the output.
+ *
+ * $element['#field_name'] contains the field name
+ * $element['#delta]  is the position of this element in the group
+ */
+function theme_fancy_multiselect_select($element) {
+  return $element['#children'];
+}
+
+/**
+ * Takes into account sorting
+ * 
+ * Format a dropdown menu or scrolling selection box.
+ *
+ * @param $element
+ *   An associative array containing the properties of the element.
+ *   Properties used: title, value, options, description, extra, multiple, required
+ * @return
+ *   A themed HTML string representing the form element.
+ *
+ * @ingroup themeable
+ *
+ * It is possible to group options together; to do this, change the format of
+ * $options to an associative array in which the keys are group labels, and the
+ * values are associative arrays in the normal $options format.
+ */
+function theme_multiselect_select($element) {
+  $select = '';
+  $size = $element['#size'] ? ' size="'. $element['#size'] .'"' : '';
+  _form_set_class($element, array('form-select'));
+  $multiple = $element['#multiple'];
+  return theme('form_element', $element, '<select name="'. $element['#name'] .''. ($multiple ? '[]' : '') .'"'. ($multiple ? ' multiple="multiple" ' : '') . drupal_attributes($element['#attributes']) .' id="'. $element['#id'] .'" '. $size .'>'. form_select_options_multiselect($element) .'</select>');
+}
+
+/**
+ * Custom fuction that adds sorting
+ * 
+ * @param array $element
+ * @param NULL $choices
+ * @return themed html
+ */
+function form_select_options_multiselect($element, $choices = NULL) {
+  if (!isset($choices)) {
+    $choices = $element['#options'];
+  }
+  // array_key_exists() accommodates the rare event where $element['#value'] is NULL.
+  // isset() fails in this situation.
+  $value_valid = isset($element['#value']) || array_key_exists('#value', $element);
+  $value_is_array = is_array($element['#value']);
+  
+  $options_out = '';
+  $options = array();
+  $elements_level = false;
+  foreach ($choices as $key => $choice) {
+    if (is_array($choice)) {      
+      $options_out .= '<optgroup label="'. $key .'">';      
+      $options_out .= form_select_options_multiselect($element, $choice);
+      $options_out .= '</optgroup>';
+    }
+    elseif (is_object($choice)) {
+      $options_out .= form_select_options_multiselect($element, $choice->option);
+    }
+    else {
+      $key = (string)$key;
+      if ($value_valid && (!$value_is_array && (string)$element['#value'] === $key || ($value_is_array && in_array($key, $element['#value'])))) {
+        $selected = ' selected="selected"';
+      }
+      else {
+        $selected = '';
+      }
+      $options[$key] = '<option value="'. check_plain($key) .'"'. $selected .'>'. check_plain($choice) .'</option>';
+      $elements_level = true;
+    }
+  }
+  if ($elements_level) {
+    $order = $element['#order'];
+    if ($order) {
+      //sorting the selected options
+      foreach ($order as $key => $value) {
+        $options_out .= $options[$value];  
+      }
+    }
+    else {
+      $order = array();
+    }
+    //append the other options others     
+    foreach ($options as $key => $value) {
+      if (!in_array($key, $order)) {
+        $options_out .= $options[$key];
+      }
+    }
+    
+  }
+  
+  return $options_out;
+}

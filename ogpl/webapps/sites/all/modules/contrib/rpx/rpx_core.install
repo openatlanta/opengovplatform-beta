@@ -1,0 +1,209 @@
+<?php
+
+/**
+ * @file
+ *
+ * Install, update and uninstall functions for the rpx_core module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function rpx_core_schema() {
+  $schema['rpx_sessions'] = array(
+    'description' => 'Stores Janrain Engage auth_info data for sessions.',
+    'fields' => array(
+      'sid' => array(
+        'description' => "A Drupal session ID.",
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+      ),
+      'timestamp' => array(
+        'description' => 'The Unix timestamp when this record was created. We will purge records older than timestamp + a predefined amount of time.',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'rpx_data' => array(
+        'description' => 'Engage auth_info data for the session.',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('sid'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Create rpx_sessions table that will hold the data returned from Engage,
+ * for active Engage signin sessions.
+ *
+ * Move Engage data from the sessions table. This may be a lengthy process, and
+ * is performed batch-wise.
+ */
+function rpx_core_update_6001(&$sandbox) {
+  $ret['#finished'] = 0;
+  if (!isset($sandbox['session_from'])) {
+    $schema['rpx_sessions'] = array(
+      'description' => 'Stores Janrain Engage auth_info data for sessions.',
+      'fields' => array(
+        'sid' => array(
+          'description' => "A Drupal session ID.",
+          'type' => 'varchar',
+          'length' => 64,
+          'not null' => TRUE,
+        ),
+        'timestamp' => array(
+          'description' => 'The Unix timestamp when this record was created. We will purge records older than timestamp + a predefined amount of time.',
+          'type' => 'int',
+          'not null' => TRUE,
+        ),
+        'rpx_data' => array(
+          'description' => 'Engage auth_info data for the session.',
+          'type' => 'text',
+          'size' => 'big',
+          'not null' => TRUE,
+        ),
+      ),
+      'primary key' => array('sid'),
+    );
+
+    foreach ($schema as $name => $table) {
+      db_create_table($ret, $name, $table);
+    }
+
+    $sandbox['session_from'] = 0;
+    $sandbox['session_count'] = db_result(db_query("SELECT COUNT(sid) FROM {sessions}"));
+  }
+  else {
+    //
+    // Delete auth_info data from the sessions table, storing the data for valid
+    // sessions in the new table. We consider a session valid if it belongs to
+    // user 0 (anonymous) and its last page request was less than
+    // RPX_SESSION_LIFETIME seconds ago.
+    //
+
+    // RPX_SESSION_LIFETIME is defined in the module file.
+    require_once dirname(__FILE__) . '/rpx_core.module';
+    $has_rows = FALSE;
+    // Update this many per page load.
+    $count = 100;
+    $sessions = db_query_range("SELECT uid, sid, timestamp, session FROM {sessions}", $sandbox['session_from'], $count);
+    while ($session = db_fetch_object($sessions)) {
+      $has_rows = TRUE;
+
+      $data = rpx_core_session_unserialize($session->session);
+      if (isset($data['rpx'])) {
+        if ($session->uid == 0 && time() - $session->timestamp < RPX_SESSION_LIFETIME) {
+          db_query("INSERT INTO {rpx_sessions} (sid, timestamp, rpx_data) VALUES ('%s', '%d', '%s')",
+                   $session->sid, $session->timestamp, serialize($data['rpx']));
+        }
+        unset($data['rpx']);
+        db_query("UPDATE {sessions} SET session = '%s' WHERE sid = '%s'", rpx_core_session_serialize($data), $session->sid);
+      }
+    }
+    $ret['#finished'] = $sandbox['session_from']/$sandbox['session_count'];
+    $sandbox['session_from'] += $count;
+    if (!$has_rows) {
+      $ret['#finished'] = 1;
+      $ret[] = array('success' => TRUE, 'query' => t('Janrain Engage session data moved to a custom table to improve security.'));
+    }
+  }
+
+  return $ret;
+}
+
+/**
+ * Scrub Janrain Engage data from the users table. This may be a lengthy
+ * process, and is performed batch-wise.
+ */
+function rpx_core_update_6002(&$sandbox) {
+  $ret['#finished'] = 0;
+  // Multi-part update.
+  if (!isset($sandbox['user_from'])) {
+    $sandbox['user_from'] = 0;
+    $sandbox['user_count'] = db_result(db_query("SELECT COUNT(uid) FROM {users}"));
+  }
+  else {
+    $has_rows = FALSE;
+    // Update this many per page load.
+    $count = 100;
+    $accounts = db_query_range("SELECT uid, login, data FROM {users} WHERE uid > 0 ORDER BY uid", $sandbox['user_from'], $count);
+    while($account = db_fetch_object($accounts)) {
+      $has_rows = TRUE;
+
+      // If the user hasn't logged in yet (e.g. their account had to be approved
+      // by the admin), we need to keep the data. It will be deleted upon their
+      // next Engage-enabled login.
+      if (!$account->login || !preg_match('/rpx_data/', $account->data)) {
+        continue;
+      }
+
+      $data = unserialize($account->data);
+      if (isset($data['rpx_data'])) {
+        unset($data['rpx_data']);
+        db_query("UPDATE {users} SET data = '%s' WHERE uid = '%d'", serialize($data), $account->uid);
+      }
+    }
+    $ret['#finished'] = $sandbox['user_from']/$sandbox['user_count'];
+    $sandbox['user_from'] += $count;
+    if (!$has_rows) {
+      $ret['#finished'] = 1;
+      $ret[] = array('success' => TRUE, 'query' => t('Janrain Engage data deleted from the users table to improve security.'));
+    }
+  }
+
+  return $ret;
+}
+
+/**
+ * Utility function: unserialize a PHP session variable.
+ *
+ * @param $data
+ *   The serialized session data.
+ * @return
+ *   An array with the unserialized session data.
+ */
+function rpx_core_session_unserialize($data) {
+  $current_session = session_encode();
+  session_unset();
+  session_decode($data);
+  $result = $_SESSION;
+  session_unset();
+  session_decode($current_session);
+  return $result;
+}
+
+/**
+ * Utility function: serialize an array into a PHP session string.
+ *
+ * @param $data
+ *   The array to serialize.
+ * @return
+ *   An string with the serialized array data.
+ */
+function rpx_core_session_serialize($data) {
+  $current_session = session_encode();
+  $_SESSION = $data;
+  $result = session_encode();
+  session_unset();
+  session_decode($current_session);
+  return $result;
+}
+
+/**
+ * Implements hook_install().
+ */
+function rpx_core_install() {
+  drupal_install_schema('rpx_core');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function rpx_core_uninstall() {
+  drupal_uninstall_schema('rpx_core');
+}

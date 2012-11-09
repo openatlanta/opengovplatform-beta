@@ -1,0 +1,67 @@
+<?php
+// $Id: ahah_page_storage.module,v 1.1.2.1 2009/04/16 03:14:24 effulgentsia Exp $
+
+/**
+ * @file
+ * Provides a way for modules to store information about the state of a page 
+ * as it changes during AHAH callbacks.
+ *
+ * This is similar to what is possible with multi-step forms, using 
+ * $form_state['storage'], except that form storage is specific to the
+ * form, whereas this module deals with information that is specific
+ * to the page, even if multiple forms are on it. An example of wanting
+ * page storage is if a module is tracking which JS and CSS files have been
+ * loaded.
+ *
+ * We use the cache_form table for the storage, to leverage the fact that it
+ * is a cache table that isn't flushed when the cache is flushed (since unlike
+ * other cache tables, it contains primary information, not just derived
+ * information that's stored for speed optimization), but that is pruned during
+ * cron runs.
+ */
+ 
+/**
+ * Implementation of hook_init().
+ */
+function ahah_page_storage_init() {
+  $sBuildId = isset($_POST['ahah_page_storage']['page_build_id']) ? $_POST['ahah_page_storage']['page_build_id'] : ('page-' . md5(uniqid(rand(), TRUE)));
+  ahah_page_storage(NULL, $sBuildId);
+  drupal_add_js(drupal_get_path('module', 'ahah_page_storage') . '/ahah_page_storage.js');
+  drupal_add_js(array('ahahPageStorage' => array('pageBuildId' => $sBuildId)), 'setting');
+}
+
+/**
+ * Primary API function for getting/setting the page storage.
+ */
+function ahah_page_storage($aStorage = NULL, $sBuildId = NULL) {
+  static $sCurrentBuildId;
+  static $aCurrentStorage = array();
+  
+  if (isset($sBuildId)) {
+    $sCurrentBuildId = $sBuildId;
+    $aCurrentStorage = ahah_page_storage_get($sBuildId);
+  }
+  
+  if (isset($aStorage) && ($aStorage !== $aCurrentStorage)) {
+    $aCurrentStorage = $aStorage;
+    ahah_page_storage_set($aCurrentStorage, $sCurrentBuildId);
+  }
+  
+  return $aCurrentStorage;
+}
+
+/**
+ * Fetch from cache
+ */
+function ahah_page_storage_get($sBuildId) {
+  return ($oCache = cache_get('ahah_page_storage_' . $sBuildId, 'cache_form')) ? $oCache->data : array();
+}
+
+/**
+ * Store in cache
+ */
+function ahah_page_storage_set($aStorage, $sBuildId) {
+  // 6 hours life time, same as for forms
+  cache_set('ahah_page_storage_' . $sBuildId, $aStorage, 'cache_form', time() + 21600);
+}
+

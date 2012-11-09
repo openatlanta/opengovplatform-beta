@@ -1,0 +1,1509 @@
+body,
+input,
+textarea,
+select { font-family:"Lucida","Lucida Grande","Trebuchet MS",Tahoma,Verdana,sans-serif; }
+
+body.rubik {
+  color:#333;
+  background:#fff; 
+  
+  }
+  html{
+    background: url("images/bg-body.gif") repeat-x scroll 0 0 #E4E4E4;
+  }
+
+
+a {
+  color:#39c;
+  text-decoration:none;
+  }
+sup {
+	color: #FF0000;
+  font-size: 80% !important;
+  vertical-align: 3px;
+}
+
+/**
+ * "Rounded" elements =================================================
+ */
+.block,
+.item-list,
+.help-items ul,
+.form-item,
+.admin-list,
+.node-type-list,
+.admin-panel,
+.box-title,
+div.messages,
+.compact-link a,
+.confirmation ul,
+form .buttons,
+input.teaser-button,
+input.form-submit {
+  -moz-border-radius:3px;
+  -webkit-border-radius:3px;
+  }
+
+.item-list h3,
+.block .block-title,
+.admin-panel h3,
+.collapsible .fieldset-title a {
+  -moz-border-radius:2px 2px 0px 0px;
+  -webkit-border-radius-top-left:2px;
+  -webkit-border-radius-top-right:2px;
+  }
+
+  .fieldset-title {
+    -moz-border-radius:3px 3px 0px 0px;
+    -webkit-border-radius:3px 3px 0px 0px;
+    }
+
+  .collapsed .fieldset-title {
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    }
+
+  .collapsed .fieldset-title a {
+    -moz-border-radius:2px;
+    -webkit-border-radius:2px;
+    }
+
+  .fieldset-content {
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    }
+
+  .titled .fieldset-content {
+    -moz-border-radius:0px 0px 3px 3px;
+    -webkit-border-radius:0px 0px 3px 3px;
+    }
+
+.block .block-content {
+  -moz-border-radius:0px 0px 2px 2px;
+  -webkit-border-radius-bottom-left:2px;
+  -webkit-border-radius-bottom-right:2px;
+  }
+
+/**
+ * "Popped" elements ==================================================
+ */
+div.messages {
+  -moz-box-shadow:#ddd 0px 1px 3px;
+  -webkit-box-shadow:#ddd 0px 1px 3px;
+  }
+
+input.teaser-button,
+input.form-submit {
+  -moz-box-shadow:#ddd 0px 1px 1px;
+  -webkit-box-shadow:#ddd 0px 1px 1px;
+  text-transform: capitalize;
+  }
+
+/**
+ * "Embossed" elements ================================================
+ */
+table,
+.block,
+.item-list,
+.help-items ul,
+.fieldset,
+.form-item,
+.admin-list,
+.node-type-list,
+.admin-panel,
+.pager a:hover,
+.confirmation ul {
+  -moz-box-shadow:#fff 0px 1px 0px;
+  -webkit-box-shadow:#fff 0px 1px 0px;
+  }
+
+.block .item-list,
+.block .form-item,
+.admin-panel .admin-list,
+.teaser-checkbox .form-item,
+.form-item .form-item,
+.fieldset .form-item,
+table .form-item {
+  -moz-box-shadow:none;
+  -webkit-box-shadow:none;
+  }
+
+table th {
+  text-shadow:#fff 0px 1px 0px;
+  }
+  
+  /**
+ * Branding (Below the Menu Block) STARTS===========================================================
+ */
+
+#branding {
+  margin: 10px 30px 0;
+  padding:5px 0px 4px;
+  border-bottom:1px solid #e0e0e0;
+  overflow:hidden;
+  position:relative;
+  font-size:11px;
+  text-shadow:#fff 0px 1px 0px;
+  line-height:20px;
+  color:#999;
+}
+
+#branding a {
+  -moz-border-radius:3px;
+  -webkit-border-radius:3px;
+  color:#333;
+  /* float:left; */
+  padding:0px 10px;
+}
+
+#branding a:hover { background:#ddd; }
+
+#branding ul.links { float:right; }
+
+#branding .breadcrumb {
+  padding:3px 5px;
+  float:left;
+  text-transform:uppercase;
+  font-weight:normal;
+}
+
+#branding .breadcrumb a,
+#branding .breadcrumb strong {
+    font-weight:normal;
+    /*float:left;*/
+    padding:0px 5px;
+}
+#branding .breadcrumb .breadcrumb-link {
+    float:left;
+    padding-right:5px;
+    background:url(images/sprite.png) 100% 100% no-repeat;
+}
+
+/* Welcome User block added Code starts */
+#block-block-4 {
+	border:none;
+}
+#block-block-4 .block-content {
+	padding: 0;
+}
+
+#block-block-4 .block-content .user-info-container {
+	padding-top:3px;
+}
+
+#branding #block-block-4 .block-content .user-info-container .welcome {
+	float: left;
+}
+body #branding .user-info-container .welcome a {
+	text-transform:uppercase;
+}
+#block-block-4 .block-content .user-info-container .help{
+	float:right;
+}
+/* Welcome User block added Code ends */
+
+
+
+/**
+ * Branding (Below the Menu Block) ENDS ***********************************
+ */
+  
+  
+  
+/**
+* Page title STRATS==========================================================
+*/
+.page-user #page-title {
+	margin:5px 0 0 0;
+}
+.page-user #page-title .page-title {
+	margin-bottom:none;
+}
+#page-title {
+  	margin: 15px 0 0;
+   	padding: 0 0 25px 45px;
+    position: relative;
+    text-transform: capitalize;
+}
+
+#page-title .page-title {
+  -webkit-text-shadow:#fff 0px 1px 0px;
+  letter-spacing:-1px;
+  font-size: 20px;
+  font-weight: normal;
+  letter-spacing: -1px;
+  text-shadow: 0 1px 0 #FFFFFF;
+  width: 98%;
+}
+#page-title-header .page-title {
+  margin-bottom: 10px;
+  text-shadow:#fff 0px 1px 0px;
+  -webkit-text-shadow:#fff 0px 1px 0px;
+  letter-spacing:-1px;
+  font-weight:normal;
+  font-size:20px;
+  text-transform:capitalize;
+}
+
+#page-title .page-title span.icon {
+  float:left;
+  margin-right:10px;
+}
+
+#spacer {
+	margin:18px 0 0 0;
+	
+}
+/**
+* Page title ENDS **********************************************************
+*/
+
+
+
+/**
+ * Tabs ====================================================================
+ */
+.primary-tabs {
+  position:absolute;
+  right:37px;
+  bottom:-1px;
+  overflow:hidden;
+  height:36px;
+  padding:0px;
+  line-height:20px;
+  }
+
+.primary-tabs li { padding-left:5px; }
+
+.pager a,
+.pager li.pager-current,
+.primary-tabs li a {
+  -moz-border-radius:3px;
+  -webkit-border-radius:3px;
+  padding:4px 9px;
+
+  font-size:11px;
+  font-weight:normal;
+
+  color:#999;
+  background:transparent;
+
+  border-width:1px;
+  border-style:solid;
+  border-color:transparent;
+  }
+
+  .pager a:hover {
+    background:#eee;
+    border-color:#ccc #ddd #eee;
+    }
+
+.pager li.pager-current,
+.primary-tabs li a:hover {
+  -moz-box-shadow:#fff 0px 1px 0px;
+  -webkit-box-shadow:#fff 0px 1px 0px;
+  border-color:#999;
+  background:#888 url(images/bleeds.png) 0px 0px repeat-x;
+  color:#fff;
+  }
+
+.primary-tabs li.active a,
+.primary-tabs li.active a.active {
+  -moz-border-radius:3px 3px 0px 0px;
+  -webkit-border-radius:3px 3px 0px 0px;
+
+  padding:4px 14px 11px;
+  color:#333;
+  border-bottom:0px;
+  border-color:#fff;
+  background:#f4f4f4 url(images/bleeds.png) 0px -41px repeat-x;
+  }
+
+div.secondary-tabs {
+  font-size:11px;
+  padding:4px;
+  border-bottom:1px solid #e8e8e8;
+  }
+
+  ul.secondary-tabs { float:right; }
+
+  .secondary-tabs li a,
+  .secondary-tabs li a:hover {
+    color:#333;
+    padding:0px 10px;
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    }
+
+  .secondary-tabs li a:hover { background:#ddd; }
+
+  .secondary-tabs li a.active,
+  .secondary-tabs li.active a {
+    background:#888 url(images/bleeds.png) 0px 0px repeat-x;
+    color:#fff;
+    }
+
+/**
+ * Page layout STARTS========================================================
+ */
+#page {
+  margin:0px 30px;
+  border:1px solid #fff;
+  background:#ffffff;
+  -moz-border-radius:3px;
+  -webkit-border-radius:3px;
+  }
+.page-visualize #page {
+	margin-top:-40px;
+}
+
+.page-content { padding:4px; }
+
+.page-content #content #node-form .description {
+	margin-right:20px;
+}
+.page-content #content #node-form .description strong {
+	color:#000;
+}
+
+.content-wrapper { margin:5px; }
+
+div.messages,
+.block { margin:5px; }
+
+#console .messages , #console .error {
+	font-size:85%;
+}
+
+/* Page Layout ENDS ********************************************************
+*/
+
+/**
+ * Footer STARTS =============================================================
+ */
+#footer {
+  padding:10px 30px 30px;
+  font-size:11px;
+  text-shadow:#fff 0px 1px 0px;
+  }
+
+#footer .footer-message {
+  padding:0px 10px;
+  float:left;
+  }
+#footer .footer-admin-poweredby a {
+	float:right;
+}
+
+#footer .feed-icons {
+  -moz-border-radius:3px;
+  -webkit-border-radius:3px;
+
+  /* Assume icons are 16x16 like Drupal core. */
+  line-height:16px;
+  padding:7px 5px;
+  background:#c4c4c4;
+  float:right;
+  }
+
+  #footer .feed-icons img { display:block; }
+
+  #footer .feed-icons label,
+  #footer .feed-icons a {
+    padding:0px 5px;
+    float:left;
+    }
+
+/* 
+Footer ENDS *****************************************************************
+ */
+
+/**
+ * Help STARTS ===============================================================
+ */
+ 
+a#help-toggler {
+  position:absolute;
+  right:30px;
+  bottom:10px;
+  background:url(images/sprite.png) -20px 0px no-repeat;
+
+  height:20px;
+  width:20px;
+
+  text-indent:-999px;
+  overflow:hidden;
+  
+  display:none;
+  }
+
+  a#help-toggler.toggler-active { background-position:-20px -20px; }
+
+  a#help-toggler.toggler-disabled {
+    cursor:default;
+    background-position:-20px -40px;
+    }
+
+#help-text {
+  background:#fff url(images/vrule.png) 65% 0% repeat-y;
+  border-bottom:1px solid #ddd;
+  }
+
+  #help-text.with-tabs {
+    -moz-border-radius:2px 2px 0px 0px;
+    -webkit-border-radius-top-left:2px;
+    -webkit-border-radius-top-right:2px;
+    }
+
+  #help-text .breadcrumb-label,
+  #help-text .breadcrumb-link { display:block; }
+
+  #help-text .breadcrumb-link {
+    background:url(images/sprite.png) -185px -180px no-repeat;
+    padding-left:20px;
+    }
+/*  Help ENDS ******************************************************* */
+
+
+/**
+ * Content STARTS =====================================================
+ */
+.help-page,
+div.comment,
+div.node {
+  border-style:solid;
+  border-width:1px;
+  border-color:#ccc #ddd #eee;
+
+  background:#fff url(images/vrule.png) 65% 0% repeat-y;
+  margin:0px 0px 10px;
+
+  -moz-box-shadow:#fff 0px 1px 0px;
+  -webkit-box-shadow:#fff 0px 1px 0px;
+  -moz-border-radius:3px;
+  -webkit-border-radius:3px;
+  }
+
+#help-text .column-main .column-wrapper,
+.help-page .column-main .column-wrapper,
+div.comment .column-main .column-wrapper,
+div.node .column-main .column-wrapper { padding:19px; }
+
+#help-text .column-main .column-wrapper {
+    padding-left:59px;
+    position:relative;
+}
+
+#help-text .column-main .column-wrapper span.icon {
+	position:absolute;
+	top:15px;
+	left:15px;
+}
+
+#help-text .column-side .column-wrapper,
+.help-page .column-side .column-wrapper,
+div.comment .column-side .column-wrapper,
+div.node .column-side .column-wrapper {
+  padding:9px;
+  font-size:11px;
+}
+
+#help-text .column-side .help-links,
+.help-page .column-side .help-page-links,
+.node-submitted,
+.comment-submitted {
+  padding:10px;
+  background:#f8f8f8;
+}
+
+.comment-links,
+.node-links { padding:10px 0px; }
+
+.help-page .help-page-links ul.links {
+  -moz-column-count:2;
+  -webkit-column-count:2;
+}
+
+.column-side ul.links li,
+.column-side ul.links a,
+.column-side ul.links span {
+  
+  float:none;
+  /* display:block; */
+}
+
+.column-side ul.links a,
+.column-side ul.links span {
+  padding:0px 4px;
+  display:block;
+  float:none;
+}
+
+.column-side ul.links span a {
+    padding: 0px 24px 3px 24px;
+    text-indent: -9999px;
+}
+
+  .column-side ul.links a.active,
+ /* .column-side ul.links a:hover { background:#fff; }*/
+  .column-side ul.links a:hover { 
+    background-position:0 0px;
+ }
+  .comment-links ul.links a:hover { background:#f4f4f4; }
+
+.comment-title,
+.node-title {
+  margin:0px 0px 20px;
+  font-weight:normal;
+  font-size:16px;
+  }
+.rate-description {
+	font-size:0.99em;
+}
+.rate-description .item-list ul {
+	height: 30px;
+    padding: 5px 2px 2px 8px;
+    width: 100%;
+}
+.rate-description .item-list ul li {
+	border:none;
+}
+/*  Content ENDS ******************************************************* */
+
+
+
+/**
+* Home Dashboard STARTS
+*/
+h2.title {
+    color: #024672;
+    font-family: Myriad,Helvetica,Tahoma,Arial,clean,sans-serif;
+    font-size: 150%;
+    font-style: normal !important;
+    line-height: 1.3em;
+}
+
+
+
+  /*  Menu Block for Rubik Starts    */
+#menu {
+    /*float: left;
+    margin-left: 40px;*/
+    width: 100%;
+}
+
+#block-superfish-1 {
+   border: none;
+}
+
+#block-superfish-1 .block-content {
+    background: #214472 !important;
+    background: -moz-linear-gradient(left, #214472 0%, #59718e 60%, #214472 100%) !important; /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,#214472), color-stop(60%,#59718e), color-stop(100%,#214472)) !important; /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(left, #214472 0%,#59718e 60%,#214472 100%) !important; /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(left, #214472 0%,#59718e 60%,#214472 100%)  !important; /* Opera 11.10+ */
+    background: -ms-linear-gradient(left, #214472 0%,#59718e 60%,#214472 100%) !important; /* IE10+ */
+    background: linear-gradient(left, #214472 0%,#59718e 60%,#214472 100%) !important; /* W3C */
+    border-radius: 10px 10px 0px 0px;
+    -moz-border-radius: 10px 10px 0px 0px;
+    -webkit-border-radius: 10px 10px 0px 0px;
+    /*border: 1px transparent solid;*/
+    color: #FFFFFF !important;
+    font-family: Myriad,Helvetica,Tahoma,Arial,clean,sans-serif;
+    height: 54px !important;
+    margin: auto;
+    overflow: visible;
+    padding: 0;
+    /*position: absolute;*/
+    /*right: 29px;
+    top: 25px;
+    */
+    margin-right: 20px;
+    text-align: center;
+    
+    width:96%;
+    float:right;
+}
+
+
+
+#block-superfish-1 ul.primary-navbar li#menu-13076-1 {
+    background: url("images/home.png") no-repeat scroll left 8px transparent !important;
+    padding-left: 35px !important;
+}
+
+#block-superfish-1 .block-content .sf-menu li {
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none !important;
+    display: inline; 
+    overflow: visible;
+    padding: 0 !important;
+    font-size: 14px !important;
+    line-height: 50px !important;
+    margin: 0 15px !important;
+    
+}
+
+#block-superfish-1 .sf-menu a {
+    color:#fff !important;
+    text-decoration:none;
+    font-weight:bolder;
+    padding: 0 !important;
+}
+
+
+#block-superfish-1 ul.menu li a:hover, #block-menu-primary-links ul.menu li a, 
+.primary-navigation .sf-menu li a:hover, .primary-navigation .sf-menu li a  {
+    text-decoration:none;
+}
+
+#block-superfish-1 ul.menu li a.active, .primary-navigation .sf-menu li a.active {
+    color:#fff;
+}
+  
+  
+ /* Primary Navigation Superfish Dropdown Styles
+/-------------------------------------------------------------- */
+
+#block-superfish-1 ul.primary-navbar li.menuparent:hover, ul.primary-navbar li.menuparent:active, 
+#block-superfish-1 ul.primary-navbar li.sf-no-children:hover, ul.primary-navbar li.sf-no-children:active {
+    border-bottom: 4px solid #f1c851 !important;
+}
+
+/*
+#block-superfish-1 ul.primary-navbar li.menuparent ul li:active{
+	border-bottom:none ;
+}
+*/
+
+#block-superfish-1 ul.primary-navbar li.active-trail, .primary-navbar .sf-menu li.active-trail {
+    border-bottom: 4px solid #deac1c ;
+}
+
+
+#block-superfish-1 ul.primary-navbar li ul {
+    background: #f1c851 !important;
+    margin: 10px 0 0 0 !important;
+    padding: 0 !important;
+    padding-right:15px !important;
+    overflow: visible;
+    text-align:left;
+    line-height:30px !important;
+}
+#block-superfish-1 ul.primary-navbar li ul li a:hover {
+    
+    line-height:30px ;
+    color:#003366 !important;
+    background: url("images/menu-arrow-blue.png") left no-repeat !important;
+}
+
+#block-superfish-1 ul.primary-navbar li ul li.first, ul.primary-navbar li ul li.first:hover,
+#block-superfish-1 ul.primary-navbar li ul li.first:hover,
+#block-superfish-1 ul.primary-navbar li ul li.middle:hover,
+#block-superfish-1 ul.primary-navbar li ul li.last:hover,
+#block-superfish-1 ul.primary-navbar li ul li.sf-no-children:hover, ul.primary-navbar li ul li.sf-no-children:active {
+    margin: 0 !important;
+    padding-left:15px !important;
+    padding-right:15px;
+    background: none ;
+    height:30px !important;
+    border: 0 !important;
+    overflow: visible;
+    text-align:left;
+    font-size: 14px !important;
+    font-weight:500 !important;
+    line-height:30px;
+    color:#214472 !important;
+    font-family: Myriad,Helvetica,Tahoma,Arial,clean,sans-serif;
+}
+
+#block-superfish-1 ul.primary-navbar li ul li a {
+    line-height:30px !important;
+    color: #214472 !important;
+    padding-left:15px !important;
+    font-weight:500 !important;
+    border: 0 !important;
+    
+}
+
+
+.sf-shadow ul {
+    border-bottom-radius: 0 0 0 17px;
+    border-top-radius: 0 17px 0 0;
+    
+}
+.sf-menu ul {
+	border-bottom-left-radius:17px !important;
+	border-top-right-radius:17px !important;
+	width: 13em;
+}
+
+/* Creating Whats the New Block below the Menu of the Home Page */
+/*
+#menu #block-views-whats_new-block_2 {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #6A6868;
+    font-size: 10px;
+    max-width: 425px !important;
+    margin: -32px 42px 0 0;
+    overflow: hidden;
+    padding: 0 2px 0 0;
+    vertical-align: middle;
+    width: 290px;
+    margin: 10px 27px 0 0;
+    float: right;
+}*/
+#menu #block-views-whats_new-block_2 {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #6A6868;
+    float: left;
+    font-size: 10px;
+    margin: 12px 23px 0;
+    overflow: hidden;
+    padding: 0 2px 0 0;
+    vertical-align: middle;
+    width: 762px;
+    height:28px;
+}
+#menu #block-views-whats_new-block_2 .block-title {
+   display:none;
+}
+#menu #block-views-whats_new-block_2 h2.title {
+    font-size: 120% ;
+    line-height: 25px ;
+    overflow: hidden;
+}
+/*
+#menu #block-views-whats_new-block_2 .ticker-2 {
+    color: #444444;
+    float: right;
+    line-height: 25px;
+    margin-top: -24px;
+    text-align: right;
+    width: 238px;
+}
+*/
+#menu #block-views-whats_new-block_2 .ticker-2 {
+    color: #444444;
+    float: left;
+    line-height: 25px;
+    margin-left: 100px;
+    margin-top: -24px;
+    text-align: left;
+    width: 635px;
+}
+/*  Creating Whats the New Block below the Menu of the Home Page ENDS  */
+
+
+
+/* Creating Dataset below the Menu of the Home Page */
+#menu .block .block-content {
+	padding:0;
+}
+#menu #block-block-2 {
+    background: url("images/create-dataset-bg.png") no-repeat scroll right top;
+    border:none;
+    height: 65px;
+    width: 185px !important;
+    float: right;
+    /*margin: -1px 4px 0 0;*/
+    margin: 0px 25px 0 0;
+}
+
+#menu #block-block-2 .block-content{
+    background:none;
+}
+#menu #block-block-2 p {
+    color: #21759B;
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    height: 45px;
+    margin: -6px 0 0 9px;
+}
+#menu #block-block-2 a {
+    display: block;
+    float: left;
+    margin-left: 77px;
+    margin-top: -26px;
+    width: 92px;
+}
+#menu #block-block-2 span.catalog-pointer {
+	background: url("images/right-open-small.png") no-repeat scroll 0 0 transparent;
+    display: block;
+    float: left;
+    height: 23px;
+    margin-left: 55px;
+    width: 20px;
+}
+span.create-catalog-header {
+	color: green;
+    font-weight: bold;
+    margin-left: 14px;
+}
+
+/*  Menu Block for Rubik Ends    ************************************************** */
+#welcome-message .pane-content {
+	padding-bottom: 30px;
+}
+	
+
+
+/* 
+Dashboard Tab Panel STARTS =====================================================
+*/
+.ui-tabs-panel
+{
+    border: 1px solid #808080;
+    float: left;
+    margin-bottom: 1.5em;
+    width:95%;
+    font-size: 1.05em;
+}
+.ui-tabs-nav {
+	   border-right: none;
+}
+.ui-tabs-nav li {
+	   border: none;
+	   margin-right: 5px;
+}
+
+.pane-content {
+    font-size: 1em;
+    line-height: 1.5em;
+    /*margin-top: 20px;*/
+}
+
+div.workflow-summary-table .view-content {
+    border: 1px solid #CCCCCC;
+}
+thead th, th {
+    background: none repeat scroll 0 0 #FFF;
+    border-bottom: medium none;
+    font-weight:bold;
+    color:#000000;
+    font-size:12px;
+    font-family:Myriad,Helvetica,Tahoma,Arial,clean,sans-serif;
+}
+
+/* Field width of the Dataset Summary are resized and having fixed width starts on 25th June 2012 */
+
+th.views-field-counter {
+	width:45px;
+}
+th.views-field-title{
+     width:420px;
+}
+th.views-field-field-ds-ministry-department-value {
+     width:160px;
+}
+
+td.views-field-field-ds-ministry-department-value ul.hierarchical-select-lineages {
+    display: inline;
+    list-style: none outside none;
+  
+}
+th.views-field-changed {
+     width:80px;
+}
+th.views-field-dms-allowed-operations {
+     width:200px;
+}
+th.views-field-cms-allowed-operations {
+	width:100px;
+}
+/* Field width of the Dataset Summary are resized and having fixed width ends on 25th June 2012 */
+
+
+/* +++++++++++++ Home Page Tabs Design Code Starts . (For user management used #tabs-center ul.ui-tabs-nav) +++++++++++++++++++++++ */
+
+/*
+#tabs-center ul.ui-tabs-nav li {
+	margin-right:5px;
+}
+
+
+.pane-content ul.tabs li.active a,.pane-content ul.tabs li.ui-tabs-selected a,
+#tabs-center ul.ui-tabs-nav li.ui-tabs-selected a {
+   color:#ffffff; 
+   background:blue;
+   
+}
+
+.pane-content ul.tabs li a ,
+#tabs-center ul.ui-tabs-nav li a{
+    background: none repeat scroll 0 0 #D5D4D4 ;
+    border-radius: 10px 10px 0 0;
+    height: 100%;
+    line-height: 25px;
+    padding: 5px 10px;
+  
+}
+.pane-content ul.tabs a,
+#tabs-center ul.ui-tabs-nav a {
+    color: royalblue;
+    font-size: 1em;
+    font-weight: bold;
+    text-decoration: none !important;
+}
+
+.pane-content ul.tabs li:hover a ,
+#tabs-center ul.ui-tabs-nav li:hover a{
+    color:#000; 
+    background:#fff;
+    border-radious:10px 10px 0 0;
+}
+
+
+.pane-content .ui-tabs-nav li.ui-tabs-selected a, .pane-content .ui-tabs-nav li:hover a ,
+#tabs-center ul.ui-tabs-nav li.ui-tabs-selected a , #tabs-center ul.ui-tabs-nav li:hover a {
+    border-color: #D3D3D3;
+    border-radius: 10px 10px 0 0;
+    border-style: solid solid none;
+    border-width: 1px 1px medium;
+    padding: 4px 9px 5px;
+}
+.view-dataset-management #views-bulk-operations-select #views-bulk-operations-submit {
+    padding: 9px 0 0;
+}
+*/
+#views-bulk-operations-dropdown {
+    float: none;
+}
+
+/* +++++++++++++ Home Page Tabs Design Code Ends . (For user management used #tabs-center ul.ui-tabs-nav) +++++++++++++++++++++++ */
+
+
+/* Dashboard Tab Panel ENDS ************************************************************ */
+
+/**
+
+* Home Dashboard For VRM ADMIN (Quick tab design) STARTS ===================================
+*/
+
+#tabs-mini-panel-minipanel-vrm-admin-dashboard-center ul.ui-tabs-nav {
+	display:none;
+}
+#quicktabs_container_vrm_admin_tabs .quicktabs_tabpage .quicktabs_wrapper {
+	margin-top:30px;
+}
+
+.quicktabs_main{ 
+    clear:both; 
+}
+ .quicktabs_wrapper ul.quicktabs-style-nostyle {
+    position:relative;
+    padding:2px 0 2px 0;
+    margin:0 0 5px !important;
+}
+.quicktabs_wrapper ul.quicktabs-style-nostyle a {
+    color: royalblue;
+    font-size: 1em;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.quicktabs_wrapper ul.quicktabs-style-nostyle li a { 
+  	background: none repeat scroll 0 0 #D5D4D4 ;
+    border-radius: 10px 10px 0 0;
+    height: 100%;
+    line-height: 25px;
+    padding: 5px 10px;
+}
+.quicktabs_wrapper ul.quicktabs-style-nostyle li:hover a,
+.quicktabs_wrapper ul.quicktabs-style-nostyle li.active a:hover {
+  	color:#000; 
+    background:#FFF;
+    border-radious:10px 10px 0 0;
+}
+
+.quicktabs_wrapper ul.quicktabs-style-nostyle li.active a {
+    color:#FFF; 
+   	background:blue;
+}
+.quicktabs_wrapper ul.quicktabs-style-nostyle li.active a, .quicktabs_wrapper ul.quicktabs-style-nostyle li a:hover{
+    border-color: #D3D3D3;
+    border-radius: 10px 10px 0 0;
+    border-style: solid solid none;
+    border-width: 1px 1px medium;
+    padding: 4px 9px 5px;
+}
+
+
+#quicktabs-vrm_admin_tabs_list ul li a:hover {
+    border-bottom: 1px solid #FFFFFF;
+}
+form.views-processed .views-exposed-form .views-widget .date-views-filter-wrapper {
+	margin-top:22px;
+}
+
+/* Home Dashboard For VRM ADMIN (Quick tab design) ENDS ********************************* */
+
+/* +++++++++++++++++++++++  Dataset Edit Page Code Starts +++++++++++++++++++++++++++++++++  */
+.content-multiple-drag {
+	width:30px;
+}
+label[for="edit-field-dsat-downloadable-0"], label[for="edit-field-dsat-access-point-0"]  {
+	display:none;
+}
+/* +++++++++++++++++++++++  Dataset Edit Page Code Ends +++++++++++++++++++++++++++++++++  */
+
+
+/**
+* View Dataset Page STARTS ===================================
+*/
+
+.node-content .fieldgroup{
+    margin:0 0 20px 0;
+    border-radius:7px;
+    border:1px solid #eeeeee;
+    width:100%;
+    float:left;
+    padding:0px;
+    /* font-size: 1.3em; */
+}
+.node-content .fieldgroup h2{
+    background:#eeeeee;
+    padding:3px 0 3px 8px;
+    border-radius:7px 7px 0 0;
+    margin-bottom:0 !important;
+}
+.node-content .fieldgroup .content{
+    padding:0px;
+    margin:0px
+} 
+
+.node-content .field {
+    border-bottom:1px solid #cccccc;
+    display:block;
+    width:100%;
+    float:left;
+    font-family:Arial,Helvetica,sans-serif !important;
+    font-size:12px;
+    color:#2b2b2b;
+    
+}
+.node-content .field:last-child {
+    border-top: 0 none;
+    border-bottom:none;
+}
+
+.node-content .field:hover,.feedback .field:hover , .node-content .group-dsat-access-type:hover{
+    background:#eeeeee;
+}
+.node-content .field-last-item{
+    border:0px;
+}
+
+.node-content .description{
+    display:none;
+} 
+
+.node-content .field-label,.field-type-link .field-label {
+    float:left;
+    width:25%;
+    padding:8px 0 8px 8px;
+}
+
+.field-type-flexifield .field-value {
+    margin-left: 13px;
+    margin-top:9px;
+}
+
+.node-content .field-item {
+    display: block;
+    /*margin: 0 0 -2px 148px;*/
+  }
+  
+ 
+.node-content .field-item p{
+    margin:0px;
+    color:#000000;
+} 
+.node-content .field-items{
+    padding:8px 0 0px 0px;
+}
+
+.node-role_request .node-content .field-field-ds-sector .field-items,
+.node-role_request .node-content .field-field-ds-ministry-department .field-items,
+.node-role_request .node-content .field-field-rr-adv-roles .field-items {
+	float: left;
+    padding: 8px 0 0;
+    width: 400px;
+}
+
+.fieldgroup .field-field-ds-description .field-item,
+.fieldgroup .field-field-ds-ministry-department .field-item {
+	margin-left: 151px;
+}
+/* Feedback field allignment For Feedback request page code starts */
+.node-feedback .field-field-feedback-body .field-items {
+	float: left;
+    width: 73%;
+}
+
+
+	
+/* View Dataset Page ENDS ********************************* */
+ 
+.hierarchical-select-wrapper-wrapper .hierarchical-select .selects select.form-select {
+	height: auto !important;
+}
+
+ /* Border in profile view of user */
+ 
+ .profile dl
+{
+	border: 1px solid #CCCCCC;
+    padding: 10px 0 0 10px;
+}
+
+.profile dl dt {
+    float: left;
+    margin: 0 0 10px;
+    width: 200px;
+}
+#external_user_block .panels-flexible-region{
+	width:49%;
+	float:left;
+}
+.role_request_banner{
+	 background:url(images/applynow_banner.png) 100% 100% no-repeat;
+	display:block;
+	width:420px;
+	height:231px;
+	margin: 20px 0 0 0;
+}
+.role_request_banner span{
+	font-size: 25px;
+    margin: 68px 0 0 22px;
+    position: absolute;
+    padding-bottom:10px;
+}
+.role_request_banner a {
+    display: block;
+    height: 41px;
+    margin: 160px 0 0 120px;
+    position: absolute;
+    text-indent: -999px;
+    width: 174px;
+}
+
+#external_user_block .pane-view-role-management {
+    width: 95%;
+}
+#external_user_block .panel-pane.pane-profile-fields.profile {
+    margin: 0px 0 10px 0;
+}
+
+#external_user_block .view-view-role-management .views-row label,
+#external_user_block .view-view-role-management .views-row .field-content {
+    float: left;
+    margin: 10px 6px;
+    width: 180px;
+}
+#external_user_block .view-view-role-management .views-row span {
+    display: block;
+    margin: 0 0 10px;
+}
+#external_user_block .view-view-role-management .view-content {
+	border-bottom: 1px solid #CCCCCC;
+	border-right: 1px solid #CCCCCC;
+	border-left: 1px solid #CCCCCC;
+	
+    /* padding: 10px; */
+}
+#external_user_block .view-view-role-management .views-row > div {
+    border: 1px solid #CCCCCC;
+    clear: both;
+}
+
+
+
+
+
+
+/* ++++++++++++ Header section with logo and footer logo added for Rubik Code starts +++++++++++ */
+
+#logo {
+	width:100%;
+}
+#logo .logo {
+	float:left;
+	margin-top: 25px;
+}
+
+hr.footer-hr{
+	background-color: #000000;
+    color: #000000;
+    display: block;
+    height: 5px;
+}
+/*
+#logo .logo a {
+	background: url("images/datagovlogo.png") no-repeat scroll 0 0 transparent;
+    display: block;
+    height: 33px;
+    text-decoration: none;
+    text-indent: -20000px;
+    width: 156px;
+    outline:none;
+}
+*/
+.header-anounced-text {
+    display: block;
+    float: left;
+    height: 65px;
+    margin: 18px 0 10px 10px;
+    text-indent: -9999px;
+    width: 388px;
+}
+.searchPan {
+    display: block;
+    float: right;
+    height: 81px;
+    margin: 3px 114px 3px 0;
+    width: 47px;
+}
+/*
+.footer-admin-poweredby a.logo {
+    background: url("images/poweredbyopengov_logo.png") no-repeat scroll 0 0 transparent;
+    display: block;
+    float: right;
+    height: 48px;
+    text-decoration: none;
+    text-indent: -20000px;
+    width: 104px;
+    margin-right: 6px;
+}
+*/
+
+/* ++++++++++++ Header section with logo and footer logo added for Rubik Code starts +++++++++++ */
+
+/* Workflow Summary box height fixed --  Code starts*/
+#edit-field-rr-dms-role-value--wrapper{
+	display:none;
+}
+#home-admin #edit-sid-wrapper select.form-select {
+	height: 145px;
+    min-height: 145px;
+}
+#home-admin #edit-field-request-type-value-many-to-one-wrapper select.form-select {
+	height:70px;
+	padding:4px;
+}
+
+/* Workflow Summary box height fixed -- Code ends*/
+
+/*
+Commnety form styale start
+*/
+ #comments{
+	display: none;
+}
+
+#content li.rate_quality, #content li.rate_accessibility, #content li.rate_usability {
+	display: none;
+}
+
+.comment-links ul.links li a {
+    display: inline;
+}
+.comment-links ul.links li{
+  display: inline;
+}
+
+.comment-links ul.links li.rate_comment_rating {
+  display: none;
+}
+
+.column-side ul.links li {
+    display: block;
+}
+/* ++++++++++++ th Order section for phone number (multiple) in backend datasite has been removed - code starts ++++++++++++++++= */
+#field_ds_contact_phone_number_values .tableHeader-processed tr th:last-child {
+    display: none;
+}
+/* ++++++++++++ th Order section for phone number (multiple) in backend datasite has been removed - code ends ++++++++++++++++= */
+
+/* +++++++++++++++++++=== Backend Cancel anchor has been updated to submit button Code Starts ++++++++++++++++++++++++++==== */
+.confirmation .buttons .container-inline a {
+	background:#F4F4F4 url(images/bleeds.png) 0px -41px repeat-x;
+	/*background: none repeat scroll 0 0 #FFFFFF;*/
+    border-color: #DDDDDD #DDDDDD #CCCCCC;
+    border-style: solid;
+    border-width: 1px;
+    color: #333333;
+    padding: 3px 10px;
+    margin-right:4px;
+}
+.confirmation .buttons .container-inline a:hover {
+	background: url("images/bleeds.png") repeat-x scroll 0 0 #888888;
+    border-color: #999999 #999999 #888888;
+    color: #FFFFFF;
+	
+}
+a.form-submit {
+	background:#F4F4F4 url(images/bleeds.png) 0px -41px repeat-x;
+    border-color: #DDDDDD #DDDDDD #CCCCCC;
+    border-style: solid;
+    border-width: 1px;
+    color: #333333;
+    padding: 3px 10px;
+    margin-right:4px;
+}
+a.form-submit:hover {
+	background: url("images/bleeds.png") repeat-x scroll 0 0 #888888;
+    border-color: #999999 #999999 #888888;
+    color: #FFFFFF;
+}
+
+
+/* +++++++++++++++++++=== Backend Cancel anchor has been updated to submit button Code Ends ++++++++++++++++++++++++++==== */
+
+/* +++++++++++++++++++++++=== Voting Result (Rating) Page Structure changed code starts  +++++++++++++++++++++++++++++++++++++++++++ */
+.voting_content .voting_item {
+    float: left;
+    margin: 20px 0;
+    padding-right: 28px;
+    width: 30%;
+}
+/* +++++++++++++++++++++++=== Voting Result (Rating) Page Structure changed code Ends  +++++++++++++++++++++++++++++++++++++++++++ */
+
+/* - Create Contributor ---- */
+#conditional-field-cc-user-type .form-radios #edit-field-cc-user-type-value--wrapper{
+	display: none;
+}
+.tab {
+    text-transform: capitalize;
+}
+
+/* ++++++++++++++++++++++++++++++Drupa Tab Style++++++++++++++++++++++++++++++++++++++++++ */
+.drupal-tabs .ui-tabs-nav a{
+    border-color: #D3D3D3;
+    border-radius: 10px 10px 0 0;
+    border-style: solid solid none;
+    border-width: 1px 1px medium;
+    padding: 4px 9px 5px;
+}
+
+/* ++++++++++++++++++++++++++++++Drupa Tab Style++++++++++++++++++++++++++++++++++++++++++ */
+
+
+/* +++++++++++++++++++ Create Dataset page-top list alignment Code Starts +++++++++++++++++++++ */
+.page-content-top #block-multistep-dataset .block-title {
+	display:none;
+}
+.page-content-top #block-multistep-dataset .item-list ul {
+	width:997px;
+}
+.page-content-top #block-multistep-dataset .block-content .item-list > ul li {
+    display: inline;
+    float:left;
+    width:30%;
+    background: none repeat scroll 0 0 gray;
+    border-right: 1px solid #FFFFFF;
+    color: #FFFFFF;
+    font-weight:bold;
+    padding: 2px 10px 2px 0;
+    
+}
+.page-content-top #block-multistep-dataset .block-content .item-list > ul li a {
+	color:#FFF;
+}
+#block-multistep-dataset #multistep-dataset-2 {
+	
+	display:block;
+	text-align:center;
+}
+#block-multistep-dataset #multistep-dataset-3 {
+	display:block;
+	text-align:right;
+}
+
+#block-multistep-dataset .multistep-progress-bar-wrapper {
+	clear:both;
+}
+#multistep-group_ds_all_datasets .fieldset-content .hierarchical-select-wrapper-wrapper {
+	border: 1px solid #CCCCCC;
+    padding: 10px;
+    /*width: 35%;*/
+    margin:10px 8px 0 0;
+}
+
+html.js .resizable-textarea textarea {
+    height: 73px;
+}
+.filter-options {
+	/*float:right;*/
+	margin-left:664px;
+}
+
+/* Border Added for file upload while Creating a Dataset starts */
+
+#edit-field-dsat-downloadable-0-value-field-dam-datafile-0-upload , #edit-field-ds-file-0-upload {
+  border:1px solid;
+}
+#edit-field-ds-catlog-type-0-type-wrapper{
+	display:none;
+}
+#edit-field-ds-catlog-type-0-value-field-ctda-app-type-value-wrapper {
+	margin-bottom:20px;
+}
+
+/* Border Added for file upload while Creating a Dataset ends */
+label[for="edit-field-ds-catlog-type-0"] {
+  display:none;
+}   
+
+/* +++++++++++++++++++ Create Dataset/APP Code Ends +++++++++++++++++++++ */
+
+
+/*css for vrm charts legend */
+.color-code-table {
+    float: right;
+    border:1px solid;
+    border-top:none;
+   border-right:none;
+}
+.color-code-table table {
+    border: none;
+    border-collapse: separate;
+}
+
+.color-code-table td div{ width:10px; height:10px;}
+.color-code-table  .lblue {background:#ADDFFF;}
+.color-code-table  .yellow {background:#FFF000;}
+.color-code-table  .orange{background:#F87431;}
+.color-code-table  .green {background:#A0C544;}
+.color-code-table  .gold {background:#EAC117;}
+.color-code-table  .turquoise {background:#228BA8;}
+.color-code-table  .purple {background:#6D5499;}
+.color-code-table  .lorange{background:#E67541;}
+.color-code-table  .dgreen {background:#347C2C;}
+.color-code-table  .blue {background:#157DEC;}
+.color-code-table  .red {background:#800517;}
+
+.chart-total {
+font-size: 1.2em;
+font-weight: bold;
+margin-left: -350px;
+text-align: center;
+margin-bottom: 10px;
+}
+.chart-table {
+border:1px solid;
+margin-top:25px;
+width:850px;
+}
+
+.field-icon-text-css {
+  display:none !important;
+}
+.view-id-Theme_Files_Dashboard table{
+  margin-top:15px;
+}
+
+#page-title-description {
+  margin-bottom: 15px; 
+}

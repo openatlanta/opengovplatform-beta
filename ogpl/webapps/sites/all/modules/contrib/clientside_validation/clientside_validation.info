@@ -1,0 +1,13 @@
+; $Id: 
+name = Clientside Validation
+description = Add client side validation to forms and webforms
+core = 6.x
+package = Clientside Validation
+dependencies[] = jquery_update
+
+; Information added by drupal.org packaging script on 2012-06-11
+version = "6.x-1.32"
+core = "6.x"
+project = "clientside_validation"
+datestamp = "1339414878"
+

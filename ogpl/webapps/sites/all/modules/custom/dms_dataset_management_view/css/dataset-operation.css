@@ -1,0 +1,189 @@
+
+/* 
+Dataset Operation Icons Images Starts ====================================================
+*/
+
+.sendback-link {
+    background: url("../images/icons/sendback.png") no-repeat scroll center center transparent;
+    display: block;
+    float: left;
+    height: 15px;
+    margin: 3px 2px;
+    position: relative;
+    text-indent: -9999px;
+    width: 15px;
+}
+.edit-link {
+    background: url("../images/icons/edit.png") no-repeat scroll center center transparent;
+    display: block;
+    float: left;
+    height: 15px;
+    margin: 3px 2px;
+    position: relative;
+    text-indent: -9999px;
+    width: 15px;
+}
+.delete-link {
+    background: url("../images/icons/delete.png") no-repeat scroll center center transparent;
+    display: block;
+    float: left;
+    height: 15px;
+    margin: 3px 2px;
+    position: relative;
+    text-indent: -9999px;
+    width: 15px;
+}
+.preview-link {
+    background: url("../images/icons/preview.png") no-repeat scroll center center transparent;
+    display: block;
+    float: left;
+    height: 15px;
+    margin: 3px 2px;
+    position: relative;
+    text-indent: -9999px;
+    width: 15px;
+}
+.download-csv-link {
+    background: url("../images/icons/download.png") no-repeat scroll center center transparent;
+    display: block;
+    float: left;
+    height: 15px;
+    margin: 3px 2px;
+    position: relative;
+    text-indent: -9999px;
+    width: 15px;
+}
+.update-request-link {
+    background: url("../images/icons/updaterequest.png") no-repeat scroll center center transparent;
+    display: block;
+    float: left;
+    height: 15px;
+    margin: 3px 2px;
+    position: relative;
+    text-indent: -9999px;
+    width: 15px;
+}
+.delete-request-link {
+   background: url("../images/icons/deleterequest.png") no-repeat scroll center center transparent;
+   display: block;
+   float: left;
+   height: 15px;
+   margin: 3px 2px;
+   position: relative;
+   text-indent: -9999px;
+   width: 15px;
+ }
+.approve-link {
+	background: url("../images/icons/approve.png") no-repeat scroll center center transparent;
+	display: block;
+	float: left;
+	height: 15px;
+	margin: 3px 2px;
+	position: relative;
+	text-indent: -9999px;
+	width: 15px;
+ }
+.publish-link {
+	background: url("../images/icons/publish.png") no-repeat scroll center center transparent;
+	display: block;
+	float: left;
+	height: 15px;
+	margin: 3px 2px;
+	position: relative;
+	text-indent: -9999px;
+	width: 15px;
+	
+}
+.clone-link {
+	background: url("../images/icons/clone.png") no-repeat scroll center center transparent;
+	display: block;
+	float: left;
+	height: 15px;
+	margin: 3px 2px;
+	position: relative;
+	text-indent: -9999px;
+	width: 15px;
+	
+}
+.save-link {
+	background: url("../images/icons/save.png") no-repeat scroll center center transparent;
+	display: block;
+	float: left;
+	height: 15px;
+	margin: 3px 2px;
+	position: relative;
+	text-indent: -9999px;
+	width: 15px;
+	
+}
+.submit-link {
+	background: url("../images/icons/submit.png") no-repeat scroll center center transparent;
+	display: block;
+	float: left;
+	height: 15px;
+	margin: 3px 2px;
+	position: relative;
+	text-indent: -9999px;
+	width: 15px;
+	
+}
+
+
+#content .comment_delete a{
+  background: url("../images/icons/delete.png") no-repeat scroll center center transparent;
+  display: block;
+  height: 15px;
+  margin: 3px 2px;
+  position: relative;
+  text-indent: -9999px;
+  width: 15px;
+}
+#content .comment_edit a{
+	background: url("../images/icons/edit.png") no-repeat scroll center center transparent;
+  display: block;
+  height: 15px;
+  margin: 3px 2px;
+  position: relative;
+  text-indent: -9999px;
+  width: 15px;
+}
+#content .comment_reply a{
+	background: url("../images/icons/sendback.png") no-repeat scroll center center transparent;
+  display: block;
+  height: 15px;
+  margin: 3px 2px;
+  position: relative;
+  text-indent: -9999px;
+  width: 15px;
+}
+.preview-visualization {
+	background: url("../images/icons/preview_visualization.png") no-repeat scroll center center transparent;
+	display: block;
+	float: left;
+	height: 15px;
+	margin: 3px 2px;
+	position: relative;
+	text-indent: -9999px;
+	width: 15px;
+}
+.Approve-visualization {
+	background: url("../images/icons/approve_visualization.png") no-repeat scroll center center transparent;
+	display: block;
+	float: left;
+	height: 15px;
+	margin: 3px 2px;
+	position: relative;
+	text-indent: -9999px;
+	width: 15px;
+}
+.Disapprove-visualization {
+	background: url("../images/icons/dvl.png") no-repeat scroll center center transparent;
+	display: block;
+	float: left;
+	height: 16px;
+	margin: 4px 2px;
+	position: relative;
+	text-indent: -9999px;
+	width: 15px;
+}
+/* Dataset Operation Icons Images ENDS **************************************************  */

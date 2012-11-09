@@ -1,0 +1,11 @@
+; $Id: ahah_page_storage.info,v 1.1 2008/12/20 22:54:11 effulgentsia Exp $
+name = AHAH Page Storage
+description = Provides a way for modules to store information about the state of a page as it changes during AHAH callbacks.
+core = 6.x
+
+; Information added by drupal.org packaging script on 2009-05-19
+version = "6.x-1.1"
+core = "6.x"
+project = "ahah_page_storage"
+datestamp = "1242696002"
+

@@ -1,0 +1,375 @@
+<?php
+
+function web_site_config_form_alter(&$form, $form_state, $form_id) {
+  global $user;
+     $result = db_query('SELECT rid, name FROM {role} WHERE rid NOT IN(1,2)');
+     while ($role = db_fetch_object($result)) {
+      $cms_roles[$role->rid] = $role->name;
+      $frontend_roles[$role->rid] = $role->name;
+     }
+  if ($form_id == 'system_site_information_settings') {
+
+    $header_data = views_get_view_result('site_info_country_list');
+    $header_list = array('' => 'Select');
+    foreach ($header_data as $row) {
+      $header_list[$row->nid] = $row->node_title;
+    }
+
+    $form['cron_safe_threshold']['#weight']='7';
+    $form['powered_by'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Powered By Image Settings'),
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE,
+    );
+    $form['powered_by']['powerby_title'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Title for Powered By Image'),
+        '#size' => 40,
+        '#default_value' => variable_get('powerby_title', NULL),
+    );
+    $form['powered_by']['powerby_image'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Path to Powered By Image'),
+        '#size' => 40,
+        '#description' => t('Provide the url path to powered by image.'),
+        '#default_value' => variable_get('powerby_image', NULL),
+    );
+    $form['powered_by']['powerby_image_url'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Powered By URL'),
+        '#description' => t('The URL to link to.'),
+        '#default_value' => variable_get('powerby_image_url', NULL),
+    );
+    $form['hosted_by'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Hosted By Image Settings'),
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE,
+    );
+    $form['hosted_by']['hostedby_title'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Provide the title for hosted by image'),
+        '#size' => 40,
+        '#default_value' => variable_get('hostedby_title', NULL),
+    );
+    $form['hosted_by']['hostedby_image'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Provide the url path to hosted by image'),
+        '#size' => 40,
+        '#description' => t('Provide the url path to hosted by image for the site.'),
+        '#default_value' => variable_get('hostedby_image', NULL),
+    );
+    $form['hosted_by']['hostedby_image_url'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Hosted By URL'),
+        '#description' => t('The URL to link to.'),
+        '#default_value' => variable_get('hostedby_image_url', NULL),
+    );
+    $form['site_slogan'] = array(
+    '#title'=>'Country Name',
+    '#description'=>'This country name will appear in certain pages on the site',
+    '#weight'=>'1',
+    );
+    $form['site_country'] = array(
+      '#type' => 'select',
+      '#title' => t('Select the Country'),
+      '#options' => $header_list,
+      '#default_value' => variable_get('site_country', ''),
+      '#description' => t("Selected countries Site flag and government name will be shown on the site."),
+    );
+    
+    $form['site_country_language'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Provide the list of available languages for this country'),
+        '#default_value' => variable_get('site_country_language', ''),
+        '#description' => t("Provide the comma separated list of available languages for this country"),
+    );
+
+    $form['google_map_key'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Google Map API Key'),
+      '#default_value' => variable_get('google_map_key', ''),
+      '#weight'=>'15',
+    );
+
+    if (in_array('Administrator', $user->roles) || ($user->uid == 1)) {
+      $form['super_admin_ip'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Super Admin Access IPs'),
+        '#default_value' => variable_get('super_admin_ip', ''),
+        '#description' => t("Enter the IP Address from which Super admin will be allowed to login. Please separate each IP Address by a new line. Your current IP Address:<b>" . $_SERVER['REMOTE_ADDR'] . "</b>"),
+      );
+
+      $form['admin_pages_list'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Pages Accessible By Admin'),
+        '#default_value' => variable_get('admin_pages_list', ''),
+        '#description' => t("Enter the pages which will be accessible only to admin.Please enter the path on new line"),
+      );
+
+      $form['host_ip_config'] = array(
+        '#type' => 'select',
+        '#title' => t('Host IP configuration'),
+        '#options' => array('web_service' => "Web service", 'local_db' => "Local DB"),
+        '#default_value' => variable_get('host_ip_config', ''),
+        '#description' => t("Configure your HostIP application as a web service or join it with local database."),
+        '#attributes' => array('onChange' => 'show_para_hostip_para(this.value)'),
+      );
+
+      $form['webservice_url'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Webservice URL'),
+        '#default_value' => variable_get('webservice_url', ''),
+        '#description' => t("Web service URL for fetching the IP2location data"),
+      );
+
+      $form['hostip_database_name'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Host IP database name'),
+        '#default_value' => variable_get('hostip_database_name', ''),
+      );
+      /*
+	  $form['webservice_datatool'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Webservice URL for Datatool'),
+          '#default_value' => variable_get('webservice_datatool', 'http://data.gov.in/datatool/'),
+          '#description' => t("Web service URL for Datatool"),
+      );
+      $form['webservice_to_use'] = array(
+          '#type' => 'select',
+          '#title' => t('Webservice to use for visualization. datatool or dataproxy'),
+          '#default_value' => variable_get('webservice_to_use', 'dataproxy'),
+          '#description' => t("Web service URL for Datatool"),
+          '#options' => array(
+              'dataproxy' => t('Dataproxy'),
+              'datatool' => t('Datatool'),
+          ),
+      );
+	  */
+      $form['domain_names'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Domain Name For Admin And Front-End'),
+        '#description' => t('You can set the domain name for the admin site and the front-end if you have two different domain names.'),
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE,
+      );
+
+      $form['domain_names']['admin_url'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Admin URL'),
+        '#default_value' => variable_get('admin_url', ''),
+        '#description' => t("Enter the domain name for the admin login.eg:http://example.com"),
+
+      );
+      
+      $form['domain_names']['email_domain'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Email Domain'),
+          '#default_value' => variable_get('email_domain', 'nic.in'),
+          '#description' => t("Enter the comma separated domain name of the email server example: nic.in, gov.in"),
+      );
+      
+      $form['domain_names']['open_id_cms'] = array(
+          '#type' => 'checkboxes',
+          '#title' => t('Allow OpenID login on cms'),
+          '#default_value' => variable_get('open_id_cms', ''),
+          '#options' => array(
+              'allow' => t('Allow'),
+          ),
+      );
+      
+      $form['domain_names']['cms_roles'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('CMS Roles'),
+        '#default_value' => variable_get('cms_roles', ''),
+        '#options' => $cms_roles,
+      );
+      $form['domain_names'] ['frontend_url'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Front-End Url'),
+        '#default_value' => variable_get('frontend_url', ''),
+        '#description' => t("Enter the domain name for the front-end.eg:http://example.com"),
+      );
+	  $form['domain_names']['frontend_roles'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Frontend Roles'),
+	    '#default_value' => variable_get('frontend_roles', ''),
+        '#options' => $frontend_roles,
+      );
+      $form['#validate'][] = 'validate_site_conf_form';
+      $form['#submit'][] = 'misc_system_settings_form_submit';
+      $form['#submit'][] = '_site_config_form_submit';
+    }
+  }
+  if($form_id == 'user_login_block' || $form_id == 'user_login'){
+  	$form['#validate'][] = '_user_role_validate';
+  }
+}
+function _user_role_validate(&$form, &$form_state) {
+	global $base_url, $user;
+	$allowed = 1;
+    $admin_url = variable_get('admin_url', '');
+    $frontend_url = variable_get('frontend_url', '');
+    $cms_roles = variable_get('cms_roles', '');
+    $frontend_roles = variable_get('frontend_roles', '');
+    if(is_cms_url()){
+    	$name = $form['#post'][name];
+    	$account = user_load(array('name' => check_plain($name)));
+    	$email = $account->mail;
+    	foreach($cms_roles as $cms_role){
+    		if($account->uid == 1){
+    			$allowed = 1;
+    			break;
+    		}
+    		else if (empty($email)) {
+    		  $allowed = 1;
+    		  break;
+    		}
+    		elseif($cms_role != 0 && array_key_exists($cms_role,$account->roles)) {
+    			$allowed = 1;
+    			break;
+    		}
+    		else{
+    			$allowed = 0;
+    		}
+    	}
+    	if(!$allowed){
+    	  watchdog('user', 'Session closed for %name.', array('%name' => $user->name));
+    	  // Only variables can be passed by reference workaround.
+    	  $null = NULL;
+    	  user_module_invoke('logout', $null, $user);
+    	  // Destroy the current session:
+    	  session_destroy();
+    	  session_regenerate_id(true);
+    	  // Load the anonymous user
+    	  $user = drupal_anonymous_user();
+    		form_set_error('name','You are not allowed to login this site !');
+    	}
+
+    }
+    if(is_frontend_url()){
+    $name = $form['#post'][name];
+    	$account = user_load(array('name' => check_plain($name)));
+    	foreach($frontend_roles as $frontend_role){
+    		if($account->uid == 1){
+    			$allowed = 0;
+    			break;
+    		}
+    		elseif($frontend_role != 0 && array_key_exists($frontend_role,$account->roles)){
+    			$allowed = 1;
+    			break;
+    		}
+    		else{
+    			$allowed = 0;
+    		}
+    	}
+    	if(!$allowed){
+    	  watchdog('user', 'Session closed for %name.', array('%name' => $user->name));
+    	  // Only variables can be passed by reference workaround.
+    	  $null = NULL;
+    	  user_module_invoke('logout', $null, $user);
+    	  // Destroy the current session:
+    	  session_destroy();
+    	  session_regenerate_id(true);
+    	  // Load the anonymous user
+    	  $user = drupal_anonymous_user();
+    		form_set_error('name','You are not allowed to login this site !');
+    	}
+    }
+}
+function validate_site_conf_form(&$form, &$form_state) {
+  if ($form['#post']['host_ip_config'] == 1 && !valid_url($form['#post']['webservice_url'], TRUE)) {
+    form_set_error('webservice_url', t('Incorrect webservice URL'));
+  }
+
+  if (!isset($_SESSION['show_ip_warning'])) {
+    $site_var = $form['#post']['super_admin_ip'];
+    if (trim($site_var) != "") {
+      $ipLIST = explode("\r\n", $site_var);
+      if (!in_array($_SERVER['REMOTE_ADDR'], $ipLIST)) {
+        form_set_error('super_admin_ip', "");
+        drupal_set_message(t('Your current IP address: @ip_adress is not being listed in the \'Super Admin Access IPs\' field. You will be logged out immediately after you save the configurations.', array('@ip_adress' => $_SERVER['REMOTE_ADDR'])), 'warning');
+        $_SESSION['show_ip_warning'] = TRUE;
+      }
+    }
+  }
+  else {
+    unset($_SESSION['show_ip_warning']);
+  }
+}
+
+function _site_config_form_submit (&$form, &$form_state) {
+  $vid = vocab_sync_get_vocabulary_by_name('Language');
+  $site_var = $form['#post']['site_country'];
+  $site_node = node_load($site_var);
+  $parent_term = $site_node->title;
+  if ( !_taxonomy_is_exists($parent_term, $vid) && !empty($parent_term)) {
+    $pterm = array(
+        'vid'         => $vid,  // Voacabulary ID
+        'name'        => trim($parent_term), // Term Name
+    );
+    taxonomy_save_term($pterm);
+  }
+  $parent_tid = vocab_sync_get_tid_by_name($parent_term, $vid);
+  $site_lang = $form['#post']['site_country_language'];
+  if (trim($site_lang) != "") {
+    if (strrpos($site_lang, ",") != FALSE) {
+      $langlist = array_map('trim',explode(",",$site_lang));
+    }
+    elseif (strrpos($site_lang, "\r\n") != FALSE) {
+      $langlist = array_map('trim',explode("\r\n",$site_lang));
+    }
+    else {
+      $langlist = array_map('trim',explode("\r\n",$site_lang));
+    }
+  }
+  foreach ($langlist as $term_name) {
+    if ( !_taxonomy_is_exists($term_name, $vid) && !empty($term_name)) {
+      $term = array( 
+        'vid'         => $vid,  // Voacabulary ID
+        'name'        => trim($term_name), // Term Name
+        'parent'      => $parent_tid, // Parent Term Name
+      );
+    taxonomy_save_term($term);
+    } 
+  }
+  
+}
+
+function web_site_config_init() {
+  global $base_url, $user;
+  $admin_url = variable_get('admin_url', '');
+  $frontend_url = variable_get('frontend_url', '');
+if (in_array(arg(0), array('encrypt-submissions', 'image_captcha'))) return;
+  $is_admin_url = in_array(current(explode('/', drupal_get_path_alias($_GET['q']))), array("user", "admin"));
+
+  if (empty($admin_url) or empty($frontend_url)) {
+    return;
+  }
+  if (is_cms_url() && arg(0) == 'user' && $user->uid == 0) {
+    drupal_goto();
+  }
+}
+
+function is_frontend_url(){
+  global $base_url, $user;
+  $frontend_url = parse_url(variable_get('frontend_url', ''));
+  $base_url_arr = parse_url($base_url);
+  if (str_replace("www.", "", $base_url_arr['host']) == str_replace("www.", "", $frontend_url['host']) ) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
+function is_cms_url(){
+  global $base_url, $user;
+  $admin_url = parse_url(variable_get('admin_url', ''));
+  $base_url_arr = parse_url($base_url);
+  if (str_replace("www.", "", $base_url_arr['host']) == str_replace("www.", "", $admin_url['host']) ) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}

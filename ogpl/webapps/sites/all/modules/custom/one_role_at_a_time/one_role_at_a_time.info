@@ -1,0 +1,4 @@
+name = "One Role at a Time"
+description = "Functionality to allow user with multiple roles to have / pick only 1 role per session"
+package = "User Management"
+core = 6.x

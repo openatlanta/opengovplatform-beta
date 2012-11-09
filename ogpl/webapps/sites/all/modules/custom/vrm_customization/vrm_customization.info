@@ -1,0 +1,5 @@
+; $Id$
+name = VRM Customizations
+description = A module to store all customizations done to the VRM Flow.
+core = 6.x
+package = OGPL
