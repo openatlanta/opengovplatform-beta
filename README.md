@@ -1,15 +1,17 @@
-Open Government Platform-Beta
+Open Government Platform - Ver 1.0
 ====================
 
 Release notes
 ----------
 
 - Fix of OGPL-Alpha bugs
+- Added Community Support
 - Data Conversion API
-- Add Role Management
+- Enhanced Role Management
 - Improved Matrices
-- Multiple Administrator theme support
+- Multiple customized theme support
 - Improved User Dashboard
 - Added Endorsement option for Received Suggestions/Ideas
 - Improved catalog page
-- Added Community Support
+
+
