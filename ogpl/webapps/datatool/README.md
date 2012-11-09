@@ -1,14 +1,5 @@
 Data Tool
-++++++++++
-
-
-+--------------------+---------------------------------------------+
-| Type               | Description                                 |
-+====================+=============================================+
-| csv                | Comma separated values text file|           |
-+--------------------+---------------------------------------------+
-| xls                | Microsoft Excel Spreadsheet     |           |
-+--------------------+---------------------------------------------+
+=========
 
 Supported reply format (``format=`` parameter) types:
 
@@ -22,25 +13,17 @@ API Documentation
    
 Use::
 
-    HOST?url=...
+> `HOST?url=...`
 
 Parameters
 ==========
 
-+--------------------+--------------------------------------------+
-| Parameter          | Description                                |
-+====================+============================================+
-| ``url``            | URL of data resource, such as XLS or CSV   |
-|                    | file. **This is required**                 |
-+--------------------+--------------------------------------------+
-| ``format``         | Output format. Currently ``json``, ``csv`` |
-|                    | ``jsonp``,``xml`` are supported            |
-+--------------------+--------------------------------------------+
+`url  => URL of data resource, such as XLS or CSV file. This is required  `
 
-XLS Parameters:
+`format  => Output format. Currently json, csv,jsonp,xml are supported `
 
-+--------------------+--------------------------------------------+
-| Parameter          | Description                                |
-+====================+============================================+
-| ``worksheet``      | Worksheet number                            |
-+--------------------+--------------------------------------------+
+**XLS Parameters:**
+
+`worksheet => Worksheet number`
+
+
