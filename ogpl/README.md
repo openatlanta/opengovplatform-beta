@@ -16,10 +16,13 @@ For information on Drupal installation, see the INSTALL.txt file in the OGPL/Web
 	- max_execution_time = 120
 - In my.cnf file ensure max_allowed_packet_size is 16M
 - Create your mysql user and database with desired credentials.
-- If you want to install OGPL using the built-in OGPL profile, move the ogpl folder from ogpl/webapp/profiles to /profiles and run http://your-host/install.php
+- You can follow either of the bellow step to install OGPL
 
-- If you want to install OGPL manually (for Advanced Users), import the ogpl.sql file from ogpl/db to newly created database. Change the required database connection settings in /sites/default/settings.php in the following line
+	- 	If you want to install OGPL using the built-in OGPL profile, move the ogpl folder from ogpl/webapp/profiles to /profiles and run http://your-host/install.php
+	
+	- If you want to install OGPL manually (for Advanced Users), import the ogpl.sql file from ogpl/db to newly created database. Change the required database connection settings in /sites/default/settings.php in the following line
 >	`$db_url = 'mysql://database_username:database_password@localhost/database_name';`
+
 
 
 ## Post Installation and Configuration ##
