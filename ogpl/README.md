@@ -20,7 +20,7 @@ For information on Drupal installation, see the INSTALL.txt file in the OGPL/Web
 
 	- 	If you want to install OGPL using the built-in OGPL profile, move the ogpl folder from ogpl/webapp/profiles to /profiles and run http://your-host/install.php
 	
-	- If you want to install OGPL manually (for Advanced Users), import the ogpl.sql file from ogpl/db to newly created database. Change the required database connection settings in /sites/default/settings.php in the following line
+	- If you want to install OGPL manually (for Advanced Users), import the ogpl.mysql file from ogpl/db to newly created database. Change the required database connection settings in /sites/default/settings.php in the following line
 >	`$db_url = 'mysql://database_username:database_password@localhost/database_name';`
 
 
